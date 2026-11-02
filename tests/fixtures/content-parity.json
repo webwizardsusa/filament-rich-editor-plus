@@ -1,0 +1,482 @@
+[
+  {
+    "name": "paragraphs and escaping",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "a & <b> \"c\""
+            }
+          ]
+        },
+        {
+          "type": "paragraph"
+        }
+      ]
+    },
+    "html": "<p>a &amp; &lt;b&gt; \"c\"</p><p></p>"
+  },
+  {
+    "name": "marks",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "a",
+              "marks": [
+                {
+                  "type": "bold"
+                },
+                {
+                  "type": "italic"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": "b",
+              "marks": [
+                {
+                  "type": "bold"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " c "
+            },
+            {
+              "type": "text",
+              "text": "d",
+              "marks": [
+                {
+                  "type": "underline"
+                },
+                {
+                  "type": "strike"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<p><strong><em>a</em>b</strong> c <u><s>d</s></u></p>"
+  },
+  {
+    "name": "link",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "a",
+              "marks": [
+                {
+                  "type": "link",
+                  "attrs": {
+                    "href": "https://a.test",
+                    "target": null,
+                    "rel": null,
+                    "class": null,
+                    "title": "T"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<p><a href=\"https://a.test\" title=\"T\">a</a></p>"
+  },
+  {
+    "name": "hard break",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "a"
+            },
+            {
+              "type": "hardBreak"
+            },
+            {
+              "type": "text",
+              "text": "b"
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<p>a<br>b</p>"
+  },
+  {
+    "name": "heading and blockquote",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "a"
+            }
+          ]
+        },
+        {
+          "type": "blockquote",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "b"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<h2>a</h2><blockquote><p>b</p></blockquote>"
+  },
+  {
+    "name": "lists",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "orderedList",
+          "attrs": {
+            "start": 1,
+            "type": null
+          },
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "orderedList",
+          "attrs": {
+            "start": 3,
+            "type": "a"
+          },
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "c"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<ul><li><p>a</p></li></ul><ol><li><p>b</p></li></ol><ol start=\"3\" type=\"a\"><li><p>c</p></li></ol>"
+  },
+  {
+    "name": "code block and divider",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "codeBlock",
+          "attrs": {
+            "language": "php"
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "  a\n\n  b"
+            }
+          ]
+        },
+        {
+          "type": "horizontalRule"
+        },
+        {
+          "type": "codeBlock",
+          "attrs": {
+            "language": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "c"
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<pre><code class=\"language-php\">  a\n\n  b</code></pre><hr><pre><code>c</code></pre>"
+  },
+  {
+    "name": "mention",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Hi "
+            },
+            {
+              "type": "mention",
+              "attrs": {
+                "id": "1",
+                "label": "Ada",
+                "char": "@"
+              }
+            },
+            {
+              "type": "text",
+              "text": " there"
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<p>Hi <span data-id=\"1\" data-label=\"Ada\" data-char=\"@\" data-type=\"mention\" class=\"rep-mention\">@Ada</span> there</p>"
+  },
+  {
+    "name": "table",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "table",
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": null,
+                    "align": null
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ],
+                    "align": "right"
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "attrs": {
+                    "colspan": 2,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120,
+                      80
+                    ],
+                    "align": "center"
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "c"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<table><tbody><tr><th colspan=\"1\" rowspan=\"1\"><p>a</p></th><th colspan=\"1\" rowspan=\"1\" colwidth=\"120\" style=\"text-align: right\"><p>b</p></th></tr><tr><td colspan=\"2\" rowspan=\"1\" colwidth=\"120,80\" style=\"text-align: center\"><p>c</p></td></tr></tbody></table>",
+    "browserHtml": "<table style=\"min-width: 145px;\"><colgroup><col style=\"min-width: 25px;\"><col style=\"width: 120px;\"></colgroup><tbody><tr><th colspan=\"1\" rowspan=\"1\"><p>a</p></th><th colspan=\"1\" rowspan=\"1\" colwidth=\"120\" style=\"text-align: right;\"><p>b</p></th></tr><tr><td colspan=\"2\" rowspan=\"1\" colwidth=\"120,80\" style=\"text-align: center;\"><p>c</p></td></tr></tbody></table>"
+  },
+  {
+    "name": "nested list",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "a"
+                    }
+                  ]
+                },
+                {
+                  "type": "orderedList",
+                  "attrs": {
+                    "start": 1,
+                    "type": null
+                  },
+                  "content": [
+                    {
+                      "type": "listItem",
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "b"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<ul><li><p>a</p><ol><li><p>b</p></li></ol></li></ul>"
+  },
+  {
+    "name": "nested quote",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "blockquote",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "a"
+                }
+              ]
+            },
+            {
+              "type": "blockquote",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<blockquote><p>a</p><blockquote><p>b</p></blockquote></blockquote>"
+  }
+]

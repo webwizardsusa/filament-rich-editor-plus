@@ -1,0 +1,498 @@
+.rep-editor {
+    --rep-border: var(--gray-300);
+    --rep-background: #fff;
+    --rep-focus: var(--primary-600);
+    --rep-toolbar-background: #fff;
+    --rep-toolbar-border: var(--gray-900);
+    --rep-tool-color: var(--gray-900);
+    --rep-tool-hover: var(--gray-100);
+    --rep-tool-active-background: var(--gray-900);
+    --rep-tool-active-color: #fff;
+    --rep-divider: var(--gray-300);
+    --rep-font: inherit;
+    --rep-text: var(--gray-950);
+    --rep-muted: var(--gray-500);
+    --rep-code-background: var(--gray-100);
+    --rep-find-match: rgb(250 204 21 / 0.35);
+    --rep-find-current: rgb(250 204 21 / 0.75);
+
+    position: relative;
+    border: 1px solid var(--rep-border);
+    border-radius: 0.5rem;
+    background: var(--rep-background);
+}
+
+.dark .rep-editor {
+    --rep-border: rgb(255 255 255 / 0.1);
+    --rep-background: rgb(255 255 255 / 0.05);
+    --rep-focus: var(--primary-500);
+    --rep-toolbar-background: var(--gray-900);
+    --rep-toolbar-border: rgb(255 255 255 / 0.2);
+    --rep-tool-color: var(--gray-100);
+    --rep-tool-hover: rgb(255 255 255 / 0.1);
+    --rep-tool-active-background: #fff;
+    --rep-tool-active-color: var(--gray-900);
+    --rep-divider: rgb(255 255 255 / 0.2);
+    --rep-text: var(--gray-100);
+    --rep-muted: var(--gray-400);
+    --rep-code-background: rgb(255 255 255 / 0.05);
+    --rep-find-match: rgb(250 204 21 / 0.2);
+    --rep-find-current: rgb(250 204 21 / 0.45);
+}
+
+.rep-editor:focus-within {
+    border-color: var(--rep-focus);
+}
+
+.rep-editor .tiptap {
+    min-height: 16rem;
+    padding: 2rem 0.75rem;
+    color: var(--rep-text);
+    font-family: var(--rep-font);
+    font-size: 1.125rem;
+    line-height: 1.7;
+    outline: none;
+}
+
+.rep-editor .tiptap > * + * {
+    margin-top: 1rem;
+}
+
+.rep-editor .tiptap h1,
+.rep-editor .tiptap h2,
+.rep-editor .tiptap h3,
+.rep-editor .tiptap h4,
+.rep-editor .tiptap h5,
+.rep-editor .tiptap h6 {
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.rep-editor .tiptap h1 {
+    font-size: 2.25rem;
+}
+
+.rep-editor .tiptap h2 {
+    font-size: 1.75rem;
+}
+
+.rep-editor .tiptap h3 {
+    font-size: 1.375rem;
+}
+
+.rep-editor .tiptap h4,
+.rep-editor .tiptap h5,
+.rep-editor .tiptap h6 {
+    font-size: 1.125rem;
+}
+
+.rep-editor .tiptap > :is(h1, h2, h3, h4, h5, h6):not(:first-child) {
+    margin-top: 1.75rem;
+}
+
+.rep-editor .tiptap ul,
+.rep-editor .tiptap ol {
+    padding-inline-start: 1.5rem;
+}
+
+.rep-editor .tiptap ul {
+    list-style: disc;
+}
+
+.rep-editor .tiptap ol {
+    list-style: decimal;
+}
+
+.rep-editor .tiptap li + li,
+.rep-editor .tiptap li > * + * {
+    margin-top: 0.25rem;
+}
+
+.rep-editor .tiptap pre {
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    border-radius: 0.375rem;
+    background: var(--rep-code-background);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.rep-editor .tiptap hr {
+    margin-block: 1.75rem;
+    border: 0;
+    border-top: 1px solid var(--rep-border);
+}
+
+.rep-editor .tiptap hr.ProseMirror-selectednode {
+    border-top-color: var(--rep-focus);
+}
+
+.rep-editor .tiptap ul.ProseMirror-selectednode,
+.rep-editor .tiptap ol.ProseMirror-selectednode,
+.rep-editor .tiptap blockquote.ProseMirror-selectednode {
+    outline: 2px solid var(--rep-focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.rep-editor .tiptap blockquote {
+    padding-inline-start: 1rem;
+    border-inline-start: 3px solid var(--rep-border);
+    color: var(--rep-muted);
+}
+
+.rep-editor .tiptap p.is-empty::before {
+    content: attr(data-placeholder);
+    float: inline-start;
+    height: 0;
+    color: var(--rep-muted);
+    pointer-events: none;
+}
+
+.rep-editor .tiptap a {
+    color: var(--primary-600);
+    text-decoration: underline;
+}
+
+.dark .rep-editor .tiptap a {
+    color: var(--primary-400);
+}
+
+.rep-toolbar {
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.125rem;
+    transition: opacity 120ms;
+    padding: 0.125rem;
+    border: 1px solid var(--rep-toolbar-border);
+    border-radius: 0.375rem;
+    background: var(--rep-toolbar-background);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+}
+
+.rep-toolbar[hidden] {
+    display: none;
+}
+
+.rep-toolbar[data-rep-block-toolbar] {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.rep-editor[data-rep-dragging] .rep-toolbar[data-rep-block-toolbar],
+.rep-editor[data-rep-selecting] .rep-toolbar[data-rep-block-toolbar],
+.rep-editor[data-rep-suggesting] .rep-toolbar[data-rep-block-toolbar] {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.rep-toolbar-group {
+    display: contents;
+}
+
+.rep-toolbar-group[hidden] {
+    display: none;
+}
+
+.rep-tool[hidden],
+.rep-menu-separator[hidden] {
+    display: none;
+}
+
+.rep-toolbar-divider {
+    align-self: stretch;
+    width: 1px;
+    margin: 0.25rem 0.125rem;
+    background: var(--rep-divider);
+}
+
+.rep-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.25rem;
+    color: var(--rep-tool-color);
+    cursor: pointer;
+}
+
+.rep-tool:hover {
+    background: var(--rep-tool-hover);
+}
+
+.rep-tool:focus-visible {
+    outline: 2px solid var(--rep-focus);
+    outline-offset: -2px;
+}
+
+.rep-tool svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.rep-tool[aria-pressed='true'] {
+    background: var(--rep-tool-active-background);
+    color: var(--rep-tool-active-color);
+}
+
+.rep-tool[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.rep-tool[aria-disabled='true']:hover {
+    background: none;
+}
+
+.rep-drag-handle {
+    width: 1.5rem;
+    cursor: grab;
+}
+
+.rep-drag-handle:active {
+    cursor: grabbing;
+}
+
+.rep-switcher {
+    gap: 0.25rem;
+    width: auto;
+    padding-inline: 0.375rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.rep-switcher [data-rep-switcher-icon] {
+    display: inline-flex;
+}
+
+.rep-list-button {
+    gap: 0.125rem;
+    width: auto;
+    padding-inline: 0.25rem;
+}
+
+.rep-list-button [data-rep-list-icon] {
+    display: inline-flex;
+}
+
+.rep-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 31;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 11rem;
+    max-height: 20rem;
+    padding: 0.25rem;
+    overflow-y: auto;
+    border: 1px solid var(--rep-toolbar-border);
+    border-radius: 0.5rem;
+    background: var(--rep-toolbar-background);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.16);
+    color: var(--rep-tool-color);
+}
+
+.rep-menu[hidden],
+.rep-menu-item[hidden],
+.rep-drop-line[hidden] {
+    display: none;
+}
+
+.rep-slash-menu {
+    width: 18rem;
+}
+
+.rep-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    text-align: start;
+    cursor: pointer;
+}
+
+.rep-menu-item svg {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.rep-menu-item:hover,
+.rep-menu-item:focus-visible,
+.rep-menu-item[aria-selected='true'] {
+    background: var(--rep-tool-hover);
+    outline: none;
+}
+
+.rep-menu-separator {
+    display: block;
+    height: 1px;
+    margin: 0.25rem;
+    background: var(--rep-divider);
+}
+
+.rep-menu-item[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.rep-menu-item[aria-checked='true'] {
+    font-weight: 600;
+}
+
+.rep-menu-item-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.rep-menu-item-description {
+    color: var(--rep-muted);
+    font-size: 0.75rem;
+}
+
+.rep-drop-line {
+    position: absolute;
+    inset-inline: 0.5rem;
+    z-index: 29;
+    height: 2px;
+    margin-top: -1px;
+    border-radius: 1px;
+    background: var(--rep-focus);
+    pointer-events: none;
+}
+
+.rep-editor .rep-mention {
+    padding: 0.0625rem 0.3125rem;
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--rep-focus) 14%, transparent);
+    color: var(--rep-text);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.rep-editor .rep-mention.ProseMirror-selectednode {
+    outline: 2px solid var(--rep-focus);
+}
+
+.rep-mention-avatar {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    object-fit: cover;
+}
+
+.rep-menu-status {
+    padding: 0.375rem 0.5rem;
+    color: var(--rep-muted);
+    font-size: 0.875rem;
+}
+
+.rep-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rep-toolbar {
+        transition: none;
+    }
+}
+
+.rep-editor .tiptap .rep-find-match {
+    border-radius: 0.125rem;
+    background: var(--rep-find-match);
+}
+
+.rep-editor .tiptap .rep-find-current {
+    outline: 2px solid var(--rep-focus);
+    outline-offset: 1px;
+    background: var(--rep-find-current);
+}
+
+.rep-find {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 31;
+    display: grid;
+    gap: 0.25rem;
+    width: 26rem;
+    max-width: calc(100vw - 1rem);
+    padding: 0.375rem;
+    border: 1px solid var(--rep-toolbar-border);
+    border-radius: 0.5rem;
+    background: var(--rep-toolbar-background);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.16);
+    color: var(--rep-tool-color);
+}
+
+.rep-find[hidden] {
+    display: none;
+}
+
+.rep-find-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.125rem;
+}
+
+.rep-find-input {
+    flex: 1 1 8rem;
+    min-width: 0;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--rep-border);
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--rep-text);
+    font-size: 0.875rem;
+}
+
+.rep-find-input:focus-visible {
+    outline: 2px solid var(--rep-focus);
+    outline-offset: -1px;
+}
+
+.rep-find-count {
+    min-width: 4.5rem;
+    color: var(--rep-muted);
+    font-size: 0.75rem;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.rep-find-option {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.rep-find-text-button {
+    width: auto;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+
+.rep-error {
+    padding: 0.75rem 1rem;
+    color: var(--danger-600);
+}
+
+.dark .rep-error {
+    color: var(--danger-400);
+}

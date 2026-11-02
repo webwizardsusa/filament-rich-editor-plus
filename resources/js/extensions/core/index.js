@@ -1,0 +1,50 @@
+import Blockquote from '@tiptap/extension-blockquote'
+import Bold from '@tiptap/extension-bold'
+import CodeBlock from '@tiptap/extension-code-block'
+import Document from '@tiptap/extension-document'
+import HardBreak from '@tiptap/extension-hard-break'
+import Heading from '@tiptap/extension-heading'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+import Italic from '@tiptap/extension-italic'
+import Link from '@tiptap/extension-link'
+import { BulletList, ListItem, ListKeymap, OrderedList } from '@tiptap/extension-list'
+import Paragraph from '@tiptap/extension-paragraph'
+import Strike from '@tiptap/extension-strike'
+import Text from '@tiptap/extension-text'
+import Underline from '@tiptap/extension-underline'
+import { Dropcursor, Gapcursor, UndoRedo } from '@tiptap/extensions'
+import { BlockCommands } from '../../blocks/block-commands'
+import { FindReplace } from '../../find-replace/plugin'
+import { createMentionNode } from '../../mentions/mention-node'
+import { registerActionArguments, registerExtension } from '../../registry'
+
+registerExtension('core/document', () => [Document, Paragraph, Text, HardBreak, UndoRedo, Dropcursor, Gapcursor, BlockCommands])
+
+registerExtension('core/bold', () => Bold)
+registerExtension('core/italic', () => Italic)
+registerExtension('core/underline', () => Underline)
+registerExtension('core/strikethrough', () => Strike)
+registerExtension('core/blockquote', () => Blockquote)
+registerExtension('core/heading', ({ levels }) => Heading.configure({ levels }))
+registerExtension('core/bullet-list', () => [BulletList, ListItem, ListKeymap])
+registerExtension('core/ordered-list', () => [OrderedList, ListItem, ListKeymap])
+registerExtension('core/code-block', () => CodeBlock)
+registerExtension('core/divider', () => HorizontalRule)
+registerExtension('core/mention', ({ providers }) => createMentionNode(providers ?? []))
+registerExtension('core/find-replace', () => FindReplace)
+
+registerExtension('core/link', ({ protocols, defaultProtocol, autolink, HTMLAttributes }) =>
+    Link.configure({
+        protocols,
+        defaultProtocol,
+        autolink,
+        HTMLAttributes,
+        openOnClick: false,
+    }),
+)
+
+registerActionArguments('link', (editor) => {
+    const { href, target } = editor.getAttributes('link')
+
+    return { url: href ?? null, ...(href ? { shouldOpenInNewTab: target === '_blank' } : {}) }
+})

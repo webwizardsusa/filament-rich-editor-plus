@@ -200,10 +200,47 @@ export default defineConfig({
     // pre-bundle a copy of TipTap into them.
     plugins: [sharedTiptap({ exclude: [] })],
     build: {
-        lib: { entry: 'resources/js/index.js', formats: ['es'], fileName: () => 'acme-highlight.js' },
+        outDir: 'dist',
+        cssCodeSplit: false,
+        lib: {
+            entry: 'resources/js/index.js',
+            formats: ['es'],
+            fileName: () => 'acme-highlight.js',
+            cssFileName: 'acme-highlight',
+        },
     },
 })
 ```
+
+Name the output files after your `assetId()` so `RegistersPluginAssets` finds them.
+
+For hot reloading, run a second config with `vite` that serves the entry to the host app and writes the hot file the
+trait looks for. Set `root` to the app root, give the entry relative to it, and name the hot file after your
+`assetId()`:
+
+```js
+// vite.dev.config.js
+import { defineConfig } from 'vite'
+import laravel from 'laravel-vite-plugin'
+import { sharedTiptap } from './vendor/hollyit/rich-editor-plus/vite/shared-tiptap.js'
+
+const appRoot = '../..' // the host app, relative to your package
+
+export default defineConfig({
+    root: appRoot,
+    plugins: [
+        sharedTiptap({ exclude: [] }),
+        laravel({
+            input: ['packages/acme-highlight/resources/js/index.js'],
+            hotFile: `${appRoot}/public/acme-highlight.hot`,
+        }),
+    ],
+})
+```
+
+The entry must match `devServerEntry()`, which defaults to your package's `resources/js/index.js` relative to the app
+root. The dev server is only used in a `local` environment. `vite.config.js` in `hollyit/rich-editor-plus-table`
+shows both modes in one file.
 
 The local `@tiptap/core` and `@tiptap/pm` are only read for their export names; they are never bundled. Use the same
 major version as the editor (3). If your build expects an export the editor's copy doesn't have, the browser console
@@ -245,4 +282,5 @@ export default function ({ registerExtension, tiptap }) {
 }
 ```
 
-This can't import packages from npm, so anything beyond the shared modules needs the Vite setup above.
+Save it as `dist/{assetId}.js` and `RegistersPluginAssets` registers it like a built file. This can't import
+packages from npm, so anything beyond the shared modules needs the Vite setup above.

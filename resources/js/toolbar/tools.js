@@ -92,8 +92,9 @@ export function syncToolbar(editor, toolbar, tools, { hideUnavailable = true } =
 /**
  * Makes a server-rendered toolbar work: buttons run their tool without stealing focus from the editor, and the
  * toolbar follows the APG toolbar pattern (roving tabindex, arrow keys, Home/End, Escape back to the editor).
+ * `hideUnavailable` is passed on to `syncToolbar` after each click.
  */
-export function bindToolbar(editor, toolbar, tools, mountAction) {
+export function bindToolbar(editor, toolbar, tools, mountAction, { hideUnavailable = true } = {}) {
     toolbar.addEventListener('mousedown', (event) => {
         if (event.target.closest('[data-rep-tool], [data-rep-control]')) {
             event.preventDefault()
@@ -108,7 +109,7 @@ export function bindToolbar(editor, toolbar, tools, mountAction) {
         }
 
         runTool(editor, tools[button.dataset.repTool], mountAction)
-        syncToolbar(editor, toolbar, tools)
+        syncToolbar(editor, toolbar, tools, { hideUnavailable })
     })
 
     toolbar.addEventListener('keydown', (event) => {

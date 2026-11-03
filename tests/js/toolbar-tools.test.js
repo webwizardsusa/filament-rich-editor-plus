@@ -112,3 +112,15 @@ it('gives a toolbar one tab stop on its first visible button, and moves it off a
     expect(button('bold').getAttribute('tabindex')).toBe('-1')
     expect(button('levelUp').getAttribute('tabindex')).toBe('0')
 })
+
+it('keeps disabling instead of hiding after a click when told not to hide', () => {
+    editor = makeEditor(doc(bulletList))
+    bindToolbar(editor, toolbar, tools, vi.fn(), { hideUnavailable: false })
+    editor.commands.setTextSelection(3)
+
+    button('bold').click()
+
+    expect(button('levelUp').hidden).toBe(false)
+    expect(button('levelUp').getAttribute('aria-disabled')).toBe('true')
+    expect(toolbar.querySelector('[data-rep-block-tools]').hidden).toBe(false)
+})

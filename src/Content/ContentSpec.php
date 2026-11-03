@@ -144,7 +144,8 @@ abstract class ContentSpec
     /**
      * The callback gets the node or mark and its HTML attributes, and returns `['tag', $attributes, ...$children]`, as
      * in ProseMirror. `0` is where the node's children go, a nested array is an inner element, and a string is escaped
-     * text. Elements and text may come before or after the `0`.
+     * text. Elements and text may come before or after the `0`. A node with content needs a `0`: nested specs without
+     * one put the children after the innermost element, as in ProseMirror.
      */
     public function renderUsing(Closure $callback): static
     {

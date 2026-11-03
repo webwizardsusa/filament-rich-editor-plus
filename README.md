@@ -155,7 +155,7 @@ RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class
 | `CodePlugin` | Inline code (`Mod-e`). Code text can't have other marks. |
 | `SubscriptPlugin`, `SuperscriptPlugin` | Subscript (`Mod-,`) and superscript (`Mod-.`), in the more menu. Each replaces the other. |
 | `TaskListPlugin` | A checkbox list, in the list menu next to bulleted and numbered lists. Saved and rendered checkboxes are `disabled`; style them with `ul[data-type="taskList"]` and `li[data-checked="true"]`. |
-| `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. Content that ends with a table or code block is saved with a trailing `<p></p>`. |
+| `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
 ## Writing a plugin with JavaScript
 

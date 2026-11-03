@@ -11,7 +11,9 @@ use Hollyit\RichEditorPlus\Support\JsExtension;
 
 /**
  * A list of checkboxes, with TipTap's HTML. The checkbox is always `disabled` in saved and rendered HTML, where ticking
- * it couldn't save anything; the editor draws its own checkbox that can be ticked.
+ * it couldn't save anything; the editor draws its own checkbox that can be ticked. TipTap reads only the first `<div>` of
+ * a task item as its content, while the server parser keeps every child, so HTML that wraps a task item's content in
+ * several elements is read differently.
  */
 class TaskListPlugin extends Plugin
 {

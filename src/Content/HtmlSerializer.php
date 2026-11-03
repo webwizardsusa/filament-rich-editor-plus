@@ -8,7 +8,7 @@ namespace Hollyit\RichEditorPlus\Content;
  */
 class HtmlSerializer
 {
-    protected const array VOID_TAGS = ['br', 'hr', 'img', 'col'];
+    protected const array VOID_TAGS = ['br', 'hr', 'img', 'col', 'input'];
 
     /**
      * @param  bool  $forStorage  Leaves out transient attributes, so display-only data never reaches stored HTML.
@@ -127,8 +127,9 @@ class HtmlSerializer
     }
 
     /**
-     * @param  array<mixed>  $dom  `['tag', $attributes, 0]`, where the attributes are optional.
-     * @return array{0: string, 1: string} The HTML before and after the children.
+     * @param  array<mixed>  $dom  `['tag', $attributes, ...$children]`, where the attributes are optional. A child is a
+     *                             nested spec, a string of text, or `0` for where the node's own children go.
+     * @return array{0: string, 1: string} The HTML before and after the node's children.
      */
     protected function pieces(array $dom): array
     {
@@ -144,26 +145,74 @@ class HtmlSerializer
             $attributes = array_shift($dom);
         }
 
-        $child = $dom[0] ?? null;
-        $opening = "<{$tag}{$this->renderAttributes($attributes)}>";
+        $before = "<{$tag}{$this->renderAttributes($attributes)}>";
 
         if (in_array(strtolower($tag), self::VOID_TAGS, true)) {
-            return [$opening, ''];
+            return [$before, ''];
         }
 
-        $closing = "</{$tag}>";
+        $after = '';
+        $isPastHole = false;
 
-        if (is_string($child)) {
-            return [$opening.$this->escapeText($child), $closing];
+        foreach ($dom as $child) {
+            if ($child === 0) {
+                $isPastHole = true;
+
+                continue;
+            }
+
+            if (is_string($child)) {
+                if ($isPastHole) {
+                    $after .= $this->escapeText($child);
+                } else {
+                    $before .= $this->escapeText($child);
+                }
+
+                continue;
+            }
+
+            if (! is_array($child)) {
+                continue;
+            }
+
+            [$childBefore, $childAfter] = $this->pieces($child);
+
+            if (! $isPastHole && $this->containsHole($child)) {
+                $before .= $childBefore;
+                $after .= $childAfter;
+                $isPastHole = true;
+
+                continue;
+            }
+
+            if ($isPastHole) {
+                $after .= $childBefore.$childAfter;
+            } else {
+                $before .= $childBefore.$childAfter;
+            }
         }
 
-        if (is_array($child)) {
-            [$innerOpening, $innerClosing] = $this->pieces($child);
+        return [$before, $after."</{$tag}>"];
+    }
 
-            return [$opening.$innerOpening, $innerClosing.$closing];
+    /**
+     * @param  array<mixed>  $dom
+     */
+    protected function containsHole(array $dom): bool
+    {
+        array_shift($dom);
+
+        if (is_array($dom[0] ?? null) && ($dom[0] === [] || ! array_is_list($dom[0]))) {
+            array_shift($dom);
         }
 
-        return [$opening, $closing];
+        foreach ($dom as $child) {
+            if ($child === 0 || (is_array($child) && $this->containsHole($child))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

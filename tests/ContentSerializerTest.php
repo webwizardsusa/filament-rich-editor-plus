@@ -109,3 +109,31 @@ it('skips malformed content instead of throwing', function (array $node): void {
     'string attrs' => [['type' => 'token', 'attrs' => 'x']],
     'array attribute value' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'x', 'marks' => [['type' => 'link', 'attrs' => ['href' => ['x']]]]]]]],
 ]);
+
+it('renders sibling elements before and after the children', function (): void {
+    $schema = new ContentSchema([
+        NodeSpec::make('paragraph')->renderTag('p'),
+        NodeSpec::make('item')->renderUsing(fn (array $node, array $attributes): array => [
+            'li', $attributes, ['label', ['input', ['type' => 'checkbox', 'disabled' => 'disabled']], ['span']], ['div', 0], 'after',
+        ]),
+    ], []);
+
+    $html = (new HtmlSerializer($schema))->serialize(['type' => 'doc', 'content' => [
+        ['type' => 'item', 'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'x']]]]],
+    ]]);
+
+    expect($html)->toBe('<li><label><input type="checkbox" disabled="disabled"><span></span></label><div><p>x</p></div>after</li>');
+});
+
+it('renders text and elements that come before the children', function (): void {
+    $schema = new ContentSchema([
+        NodeSpec::make('paragraph')->renderTag('p'),
+        NodeSpec::make('box')->renderUsing(fn (): array => ['div', 'before', ['hr'], 0]),
+    ], []);
+
+    $html = (new HtmlSerializer($schema))->serialize(['type' => 'doc', 'content' => [
+        ['type' => 'box', 'content' => [['type' => 'paragraph']]],
+    ]]);
+
+    expect($html)->toBe('<div>before<hr><p></p></div>');
+});

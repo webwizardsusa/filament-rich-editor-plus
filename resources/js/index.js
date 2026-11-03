@@ -1,13 +1,5 @@
 import '../css/index.css'
-import * as TipTapCore from '@tiptap/core'
 import { Placeholder } from '@tiptap/extensions'
-import * as TipTapPmState from '@tiptap/pm/state'
-import * as TipTapPmView from '@tiptap/pm/view'
-import * as TipTapPmModel from '@tiptap/pm/model'
-import * as TipTapPmTransform from '@tiptap/pm/transform'
-import * as TipTapPmCommands from '@tiptap/pm/commands'
-import * as TipTapPmKeymap from '@tiptap/pm/keymap'
-import * as TipTapPmTables from '@tiptap/pm/tables'
 import { toBlockTypeList } from './blocks/block-types'
 import { createCheckedEditor, setCheckedContent } from './content-check'
 import './extensions/core'
@@ -20,19 +12,9 @@ import { registerSuggestion } from './slash/suggestion-list'
 import { createBlockDrag } from './toolbar/block-drag'
 import { createBlockToolbarPlugin } from './toolbar/block-toolbar'
 import { bindToolbar, syncToolbar } from './toolbar/tools'
+import { tiptap } from './shared-modules'
 
-const { Selection } = TipTapPmState
-
-const tiptap = {
-    core: TipTapCore,
-    pmState: TipTapPmState,
-    pmView: TipTapPmView,
-    pmModel: TipTapPmModel,
-    pmTransform: TipTapPmTransform,
-    pmCommands: TipTapPmCommands,
-    pmKeymap: TipTapPmKeymap,
-    pmTables: TipTapPmTables,
-}
+const { Selection } = tiptap.pmState
 
 // Shared with third-party plugin JS so every extension uses one ProseMirror instance.
 window.RichEditorPlus = window.RichEditorPlus || {}

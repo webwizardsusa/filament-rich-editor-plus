@@ -488,6 +488,17 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     }
 
     /**
+     * The plugins' CSS for the content, such as palette classes. Rendered also when the field is disabled, since the
+     * content still shows. Plugins validate what they return, so it is printed as it is.
+     */
+    public function getEditorStylesHtml(): string
+    {
+        $styles = $this->getPluginRegistry()->getEditorStyles();
+
+        return $styles === '' ? '' : '<style data-rep-editor-styles>'.$styles.'</style>';
+    }
+
+    /**
      * The toolbar above the editor, or nothing when the field has none. A disabled field still shows it, with every
      * button disabled, so the field keeps its shape. It hides with the editor when the editor cannot load.
      */
@@ -549,6 +560,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
             class="rep-editor"
         >
             <p x-show="error" x-text="error" class="rep-error" role="alert" style="display: none"></p>
+            <?= $this->getEditorStylesHtml() ?>
             <?= $this->getFixedToolbarHtml() ?>
             <div x-ref="editor" x-show="! error"></div>
             <?= $isDisabled ? '' : $this->getToolbarsHtml($id) ?>

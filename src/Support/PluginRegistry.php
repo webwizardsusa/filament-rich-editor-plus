@@ -11,6 +11,7 @@ use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
+use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
 use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
@@ -666,6 +667,22 @@ class PluginRegistry
             static fn (EditorPlugin $plugin): ?string => $plugin->getEditorHtml(),
             $this->plugins,
         )));
+    }
+
+    /**
+     * The CSS of every plugin that provides editor styles, in plugin order.
+     */
+    public function getEditorStyles(): string
+    {
+        $styles = [];
+
+        foreach ($this->plugins as $plugin) {
+            if ($plugin instanceof ProvidesEditorStyles && ($css = $plugin->getEditorStyles()) !== '') {
+                $styles[] = $css;
+            }
+        }
+
+        return implode("\n", $styles);
     }
 
     /**

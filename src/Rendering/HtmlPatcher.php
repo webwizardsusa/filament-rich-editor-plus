@@ -100,13 +100,14 @@ class HtmlPatcher
 
     /**
      * An element marked as a rendered node, with only text inside. Stored text and attribute values are escaped, so
-     * they never contain `<` or `>`.
+     * they never contain `<` or `>`, and every attribute is written as `name="value"`. Attributes are stepped over
+     * whole and possessively, so a very long value (such as a large URL) costs one step, not one per byte.
      */
     protected function pattern(): string
     {
         $types = implode('|', array_map(static fn (string $name): string => preg_quote($name, '/'), array_keys($this->renderedNodes)));
 
-        return '/<(?<tag>[a-zA-Z][a-zA-Z0-9]*)\b[^>]*\sdata-type="(?<type>'.$types.')"[^>]*>[^<]*<\/(?P=tag)>/u';
+        return '/<(?<tag>[a-zA-Z][a-zA-Z0-9-]*+)(?:\s[^\s=>"]++(?:="[^"]*+")?)*?\sdata-type="(?<type>'.$types.')"[^>]*+>[^<]*+<\/(?P=tag)>/u';
     }
 
     /**

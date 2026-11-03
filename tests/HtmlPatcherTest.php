@@ -83,7 +83,7 @@ class ChipPatchTestPlugin extends Plugin implements PatchesRenderedHtml
 
     public function getNodes(): array
     {
-        return [NodeSpec::make('chip')->inline()->atom()->parseTags(['x-chip'])->renderTag('x-chip')];
+        return [NodeSpec::make('chip')->inline()->atom()->parseTags(['x-chip'])->htmlAttributes(['data-type' => 'chip'])->renderTag('x-chip')];
     }
 
     public function getRenderedNodes(): array
@@ -228,4 +228,23 @@ it('rejects stored HTML that does not parse back to the declared node', function
 it('patches only when every preparing plugin declares its rendered nodes', function (): void {
     expect(HtmlPatcher::supports(PluginRegistry::make(htmlPatchPlugins(htmlPatchProvider([])))))->toBeTrue()
         ->and(HtmlPatcher::supports(PluginRegistry::make(PluginRegistry::defaultPlugins())))->toBeTrue();
+});
+
+it('patches rendered nodes whose tag has a hyphen', function (): void {
+    $patcher = new HtmlPatcher(PluginRegistry::make([...PluginRegistry::defaultPlugins(), ChipPatchTestPlugin::make()]));
+
+    expect($patcher->patch(['<p><x-chip data-type="chip">stale</x-chip></p>'])[0])->toBe('<p><x-chip data-type="chip"></x-chip></p>');
+});
+
+it('patches documents with very long attributes without hitting the backtrack limit', function (): void {
+    $href = 'https://a.test/?q='.str_repeat('a', 2_000_000);
+    $document = htmlPatchDocument([
+        ['type' => 'text', 'text' => 'link', 'marks' => [['type' => 'link', 'attrs' => ['href' => $href]]]],
+        ['type' => 'text', 'text' => ' '],
+        htmlPatchMention('1', 'Old'),
+    ]);
+
+    [$patched, $expected] = htmlPatchAndRender($document, htmlPatchProvider([1 => 'Ada']));
+
+    expect($patched)->toBe($expected)->toContain('@Ada');
 });

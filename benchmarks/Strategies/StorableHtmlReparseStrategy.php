@@ -19,14 +19,14 @@ class StorableHtmlReparseStrategy extends Strategy
 
     public function renderOne(int $id): string
     {
-        return $this->renderer($this->store->row($id, ['storable_html'])->storable_html)->toHtml();
+        return $this->renderer($this->store->row($id, ['storable_html'])->storable_html)->parseHtml()->toHtml();
     }
 
     public function renderMany(array $ids): array
     {
         $html = array_map(static fn (object $row): string => $row->storable_html, $this->store->rows($ids, ['storable_html']));
 
-        return $this->batch($html)->toHtml();
+        return $this->batch($html)->parseHtml()->toHtml();
     }
 
     /**

@@ -2,14 +2,13 @@
 
 namespace Hollyit\RichEditorPlus\Benchmarks\Micro;
 
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\MentionPatcher;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\ParamProviders;
 
 #[BeforeMethods('setUp')]
 #[ParamProviders(['provideShapes', 'provideBatchSizes'])]
-class MentionPatchBench extends MicroBench
+class HtmlPatchBench extends MicroBench
 {
     /**
      * @var array<int, string>
@@ -30,6 +29,6 @@ class MentionPatchBench extends MicroBench
 
     public function benchPatch(): void
     {
-        (new MentionPatcher($this->plugins))->patchMany($this->html);
+        RichContentPlusRenderer::many($this->html)->plugins($this->plugins)->toHtml();
     }
 }

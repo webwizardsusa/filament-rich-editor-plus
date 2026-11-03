@@ -3,8 +3,8 @@
 namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
 
 /**
- * Stores storable HTML next to the JSON, and renders it by patching only the mentions. The patcher is built per call,
- * as a request would build it.
+ * Stores storable HTML next to the JSON, and renders it with the package's default path for HTML, which patches only
+ * the nodes plugins refresh at render time.
  */
 class StorableHtmlPatchStrategy extends Strategy
 {
@@ -20,14 +20,14 @@ class StorableHtmlPatchStrategy extends Strategy
 
     public function renderOne(int $id): string
     {
-        return $this->patcher()->patchMany([$this->store->row($id, ['storable_html'])->storable_html])[0];
+        return $this->renderer($this->store->row($id, ['storable_html'])->storable_html)->toHtml();
     }
 
     public function renderMany(array $ids): array
     {
         $html = array_map(static fn (object $row): string => $row->storable_html, $this->store->rows($ids, ['storable_html']));
 
-        return $this->patcher()->patchMany($html);
+        return $this->batch($html)->toHtml();
     }
 
     /**
@@ -36,10 +36,5 @@ class StorableHtmlPatchStrategy extends Strategy
     public function bytesPerDocument(): float
     {
         return $this->store->averageLength('body') + $this->store->averageLength('storable_html');
-    }
-
-    protected function patcher(): MentionPatcher
-    {
-        return new MentionPatcher($this->store->plugins());
     }
 }

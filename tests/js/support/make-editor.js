@@ -37,7 +37,7 @@ export function editorOptions(content, pluginIds = defaultPluginIds) {
     document.body.append(element)
 
     const { extensions } = resolveExtensions(
-        pluginIds.map((id) => ({ id, options: optionsFor[id] ?? {} })),
+        pluginIds.map((id) => (typeof id === 'string' ? { id, options: optionsFor[id] ?? {} } : id)),
         {},
     )
 

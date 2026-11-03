@@ -528,5 +528,90 @@
       ]
     },
     "html": "<ul data-type=\"taskList\"><li data-checked=\"true\" data-type=\"taskItem\"><label><input type=\"checkbox\" checked=\"checked\" disabled=\"disabled\"><span></span></label><div><p>a</p><ul data-type=\"taskList\"><li data-checked=\"false\" data-type=\"taskItem\"><label><input type=\"checkbox\" disabled=\"disabled\"><span></span></label><div><p>b</p></div></li></ul></div></li></ul>"
+  },
+  {
+    "name": "global style attribute on paragraphs and headings",
+    "globalAttributes": [
+      { "name": "textAlign", "kind": "style", "key": "text-align", "types": ["paragraph", "heading"], "values": ["left", "center", "right", "justify"], "pattern": null, "keepOnSplit": true }
+    ],
+    "document": {
+      "type": "doc",
+      "content": [
+        { "type": "paragraph", "attrs": { "textAlign": "center" }, "content": [{ "type": "text", "text": "a" }] },
+        { "type": "heading", "attrs": { "textAlign": "right", "level": 2 }, "content": [{ "type": "text", "text": "b" }] },
+        { "type": "paragraph", "attrs": { "textAlign": null }, "content": [{ "type": "text", "text": "c" }] }
+      ]
+    },
+    "html": "<p style=\"text-align: center\">a</p><h2 style=\"text-align: right\">b</h2><p>c</p>",
+    "browserHtml": "<p style=\"text-align: center;\">a</p><h2 style=\"text-align: right;\">b</h2><p>c</p>"
+  },
+  {
+    "name": "two global style attributes on one paragraph",
+    "globalAttributes": [
+      { "name": "textAlign", "kind": "style", "key": "text-align", "types": ["paragraph"], "values": ["left", "center", "right", "justify"], "pattern": null, "keepOnSplit": true },
+      { "name": "lineHeight", "kind": "style", "key": "line-height", "types": ["paragraph"], "values": null, "pattern": "[0-9]+(\\.[0-9]+)?", "keepOnSplit": true }
+    ],
+    "document": {
+      "type": "doc",
+      "content": [
+        { "type": "paragraph", "attrs": { "textAlign": "center", "lineHeight": "1.5" }, "content": [{ "type": "text", "text": "a" }] }
+      ]
+    },
+    "html": "<p style=\"text-align: center; line-height: 1.5\">a</p>",
+    "browserHtml": "<p style=\"text-align: center; line-height: 1.5;\">a</p>"
+  },
+  {
+    "name": "global class attribute",
+    "globalAttributes": [
+      { "name": "tone", "kind": "html", "key": "class", "types": ["paragraph"], "values": ["lead", "muted"], "pattern": null, "keepOnSplit": true }
+    ],
+    "document": {
+      "type": "doc",
+      "content": [
+        { "type": "paragraph", "attrs": { "tone": "lead" }, "content": [{ "type": "text", "text": "a" }] }
+      ]
+    },
+    "html": "<p class=\"lead\">a</p>"
+  },
+  {
+    "name": "global html attribute on headings",
+    "globalAttributes": [
+      { "name": "anchor", "kind": "html", "key": "id", "types": ["heading"], "values": null, "pattern": "[A-Za-z][A-Za-z0-9_-]*", "keepOnSplit": false }
+    ],
+    "document": {
+      "type": "doc",
+      "content": [
+        { "type": "heading", "attrs": { "anchor": "intro", "level": 2 }, "content": [{ "type": "text", "text": "Intro" }] }
+      ]
+    },
+    "html": "<h2 id=\"intro\">Intro</h2>"
+  },
+  {
+    "name": "global attribute on a mark",
+    "globalAttributes": [
+      { "name": "tone", "kind": "html", "key": "class", "types": ["bold"], "values": ["loud"], "pattern": null, "keepOnSplit": true }
+    ],
+    "document": {
+      "type": "doc",
+      "content": [
+        { "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "bold", "attrs": { "tone": "loud" } }], "text": "a" }] }
+      ]
+    },
+    "html": "<p><strong class=\"loud\">a</strong></p>"
+  },
+  {
+    "name": "global attribute on a task item",
+    "globalAttributes": [
+      { "name": "tone", "kind": "html", "key": "class", "types": ["taskItem"], "values": ["urgent"], "pattern": null, "keepOnSplit": true }
+    ],
+    "document": {
+      "type": "doc",
+      "content": [
+        { "type": "taskList", "content": [
+          { "type": "taskItem", "attrs": { "tone": "urgent", "checked": false }, "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "a" }] }] }
+        ] }
+      ]
+    },
+    "html": "<ul data-type=\"taskList\"><li class=\"urgent\" data-checked=\"false\" data-type=\"taskItem\"><label><input type=\"checkbox\" disabled=\"disabled\"><span></span></label><div><p>a</p></div></li></ul>"
   }
 ]

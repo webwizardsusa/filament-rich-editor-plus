@@ -9,6 +9,7 @@ import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Italic from '@tiptap/extension-italic'
 import Link from '@tiptap/extension-link'
 import { BulletList, ListItem, ListKeymap, OrderedList, TaskList } from '@tiptap/extension-list'
+import { globalAttributesExtension } from './global-attributes'
 import { ReadOnlyHtmlTaskItem } from './task-item'
 import Paragraph from '@tiptap/extension-paragraph'
 import Strike from '@tiptap/extension-strike'
@@ -23,6 +24,7 @@ import { createMentionNode } from '../../mentions/mention-node'
 import { registerActionArguments, registerExtension } from '../../registry'
 
 registerExtension('core/document', () => [Document, Paragraph, Text, HardBreak, UndoRedo, Dropcursor, Gapcursor, BlockCommands])
+registerExtension('core/global-attributes', (options) => globalAttributesExtension(options))
 
 registerExtension('core/bold', () => Bold)
 registerExtension('core/italic', () => Italic)

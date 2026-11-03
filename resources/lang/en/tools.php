@@ -31,6 +31,28 @@ return [
         'purple' => 'Purple',
         'pink' => 'Pink',
     ],
+    'font_family' => 'Font',
+    'font_family_current' => 'Font: :item',
+    'font_size' => 'Size',
+    'font_size_current' => 'Size: :item',
+    'line_height' => 'Line height',
+    'line_height_current' => 'Line height: :item',
+    'fonts' => [
+        'sans' => 'Sans serif',
+        'serif' => 'Serif',
+        'mono' => 'Monospace',
+    ],
+    'sizes' => [
+        'small' => 'Small',
+        'large' => 'Large',
+        'x-large' => 'Extra large',
+        'xx-large' => 'Huge',
+    ],
+    'line_heights' => [
+        'tight' => 'Tight',
+        'relaxed' => 'Relaxed',
+        'loose' => 'Loose',
+    ],
     'decrease_level' => 'Decrease level',
     'increase_level' => 'Increase level',
 ];

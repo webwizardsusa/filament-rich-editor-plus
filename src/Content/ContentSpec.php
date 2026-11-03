@@ -154,7 +154,8 @@ abstract class ContentSpec
     }
 
     /**
-     * Plain-text output for an inline node. The callback gets the node.
+     * Plain-text output. For an inline node it is the node's text; for a block node it goes before the text of its
+     * children, such as a task item's `[x] `. The callback gets the node.
      */
     public function textUsing(Closure $callback): static
     {

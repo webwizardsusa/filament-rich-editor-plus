@@ -73,3 +73,17 @@ it('skips malformed content instead of throwing', function (): void {
         textParagraph(['type' => 'text', 'text' => 'ok']),
     ))->toBe('ok');
 });
+
+it('puts a block node\'s text before its children', function (): void {
+    $schema = new ContentSchema([
+        NodeSpec::make('paragraph')->renderTag('p'),
+        NodeSpec::make('task')->renderTag('li')->textUsing(fn (array $node): string => $node['attrs']['done'] ? '[x] ' : '[ ] '),
+    ], []);
+
+    $text = (new TextSerializer($schema))->serialize(['type' => 'doc', 'content' => [
+        ['type' => 'task', 'attrs' => ['done' => true], 'content' => [textParagraph(['type' => 'text', 'text' => 'a'])]],
+        ['type' => 'task', 'attrs' => ['done' => false], 'content' => [textParagraph(['type' => 'text', 'text' => 'b'])]],
+    ]]);
+
+    expect($text)->toBe("[x] a\n\n[ ] b");
+});

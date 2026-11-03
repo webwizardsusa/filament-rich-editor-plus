@@ -46,7 +46,7 @@ class TextSerializer
             }
 
             $blocks[] = $line;
-            $blocks[] = $this->renderChildren($node['content'] ?? []);
+            $blocks[] = ($spec?->renderText($node) ?? '').$this->renderChildren($node['content'] ?? []);
             $line = '';
         }
 

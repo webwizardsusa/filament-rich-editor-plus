@@ -54,3 +54,24 @@ export function makeToolbarRoot() {
 
     return root
 }
+
+/**
+ * A fixed toolbar as `ToolbarRenderer::renderFixedToolbar()` writes it, with a table group and a list group.
+ */
+export const fixedToolbarMarkup = `
+    <div data-rep-fixed-toolbar>
+        <button data-rep-control="switcher" data-rep-generic-label="Block" data-rep-multiple-label=":count blocks" tabindex="-1">
+            <span data-rep-switcher-icon></span><span data-rep-switcher-label></span>
+        </button>
+        <span data-rep-inline-tools><button data-rep-tool="bold" tabindex="-1"></button></span>
+        <span data-rep-list-tools>
+            <button data-rep-control="list" data-rep-label="List options: :type" aria-disabled="true" tabindex="-1"><span data-rep-list-icon><svg></svg></span></button>
+        </span>
+        <span data-rep-block-tools>
+            <span data-rep-block-tools-for="*"></span>
+            <span data-rep-block-tools-for="table" hidden><button data-rep-tool="addRowAfter" tabindex="-1"></button></span>
+            <span data-rep-block-tools-for="bulletList" hidden><button data-rep-tool="levelUp" tabindex="-1"></button></span>
+        </span>
+        <button data-rep-control="more" tabindex="-1"></button>
+    </div>
+`

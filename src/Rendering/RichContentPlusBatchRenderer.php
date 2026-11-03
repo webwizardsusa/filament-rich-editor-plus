@@ -19,6 +19,8 @@ class RichContentPlusBatchRenderer
 
     protected ?ContentSchema $schema = null;
 
+    protected bool $parsesHtml = false;
+
     /**
      * @var array<array-key, string | array<string, mixed> | null>
      */
@@ -52,15 +54,41 @@ class RichContentPlusBatchRenderer
     }
 
     /**
-     * HTML for display, with data from plugins filled in. It is safe to print.
+     * Parses stored HTML into documents before rendering, instead of patching it. Use this for HTML that was not
+     * written by the field or by `toStorableHtml()`.
+     */
+    public function parseHtml(bool $condition = true): static
+    {
+        $this->parsesHtml = $condition;
+
+        return $this;
+    }
+
+    /**
+     * HTML for display, with data from plugins filled in. It is safe to print when the content was stored by the field
+     * or by `toStorableHtml()`: stored HTML is patched, not parsed. Use `->parseHtml()` for HTML from anywhere else.
      *
      * @return array<array-key, string>
      */
     public function toHtml(): array
     {
-        $serializer = new HtmlSerializer($this->getSchema());
+        $patchable = $this->parsesHtml || ! HtmlPatcher::supports($this->getRegistry())
+            ? []
+            : array_filter($this->contents, RichContentPlusRenderer::isHtml(...));
 
-        return array_map($serializer->serialize(...), $this->getPreparedDocuments());
+        $patched = $patchable === [] ? [] : (new HtmlPatcher($this->getRegistry(), $this->getSchema()))->patch($patchable);
+
+        $remaining = array_diff_key($this->contents, $patchable);
+        $serializer = new HtmlSerializer($this->getSchema());
+        $rendered = $remaining === [] ? [] : array_map($serializer->serialize(...), $this->getPreparedDocuments($remaining));
+
+        $html = [];
+
+        foreach (array_keys($this->contents) as $key) {
+            $html[$key] = array_key_exists($key, $patched) ? $patched[$key] : $rendered[$key];
+        }
+
+        return $html;
     }
 
     /**
@@ -70,19 +98,20 @@ class RichContentPlusBatchRenderer
     {
         $serializer = new TextSerializer($this->getSchema());
 
-        return array_map($serializer->serialize(...), $this->getPreparedDocuments());
+        return array_map($serializer->serialize(...), $this->getPreparedDocuments($this->contents));
     }
 
     /**
+     * @param  array<array-key, string | array<string, mixed> | null>  $contents
      * @return array<array-key, array<string, mixed>>
      */
-    protected function getPreparedDocuments(): array
+    protected function getPreparedDocuments(array $contents): array
     {
         $schema = $this->getSchema();
 
         $documents = array_map(
             static fn (string|array|null $content): array => RichContentPlusRenderer::toDocument($content, $schema),
-            $this->contents,
+            $contents,
         );
 
         return $this->getRegistry()->prepareRenderedContents($documents);

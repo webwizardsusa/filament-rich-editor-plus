@@ -17,6 +17,8 @@ class RichContentPlusRenderer
 {
     protected ?PluginRegistry $registry = null;
 
+    protected bool $parsesHtml = false;
+
     /**
      * @param  string | array<string, mixed> | null  $content
      */
@@ -66,6 +68,38 @@ class RichContentPlusRenderer
     }
 
     /**
+     * Whether stored content is HTML rather than a document (an array, or JSON whose `type` is `doc`). Blank content
+     * is neither.
+     *
+     * @param  string | array<string, mixed> | null  $content
+     */
+    public static function isHtml(string|array|null $content): bool
+    {
+        if (! is_string($content) || blank($content)) {
+            return false;
+        }
+
+        if (! str_starts_with(ltrim($content), '{')) {
+            return true;
+        }
+
+        $decoded = json_decode($content, true);
+
+        return ! (is_array($decoded) && ($decoded['type'] ?? null) === 'doc');
+    }
+
+    /**
+     * Parses stored HTML into a document before rendering it, instead of patching it. Use this for HTML that was not
+     * written by the field or by `toStorableHtml()`, such as imported markup.
+     */
+    public function parseHtml(bool $condition = true): static
+    {
+        $this->parsesHtml = $condition;
+
+        return $this;
+    }
+
+    /**
      * @param  array<EditorPlugin | class-string<EditorPlugin>>  $plugins
      */
     public function plugins(array $plugins): static
@@ -76,11 +110,19 @@ class RichContentPlusRenderer
     }
 
     /**
-     * HTML for display, with data from plugins filled in. It is safe to print. Don't store it: use `toStorableHtml()`.
+     * HTML for display, with data from plugins filled in. It is safe to print when the content was stored by the field
+     * or by `toStorableHtml()`: stored HTML is patched, not parsed. Use `->parseHtml()` for HTML from anywhere else.
+     * Don't store the result: use `toStorableHtml()`.
      */
     public function toHtml(): string
     {
-        return (new HtmlSerializer($this->getSchema()))->serialize($this->getPreparedDocument());
+        $schema = $this->getSchema();
+
+        if ($this->patchesHtml()) {
+            return (new HtmlPatcher($this->getRegistry(), $schema))->patch([$this->content])[0];
+        }
+
+        return (new HtmlSerializer($schema))->serialize($this->getPreparedDocument());
     }
 
     /**
@@ -122,6 +164,11 @@ class RichContentPlusRenderer
     protected function getPreparedDocument(): array
     {
         return $this->getRegistry()->prepareRenderedContents([$this->getDocument()])[0];
+    }
+
+    protected function patchesHtml(): bool
+    {
+        return ! $this->parsesHtml && static::isHtml($this->content) && HtmlPatcher::supports($this->getRegistry());
     }
 
     protected function getSchema(): ContentSchema

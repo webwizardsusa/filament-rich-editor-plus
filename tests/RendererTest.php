@@ -112,8 +112,9 @@ it('returns an array document as given', function (): void {
     expect(RichContentPlusRenderer::make($document)->toArray())->toBe($document);
 });
 
-it('makes HTML safe to print', function (string $input, string $forbidden): void {
-    expect(RichContentPlusRenderer::make($input)->toHtml())->not->toContain($forbidden);
+it('makes HTML from outside the field safe to print and to store', function (string $input, string $forbidden): void {
+    expect(RichContentPlusRenderer::make($input)->parseHtml()->toHtml())->not->toContain($forbidden)
+        ->and(RichContentPlusRenderer::make($input)->toStorableHtml())->not->toContain($forbidden);
 })->with([
     ['<script>alert(1)</script><p>a</p>', 'alert'],
     ['<p onclick="alert(1)">a</p>', 'onclick'],

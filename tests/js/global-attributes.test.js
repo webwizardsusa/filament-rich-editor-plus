@@ -109,3 +109,40 @@ describe('the generated extension', () => {
         expect(declared.map(({ attributes }) => Object.values(attributes)[0].keepOnSplit)).toEqual([true, false])
     })
 })
+
+describe('the class kind', () => {
+    const colour = {
+        name: 'color',
+        kind: 'class',
+        key: 'class',
+        types: ['bold'],
+        values: ['red', 'blue'],
+        pattern: null,
+        keepOnSplit: true,
+        classes: { red: 'has-red-color', blue: 'has-blue-color' },
+    }
+
+    it('normalizes to a known key only', () => {
+        expect(normalize(colour, 'red')).toBe('red')
+        expect(normalize(colour, 'RED')).toBeNull()
+        expect(normalize(colour, ' red')).toBeNull()
+        expect(normalize(colour, 'teal')).toBeNull()
+        expect(normalize(colour, 3)).toBeNull()
+        expect(normalize(colour, 'constructor')).toBeNull()
+    })
+
+    it('parses the first known class among others and renders the class', () => {
+        editor = makeEditor('<p><strong class="x has-blue-color has-red-color">a</strong><strong class="has-teal-color">b</strong></p>', withAttributes(colour))
+
+        const marks = editor.getJSON().content[0].content.map((text) => text.marks[0].attrs.color)
+
+        expect(marks).toEqual(['blue', null])
+        expect(editor.getHTML()).toBe('<p><strong class="has-blue-color">a</strong><strong>b</strong></p>')
+    })
+
+    it('renders nothing for a value not in the map', () => {
+        editor = makeEditor(doc({ type: 'paragraph', content: [{ type: 'text', text: 'a', marks: [{ type: 'bold', attrs: { color: 'teal' } }] }] }), withAttributes(colour))
+
+        expect(editor.getHTML()).toBe('<p><strong>a</strong></p>')
+    })
+})

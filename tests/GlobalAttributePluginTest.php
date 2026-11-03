@@ -91,6 +91,7 @@ it('sends each plugin its attributes to the browser straight after the plugin', 
                 'values' => ['left', 'center', 'right'],
                 'pattern' => null,
                 'keepOnSplit' => true,
+                'classes' => null,
             ]],
         ]);
 });

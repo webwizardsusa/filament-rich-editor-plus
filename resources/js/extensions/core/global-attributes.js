@@ -21,11 +21,16 @@ export function styleValue(style, property) {
 }
 
 /**
- * The value to keep, or null when it isn't valid, by the rules of `GlobalAttribute::normalize()` in PHP.
+ * The value to keep, or null when it isn't valid, by the rules of `GlobalAttribute::normalize()` in PHP. A class kind
+ * value is kept only when it is a key of the attribute's `classes`.
  */
 export function normalize(attribute, value) {
     if (typeof value !== 'string') {
         return null
+    }
+
+    if (attribute.kind === 'class') {
+        return Object.hasOwn(attribute.classes ?? {}, value) ? value : null
     }
 
     const trimmed = value.trim()
@@ -49,6 +54,20 @@ function compilePattern(attribute) {
 }
 
 const parse = (attribute) => (element) => {
+    if (attribute.kind === 'class') {
+        const tokens = (element.getAttribute('class') ?? '').split(/\s+/).filter(Boolean)
+
+        for (const token of tokens) {
+            const value = Object.keys(attribute.classes).find((key) => attribute.classes[key] === token)
+
+            if (value !== undefined) {
+                return value
+            }
+        }
+
+        return null
+    }
+
     if (attribute.kind === 'style') {
         return normalize(attribute, styleValue(element.getAttribute('style') ?? '', attribute.key))
     }
@@ -61,6 +80,10 @@ const render = (attribute) => (attrs) => {
 
     if (value === null) {
         return {}
+    }
+
+    if (attribute.kind === 'class') {
+        return { class: attribute.classes[value] }
     }
 
     return attribute.kind === 'style' ? { style: `${attribute.key}: ${value}` } : { [attribute.key]: value }

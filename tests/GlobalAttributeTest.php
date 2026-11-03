@@ -124,6 +124,7 @@ it('describes itself for the browser', function (): void {
         'values' => ['left', 'center', 'right', 'justify'],
         'pattern' => null,
         'keepOnSplit' => false,
+        'classes' => null,
     ])
         ->and(fn () => GlobalAttribute::style('a', 'color')->toArray())->toThrow(InvalidArgumentException::class)
         ->and(textAlign()->isProvidedByJsExtension())->toBeFalse()
@@ -154,3 +155,55 @@ it('allows an escaped plus before a quantifier', function (): void {
     expect(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->pattern('\\++a')->assertValid())
         ->not->toThrow(InvalidArgumentException::class);
 });
+
+function palette(): GlobalAttribute
+{
+    return GlobalAttribute::classes('color', ['red' => 'has-red-color', 'blue' => 'has-blue-color'])->types(['textStyle']);
+}
+
+it('reads a class kind value from its class among others', function (): void {
+    expect(palette()->parse(globalAttributeElement('<span class="x has-blue-color y">a</span>')))->toBe('blue')
+        ->and(palette()->parse(globalAttributeElement('<span class="has-red-color has-blue-color">a</span>')))->toBe('red')
+        ->and(palette()->parse(globalAttributeElement('<span class="has-teal-color">a</span>')))->toBeNull()
+        ->and(palette()->parse(globalAttributeElement('<span>a</span>')))->toBeNull();
+});
+
+it('renders a class kind value as its class, and only known keys', function (mixed $value, array $expected): void {
+    expect(palette()->render($value))->toBe($expected);
+})->with([
+    'known' => ['red', ['class' => 'has-red-color']],
+    'unknown' => ['teal', []],
+    'other case' => ['RED', []],
+    'padded' => [' red', []],
+    'number' => [3, []],
+    'null' => [null, []],
+]);
+
+it('describes a class kind for the browser', function (): void {
+    $array = palette()->toArray();
+
+    expect($array)->toMatchArray(['name' => 'color', 'kind' => 'class', 'key' => 'class', 'values' => ['red', 'blue'], 'pattern' => null])
+        ->and(json_encode($array['classes']))->toBe('{"red":"has-red-color","blue":"has-blue-color"}')
+        ->and(textAlign()->toArray()['classes'])->toBeNull();
+});
+
+it('keeps numeric keys as strings for the browser', function (): void {
+    $array = GlobalAttribute::classes('size', ['1' => 'size-1', '2' => 'size-2'])->types(['textStyle'])->toArray();
+
+    expect($array['values'])->toBe(['1', '2'])
+        ->and(json_encode($array['classes']))->toBe('{"1":"size-1","2":"size-2"}');
+});
+
+it('validates a class kind', function (Closure $make, string $message): void {
+    expect(fn () => $make()->assertValid())->toThrow(InvalidArgumentException::class, $message);
+})->with([
+    'empty map' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', [])->types(['textStyle']), 'at least one class'],
+    'bad key' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['Red' => 'red'])->types(['textStyle']), '[Red]'],
+    'bad class' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 'has red'])->types(['textStyle']), '[has red]'],
+    'class with newline' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => "red\n"])->types(['textStyle']), 'not a valid CSS class'],
+    'non-string class' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 1])->types(['textStyle']), 'not a valid CSS class'],
+    'shared class' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 'x', 'rouge' => 'x'])->types(['textStyle']), 'same class'],
+    'values too' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 'x'])->types(['textStyle'])->values(['red']), 'values() and pattern()'],
+    'pattern too' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 'x'])->types(['textStyle'])->pattern('.+'), 'values() and pattern()'],
+    'no types' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 'x']), 'types()'],
+]);

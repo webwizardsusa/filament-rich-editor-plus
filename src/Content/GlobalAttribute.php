@@ -7,6 +7,7 @@ use InvalidArgumentException;
 
 /**
  * An attribute a plugin adds to nodes and marks that other plugins own, like TipTap's `addGlobalAttributes`. It is
+ * one of three kinds: a CSS property of `style`, an HTML attribute, or one CSS class out of a map. It is
  * plain data, so one declaration drives the server and, through the `core/global-attributes` JS extension, the
  * browser. Its value is always a string, validated against `values()` or `pattern()` on parse and on render. The
  * default is `null`, which is never rendered.
@@ -40,12 +41,17 @@ class GlobalAttribute
 
     protected ?string $pattern = null;
 
+    /**
+     * @var ?array<string, string>
+     */
+    protected ?array $classes = null;
+
     protected bool $keepsOnSplit = true;
 
     protected bool $isProvidedByJsExtension = false;
 
     /**
-     * @param  'style' | 'html'  $kind
+     * @param  'style' | 'html' | 'class'  $kind
      */
     final public function __construct(protected string $name, protected string $kind, protected string $key) {}
 
@@ -63,6 +69,21 @@ class GlobalAttribute
     public static function html(string $name, string $attribute): static
     {
         return new static($name, 'html', strtolower($attribute));
+    }
+
+    /**
+     * One CSS class out of a map, such as a palette: the document stores the key (`red`), the HTML its class
+     * (`has-red-color`). Other classes on the element are left alone, so several class attributes can share an element.
+     * Keys are lower-case letters, digits and hyphens; the map replaces `values()` and `pattern()`.
+     *
+     * @param  array<string, string>  $classesByValue
+     */
+    public static function classes(string $name, array $classesByValue): static
+    {
+        $attribute = new static($name, 'class', 'class');
+        $attribute->classes = $classesByValue;
+
+        return $attribute;
     }
 
     /**
@@ -146,6 +167,12 @@ class GlobalAttribute
             throw new InvalidArgumentException("{$label} needs types(): a list of node and mark names, or '*', 'nodes' or 'marks'.");
         }
 
+        if ($this->kind === 'class') {
+            $this->assertValidClasses($label);
+
+            return;
+        }
+
         if (($this->values === null) === ($this->pattern === null)) {
             throw new InvalidArgumentException("{$label} needs values() or pattern(), but not both.");
         }
@@ -194,6 +221,34 @@ class GlobalAttribute
     }
 
     /**
+     * @throws InvalidArgumentException
+     */
+    protected function assertValidClasses(string $label): void
+    {
+        if ($this->values !== null || $this->pattern !== null) {
+            throw new InvalidArgumentException("{$label} takes its values from classes(), so values() and pattern() can't be used with it.");
+        }
+
+        if ($this->classes === null || $this->classes === []) {
+            throw new InvalidArgumentException("{$label} needs at least one class.");
+        }
+
+        foreach ($this->classes as $value => $class) {
+            if (preg_match('/^[a-z0-9][a-z0-9-]*\z/', (string) $value) !== 1) {
+                throw new InvalidArgumentException("{$label} has the value [{$value}], which must be lower-case letters, digits and hyphens.");
+            }
+
+            if (! is_string($class) || preg_match('/^-?[A-Za-z_][A-Za-z0-9_-]*\z/', $class) !== 1) {
+                throw new InvalidArgumentException("{$label} maps [{$value}] to [".(is_string($class) ? $class : get_debug_type($class)).'], which is not a valid CSS class name.');
+            }
+        }
+
+        if (count(array_unique($this->classes)) !== count($this->classes)) {
+            throw new InvalidArgumentException("{$label} maps two values to the same class.");
+        }
+    }
+
+    /**
      * The node and mark names this attribute applies to, out of those the editor has.
      *
      * @param  array<string>  $nodeNames
@@ -219,6 +274,10 @@ class GlobalAttribute
             return null;
         }
 
+        if ($this->kind === 'class') {
+            return array_key_exists($value, $this->classes ?? []) ? $value : null;
+        }
+
         $value = trim($value);
 
         if ($value === '' || ($this->kind === 'style' && str_contains($value, ';'))) {
@@ -240,6 +299,18 @@ class GlobalAttribute
 
     public function parse(DOMElement $element): ?string
     {
+        if ($this->kind === 'class') {
+            foreach (preg_split('/\s+/', trim($element->getAttribute('class')), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $token) {
+                $value = array_search($token, $this->classes ?? [], true);
+
+                if ($value !== false) {
+                    return (string) $value;
+                }
+            }
+
+            return null;
+        }
+
         if ($this->kind === 'style') {
             return $this->normalize(static::styleValue($element->getAttribute('style'), $this->key));
         }
@@ -258,11 +329,15 @@ class GlobalAttribute
             return [];
         }
 
+        if ($this->kind === 'class') {
+            return ['class' => $this->classes[$value]];
+        }
+
         return $this->kind === 'style' ? ['style' => "{$this->key}: {$value}"] : [$this->key => $value];
     }
 
     /**
-     * @return array{name: string, kind: string, key: string, types: array<string> | string, values: ?array<string>, pattern: ?string, keepOnSplit: bool}
+     * @return array{name: string, kind: 'style'|'html'|'class', key: string, types: array<string> | string, values: ?array<string>, pattern: ?string, keepOnSplit: bool, classes: ?object}
      */
     public function toArray(): array
     {
@@ -273,9 +348,10 @@ class GlobalAttribute
             'kind' => $this->kind,
             'key' => $this->key,
             'types' => $this->types,
-            'values' => $this->values,
+            'values' => $this->kind === 'class' ? array_map(strval(...), array_keys($this->classes ?? [])) : $this->values,
             'pattern' => $this->pattern,
             'keepOnSplit' => $this->keepsOnSplit,
+            'classes' => $this->kind === 'class' ? (object) $this->classes : null,
         ];
     }
 

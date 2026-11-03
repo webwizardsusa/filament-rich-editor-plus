@@ -254,3 +254,13 @@ it('drops invalid values when parsing and keeps listed spellings', function (): 
         ->and($parse('<p style="TEXT-ALIGN: CENTER">a</p>'))->toBe(['textAlign' => 'center'])
         ->and($parse('<p style="text-align: center; text-align: right">a</p>'))->toBe(['textAlign' => 'right']);
 });
+
+it('merges two class kind attributes on one mark into one class attribute', function (): void {
+    $color = GlobalAttribute::classes('color', ['red' => 'has-red-color'])->types(['bold']);
+    $background = GlobalAttribute::classes('backgroundColor', ['yellow' => 'has-yellow-background-color'])->types(['bold']);
+    $schema = globalSchema([$color, $background]);
+    $document = (new HtmlParser($schema))->parse('<p><strong class="has-yellow-background-color has-red-color">a</strong></p>');
+
+    expect($document['content'][0]['content'][0]['marks'][0]['attrs'])->toBe(['color' => 'red', 'backgroundColor' => 'yellow'])
+        ->and(globalHtml($schema, ...$document['content']))->toBe('<p><strong class="has-red-color has-yellow-background-color">a</strong></p>');
+});

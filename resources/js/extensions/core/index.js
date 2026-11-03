@@ -38,6 +38,18 @@ registerExtension('core/background-color', ({ colors }) => [
     TextStyle,
     paletteStyleExtension({ name: 'backgroundColorCommands', attribute: 'backgroundColor', setCommand: 'setBackgroundColor', unsetCommand: 'unsetBackgroundColor', values: colors }),
 ])
+registerExtension('core/font-family', ({ values }) => [
+    TextStyle,
+    paletteStyleExtension({ name: 'fontFamilyCommands', attribute: 'fontFamily', setCommand: 'setFontFamily', unsetCommand: 'unsetFontFamily', values }),
+])
+registerExtension('core/font-size', ({ values }) => [
+    TextStyle,
+    paletteStyleExtension({ name: 'fontSizeCommands', attribute: 'fontSize', setCommand: 'setFontSize', unsetCommand: 'unsetFontSize', values }),
+])
+registerExtension('core/line-height', ({ values }) => [
+    TextStyle,
+    paletteStyleExtension({ name: 'lineHeightCommands', attribute: 'lineHeight', setCommand: 'setLineHeight', unsetCommand: 'unsetLineHeight', values }),
+])
 
 registerExtension('core/bold', () => Bold)
 registerExtension('core/italic', () => Italic)

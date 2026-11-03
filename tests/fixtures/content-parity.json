@@ -616,22 +616,42 @@
   },
   {
     "name": "text colour",
-    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "red", "backgroundColor": null } }], "text": "a" }] }] },
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "red", "backgroundColor": null, "fontFamily": null, "fontSize": null, "lineHeight": null } }], "text": "a" }] }] },
     "html": "<p><span class=\"has-red-color\">a</span></p>"
   },
   {
     "name": "background colour",
-    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": null, "backgroundColor": "yellow" } }], "text": "a" }] }] },
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": null, "backgroundColor": "yellow", "fontFamily": null, "fontSize": null, "lineHeight": null } }], "text": "a" }] }] },
     "html": "<p><span class=\"has-yellow-background-color\">a</span></p>"
   },
   {
     "name": "text and background colour on one span",
-    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "red", "backgroundColor": "yellow" } }], "text": "a" }] }] },
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "red", "backgroundColor": "yellow", "fontFamily": null, "fontSize": null, "lineHeight": null } }], "text": "a" }] }] },
     "html": "<p><span class=\"has-red-color has-yellow-background-color\">a</span></p>"
   },
   {
     "name": "colour and bold",
-    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "blue", "backgroundColor": null } }, { "type": "bold" }], "text": "a" }] }] },
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "blue", "backgroundColor": null, "fontFamily": null, "fontSize": null, "lineHeight": null } }, { "type": "bold" }], "text": "a" }] }] },
     "html": "<p><span class=\"has-blue-color\"><strong>a</strong></span></p>"
+  },
+  {
+    "name": "font family",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": null, "backgroundColor": null, "fontFamily": "serif", "fontSize": null, "lineHeight": null } }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-serif-font-family\">a</span></p>"
+  },
+  {
+    "name": "font size",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": null, "backgroundColor": null, "fontFamily": null, "fontSize": "large", "lineHeight": null } }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-large-font-size\">a</span></p>"
+  },
+  {
+    "name": "line height",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": null, "backgroundColor": null, "fontFamily": null, "fontSize": null, "lineHeight": "loose" } }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-loose-line-height\">a</span></p>"
+  },
+  {
+    "name": "colour, font, size and line height on one span",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "red", "backgroundColor": "yellow", "fontFamily": "serif", "fontSize": "large", "lineHeight": "loose" } }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-red-color has-yellow-background-color has-serif-font-family has-large-font-size has-loose-line-height\">a</span></p>"
   }
 ]

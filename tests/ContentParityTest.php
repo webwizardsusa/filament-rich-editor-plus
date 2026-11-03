@@ -9,8 +9,11 @@ use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\DividerPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\FontSizePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\LineHeightPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
@@ -98,6 +101,9 @@ function parityPlugins(array $case = []): array
         SuperscriptPlugin::make(),
         TextColorPlugin::make(),
         BackgroundColorPlugin::make(),
+        FontFamilyPlugin::make(),
+        FontSizePlugin::make(),
+        LineHeightPlugin::make(),
         TaskListPlugin::make(),
         LinkPlugin::make()->openInNewTab(false),
         BlockquotePlugin::make(),

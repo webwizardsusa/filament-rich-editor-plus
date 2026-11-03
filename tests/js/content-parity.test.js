@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 import cases from '../fixtures/content-parity.json'
 import { colourPluginIds } from './support/colour-plugins'
 import { defaultPluginIds, makeEditor } from './support/make-editor'
+import { typeStylePluginIds } from './support/type-style-plugins'
 
-const pluginIds = [...defaultPluginIds, 'core/italic', 'core/underline', 'core/strikethrough', 'core/link', 'core/code', 'core/subscript', 'core/superscript', 'core/task-list', ...colourPluginIds]
+const pluginIds = [...defaultPluginIds, 'core/italic', 'core/underline', 'core/strikethrough', 'core/link', 'core/code', 'core/subscript', 'core/superscript', 'core/task-list', ...colourPluginIds, ...typeStylePluginIds]
 
 // A case's `globalAttributes` are what PHP would send for a plugin declaring them.
 const idsFor = ({ globalAttributes }) =>

@@ -58,11 +58,11 @@ function alignment(): GlobalAttribute
 }
 
 it('parses and renders the attributes a plugin provides', function (): void {
-    $renderer = fn (mixed $content) => RichContentPlusRenderer::make($content)->plugins([globalAttributePlugin([alignment()])]);
+    $renderer = fn (mixed $content) => RichContentPlusRenderer::make($content)->parseHtml()->plugins([globalAttributePlugin([alignment()])]);
 
     expect($renderer('<p style="text-align: center">a</p>')->toArray()['content'][0])
         ->toBe(['type' => 'paragraph', 'attrs' => ['textAlign' => 'center'], 'content' => [['type' => 'text', 'text' => 'a']]])
-        ->and($renderer('<p style="text-align: center">a</p>')->toHtml())->toBe('<p style="text-align: center">a</p>');
+        ->and($renderer('<p style="text-align: center">a</p><p style="text-align: bogus">b</p>')->toHtml())->toBe('<p style="text-align: center">a</p><p>b</p>');
 });
 
 it('takes attributes added to an existing plugin', function (): void {
@@ -114,8 +114,8 @@ it('generates no JS for attributes a TipTap extension provides, but still render
     $plugin = globalAttributePlugin([alignment()->providedByJsExtension()]);
 
     expect(array_column(PluginRegistry::make([$plugin])->getJsExtensions(), 'id'))->not->toContain('core/global-attributes')
-        ->and(RichContentPlusRenderer::make('<p style="text-align: right">a</p>')->plugins([$plugin])->toHtml())
-        ->toBe('<p style="text-align: right">a</p>');
+        ->and(RichContentPlusRenderer::make('<p style="text-align: right">a</p><p style="text-align: bogus">b</p>')->parseHtml()->plugins([$plugin])->toHtml())
+        ->toBe('<p style="text-align: right">a</p><p>b</p>');
 });
 
 it('generates no JS when no plugin declares global attributes', function (): void {

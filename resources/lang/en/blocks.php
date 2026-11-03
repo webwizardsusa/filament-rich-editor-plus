@@ -12,6 +12,8 @@ return [
     'bullet_list_description' => 'A simple list',
     'ordered_list' => 'Numbered list',
     'ordered_list_description' => 'A list with numbers',
+    'task_list' => 'Task list',
+    'task_list_description' => 'A list with checkboxes',
     'blockquote' => 'Quote',
     'blockquote_description' => 'Quoted text',
     'code_block' => 'Code block',

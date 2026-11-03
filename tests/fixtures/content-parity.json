@@ -497,5 +497,36 @@
       ]
     },
     "html": "<p><code>a</code> H<sub>2</sub>O x<sup>2</sup></p>"
+  },
+  {
+    "name": "nested task list",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "taskList",
+          "content": [
+            {
+              "type": "taskItem",
+              "attrs": { "checked": true },
+              "content": [
+                { "type": "paragraph", "content": [{ "type": "text", "text": "a" }] },
+                {
+                  "type": "taskList",
+                  "content": [
+                    {
+                      "type": "taskItem",
+                      "attrs": { "checked": false },
+                      "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "b" }] }]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "html": "<ul data-type=\"taskList\"><li data-checked=\"true\" data-type=\"taskItem\"><label><input type=\"checkbox\" checked=\"checked\" disabled=\"disabled\"><span></span></label><div><p>a</p><ul data-type=\"taskList\"><li data-checked=\"false\" data-type=\"taskItem\"><label><input type=\"checkbox\" disabled=\"disabled\"><span></span></label><div><p>b</p></div></li></ul></div></li></ul>"
   }
 ]

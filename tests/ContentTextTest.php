@@ -4,6 +4,7 @@ use Hollyit\RichEditorPlus\Content\ContentSchema;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Content\TextSerializer;
+use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -86,4 +87,14 @@ it('puts a block node\'s text before its children', function (): void {
     ]]);
 
     expect($text)->toBe("[x] a\n\n[ ] b");
+});
+
+it('marks task items as done or not in plain text', function (): void {
+    $schema = new ContentSchema([NodeSpec::make('paragraph')->renderTag('p'), ...TaskListPlugin::make()->getNodes()], []);
+
+    $item = fn (bool $checked, string $text): array => ['type' => 'taskItem', 'attrs' => ['checked' => $checked], 'content' => [textParagraph(['type' => 'text', 'text' => $text])]];
+
+    expect((new TextSerializer($schema))->serialize(['type' => 'doc', 'content' => [
+        ['type' => 'taskList', 'content' => [$item(true, 'a'), $item(false, 'b')]],
+    ]]))->toBe("[x] a\n\n[ ] b");
 });

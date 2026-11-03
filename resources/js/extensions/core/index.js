@@ -8,7 +8,8 @@ import Heading from '@tiptap/extension-heading'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Italic from '@tiptap/extension-italic'
 import Link from '@tiptap/extension-link'
-import { BulletList, ListItem, ListKeymap, OrderedList } from '@tiptap/extension-list'
+import { BulletList, ListItem, ListKeymap, OrderedList, TaskList } from '@tiptap/extension-list'
+import { ReadOnlyHtmlTaskItem } from './task-item'
 import Paragraph from '@tiptap/extension-paragraph'
 import Strike from '@tiptap/extension-strike'
 import Subscript from '@tiptap/extension-subscript'
@@ -35,6 +36,7 @@ registerExtension('core/blockquote', () => Blockquote)
 registerExtension('core/heading', ({ levels }) => Heading.configure({ levels }))
 registerExtension('core/bullet-list', () => [BulletList, ListItem, ListKeymap])
 registerExtension('core/ordered-list', () => [OrderedList, ListItem, ListKeymap])
+registerExtension('core/task-list', () => [TaskList, ReadOnlyHtmlTaskItem.configure({ nested: true }), ListKeymap])
 registerExtension('core/code-block', () => CodeBlock)
 registerExtension('core/divider', () => HorizontalRule)
 registerExtension('core/mention', ({ providers }) => createMentionNode(providers ?? []))

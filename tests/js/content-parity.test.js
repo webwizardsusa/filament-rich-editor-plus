@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import cases from '../fixtures/content-parity.json'
 import { defaultPluginIds, makeEditor } from './support/make-editor'
 
-const pluginIds = [...defaultPluginIds, 'core/italic', 'core/underline', 'core/strikethrough', 'core/link', 'core/code', 'core/subscript', 'core/superscript']
+const pluginIds = [...defaultPluginIds, 'core/italic', 'core/underline', 'core/strikethrough', 'core/link', 'core/code', 'core/subscript', 'core/superscript', 'core/task-list']
 
 describe('content parity with the PHP engine', () => {
     // `browserHtml` is what the browser writes when it differs from PHP, such as a table's `colgroup`.

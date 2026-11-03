@@ -15,6 +15,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
@@ -220,4 +221,23 @@ it('escapes the find panel text', function (): void {
 it('leaves the optional plugins out of the default set', function (): void {
     expect(collect(PluginRegistry::defaultPlugins())->map->getId()->all())
         ->not->toContain('core/code', 'core/subscript', 'core/superscript');
+});
+
+it('offers the task list as a list type with level tools', function (): void {
+    $plugin = TaskListPlugin::make();
+    $blockType = $plugin->getBlockTypes()[0];
+
+    expect($plugin->getId())->toBe('core/task-list')
+        ->and($plugin->getJsExtension()->getId())->toBe('core/task-list')
+        ->and(collect($plugin->getNodes())->map->getName()->all())->toBe(['taskList', 'taskItem'])
+        ->and($blockType->getNodeName())->toBe('taskList')
+        ->and($blockType->getCommand())->toBe('toggleTaskList')
+        ->and($blockType->isListType())->toBeTrue()
+        ->and($blockType->isMultiBlock())->toBeTrue()
+        ->and($blockType->getLabel())->not->toStartWith('rich-editor-plus::')
+        ->and(collect($plugin->getTools())->map->getName()->all())->toBe(['taskListDecreaseLevel', 'taskListIncreaseLevel']);
+});
+
+it('leaves the task list out of the default set', function (): void {
+    expect(collect(PluginRegistry::defaultPlugins())->map->getId()->all())->not->toContain('core/task-list');
 });

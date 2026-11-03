@@ -112,6 +112,33 @@
     margin-top: 0.25rem;
 }
 
+.rep-editor .tiptap ul[data-type='taskList'] {
+    list-style: none;
+    padding-inline-start: 0.25rem;
+}
+
+.rep-editor .tiptap li[data-type='taskItem'] {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.rep-editor .tiptap li[data-type='taskItem'] > label {
+    flex: none;
+    margin-top: 0.3em;
+    user-select: none;
+}
+
+.rep-editor .tiptap li[data-type='taskItem'] > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.rep-editor .tiptap li[data-type='taskItem'][data-checked='true'] > div > p {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
 .rep-editor .tiptap pre {
     padding: 0.75rem 1rem;
     overflow-x: auto;

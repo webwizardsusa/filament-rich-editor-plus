@@ -6,6 +6,7 @@ use Hollyit\RichEditorPlus\Content\HtmlSerializer;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
@@ -13,6 +14,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginExtension;
@@ -150,4 +152,57 @@ it('does not mark the code inside a code block as inline code', function (): voi
     $document = pluginParse('<pre><code>x</code></pre>', [CodePlugin::make(), CodeBlockPlugin::make()]);
 
     expect($document['content'][0]['content'][0])->toBe(['type' => 'text', 'text' => 'x']);
+});
+
+function taskListHtml(): string
+{
+    return '<ul data-type="taskList">'
+        .'<li data-checked="true" data-type="taskItem"><label><input type="checkbox" checked="checked" disabled="disabled"><span></span></label><div><p>a</p>'
+        .'<ul data-type="taskList"><li data-checked="false" data-type="taskItem"><label><input type="checkbox" disabled="disabled"><span></span></label><div><p>b</p></div></li></ul>'
+        .'</div></li></ul>';
+}
+
+it('parses and renders a nested task list', function (): void {
+    $plugins = [TaskListPlugin::make()];
+    $document = pluginParse(taskListHtml(), $plugins);
+
+    $paragraph = fn (string $text): array => ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => $text]]];
+
+    expect($document['content'])->toEqual([[
+        'type' => 'taskList',
+        'content' => [[
+            'type' => 'taskItem',
+            'attrs' => ['checked' => true],
+            'content' => [
+                $paragraph('a'),
+                ['type' => 'taskList', 'content' => [['type' => 'taskItem', 'attrs' => ['checked' => false], 'content' => [$paragraph('b')]]]],
+            ],
+        ]],
+    ]])->and(pluginHtml($document, $plugins))->toBe(taskListHtml());
+});
+
+it('reads whether a task item is checked', function (string $attribute, bool $checked): void {
+    $document = pluginParse("<ul data-type=\"taskList\"><li data-type=\"taskItem\"{$attribute}><div><p>a</p></div></li></ul>", [TaskListPlugin::make()]);
+
+    expect($document['content'][0]['content'][0]['attrs']['checked'])->toBe($checked);
+})->with([
+    'true' => [' data-checked="true"', true],
+    'empty' => [' data-checked=""', true],
+    'false' => [' data-checked="false"', false],
+    'missing' => ['', false],
+]);
+
+it('tells task lists and bullet lists apart', function (): void {
+    $document = pluginParse('<ul><li><p>a</p></li></ul>'.taskListHtml(), [BulletListPlugin::make(), TaskListPlugin::make()]);
+
+    expect($document['content'][0]['type'])->toBe('bulletList')
+        ->and($document['content'][1]['type'])->toBe('taskList');
+});
+
+it('keeps a task list as a bullet list without the task list plugin', function (): void {
+    $document = pluginParse('<ul data-type="taskList"><li data-type="taskItem"><div><p>a</p></div></li></ul>', [BulletListPlugin::make()]);
+
+    expect($document['content'][0]['type'])->toBe('bulletList')
+        ->and($document['content'][0]['content'][0]['type'])->toBe('listItem')
+        ->and($document['content'][0]['content'][0]['content'][0]['content'][0]['text'])->toBe('a');
 });

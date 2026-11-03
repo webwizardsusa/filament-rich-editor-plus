@@ -14,6 +14,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
@@ -40,6 +41,7 @@ function parityPlugins(): array
         CodePlugin::make(),
         SubscriptPlugin::make(),
         SuperscriptPlugin::make(),
+        TaskListPlugin::make(),
         LinkPlugin::make()->openInNewTab(false),
         BlockquotePlugin::make(),
         HeadingPlugin::make(),

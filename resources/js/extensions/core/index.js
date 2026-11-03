@@ -1,5 +1,6 @@
 import Blockquote from '@tiptap/extension-blockquote'
 import Bold from '@tiptap/extension-bold'
+import Code from '@tiptap/extension-code'
 import CodeBlock from '@tiptap/extension-code-block'
 import Document from '@tiptap/extension-document'
 import HardBreak from '@tiptap/extension-hard-break'
@@ -10,6 +11,8 @@ import Link from '@tiptap/extension-link'
 import { BulletList, ListItem, ListKeymap, OrderedList } from '@tiptap/extension-list'
 import Paragraph from '@tiptap/extension-paragraph'
 import Strike from '@tiptap/extension-strike'
+import Subscript from '@tiptap/extension-subscript'
+import Superscript from '@tiptap/extension-superscript'
 import Text from '@tiptap/extension-text'
 import Underline from '@tiptap/extension-underline'
 import { Dropcursor, Gapcursor, UndoRedo } from '@tiptap/extensions'
@@ -24,6 +27,10 @@ registerExtension('core/bold', () => Bold)
 registerExtension('core/italic', () => Italic)
 registerExtension('core/underline', () => Underline)
 registerExtension('core/strikethrough', () => Strike)
+registerExtension('core/code', () => Code)
+// Set here as well as in PHP, so the editor and the server agree whichever TipTap version is installed.
+registerExtension('core/subscript', () => Subscript.extend({ excludes: 'superscript' }))
+registerExtension('core/superscript', () => Superscript.extend({ excludes: 'subscript' }))
 registerExtension('core/blockquote', () => Blockquote)
 registerExtension('core/heading', ({ levels }) => Heading.configure({ levels }))
 registerExtension('core/bullet-list', () => [BulletList, ListItem, ListKeymap])

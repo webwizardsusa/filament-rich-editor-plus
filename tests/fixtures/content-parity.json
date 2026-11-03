@@ -478,5 +478,24 @@
       ]
     },
     "html": "<blockquote><p>a</p><blockquote><p>b</p></blockquote></blockquote>"
+  },
+  {
+    "name": "inline code, subscript and superscript",
+    "document": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "text": "a", "marks": [{ "type": "code" }] },
+            { "type": "text", "text": " H" },
+            { "type": "text", "text": "2", "marks": [{ "type": "subscript" }] },
+            { "type": "text", "text": "O x" },
+            { "type": "text", "text": "2", "marks": [{ "type": "superscript" }] }
+          ]
+        }
+      ]
+    },
+    "html": "<p><code>a</code> H<sub>2</sub>O x<sup>2</sup></p>"
   }
 ]

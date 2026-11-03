@@ -4,6 +4,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\DividerPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
@@ -11,6 +12,8 @@ use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
@@ -34,6 +37,9 @@ function parityPlugins(): array
         ItalicPlugin::make(),
         UnderlinePlugin::make(),
         StrikethroughPlugin::make(),
+        CodePlugin::make(),
+        SubscriptPlugin::make(),
+        SuperscriptPlugin::make(),
         LinkPlugin::make()->openInNewTab(false),
         BlockquotePlugin::make(),
         HeadingPlugin::make(),

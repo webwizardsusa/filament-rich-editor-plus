@@ -4,6 +4,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\DividerPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\DocumentPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\FindReplacePlugin;
@@ -12,6 +13,8 @@ use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
@@ -34,6 +37,9 @@ dataset('core plugins', [
     'underline' => [UnderlinePlugin::class, 'core/underline', 'underline', 'toggleUnderline', 'mdi-format-underline', ToolScope::Inline],
     'strikethrough' => [StrikethroughPlugin::class, 'core/strikethrough', 'strike', 'toggleStrike', 'mdi-format-strikethrough', ToolScope::Inline],
     'link' => [LinkPlugin::class, 'core/link', 'link', null, 'mdi-link', ToolScope::Inline],
+    'code' => [CodePlugin::class, 'core/code', 'code', 'toggleCode', 'mdi-code-tags', ToolScope::Inline],
+    'subscript' => [SubscriptPlugin::class, 'core/subscript', 'subscript', 'toggleSubscript', 'mdi-format-subscript', ToolScope::Overflow],
+    'superscript' => [SuperscriptPlugin::class, 'core/superscript', 'superscript', 'toggleSuperscript', 'mdi-format-superscript', ToolScope::Overflow],
 ]);
 
 it('describes itself to both PHP and JS', function (string $class, string $id, string $tiptapName, ?string $command, string $icon, ToolScope $scope): void {
@@ -209,4 +215,9 @@ it('escapes the find panel text', function (): void {
     app('translator')->addLines(['find.find' => '"><script>'], 'en', 'rich-editor-plus');
 
     expect(FindReplacePlugin::make()->getEditorHtml())->not->toContain('<script>');
+});
+
+it('leaves the optional plugins out of the default set', function (): void {
+    expect(collect(PluginRegistry::defaultPlugins())->map->getId()->all())
+        ->not->toContain('core/code', 'core/subscript', 'core/superscript');
 });

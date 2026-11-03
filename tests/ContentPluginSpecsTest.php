@@ -6,9 +6,13 @@ use Hollyit\RichEditorPlus\Content\HtmlSerializer;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginExtension;
@@ -56,6 +60,11 @@ it('parses and renders each simple mark', function (string $plugin, string $inpu
     [ItalicPlugin::class, '<em>x</em>', 'italic', '<em>x</em>'],
     [ItalicPlugin::class, '<i>x</i>', 'italic', '<em>x</em>'],
     [ItalicPlugin::class, '<span style="font-style: italic">x</span>', 'italic', '<em>x</em>'],
+    [CodePlugin::class, '<code>x</code>', 'code', '<code>x</code>'],
+    [SubscriptPlugin::class, '<sub>x</sub>', 'subscript', '<sub>x</sub>'],
+    [SubscriptPlugin::class, '<span style="vertical-align: sub">x</span>', 'subscript', '<sub>x</sub>'],
+    [SuperscriptPlugin::class, '<sup>x</sup>', 'superscript', '<sup>x</sup>'],
+    [SuperscriptPlugin::class, '<span style="vertical-align: super">x</span>', 'superscript', '<sup>x</sup>'],
     [UnderlinePlugin::class, '<u>x</u>', 'underline', '<u>x</u>'],
     [UnderlinePlugin::class, '<span style="text-decoration: underline">x</span>', 'underline', '<u>x</u>'],
     [StrikethroughPlugin::class, '<s>x</s>', 'strike', '<s>x</s>'],
@@ -128,4 +137,17 @@ it('dedupes specs shared between plugins, first one wins', function (): void {
         ->and(array_count_values($nodes)['paragraph'])->toBe(1)
         ->and(pluginHtml(['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'x', 'marks' => [['type' => 'bold']]]]]]], [BoldPlugin::make()]))
         ->toBe('<p><strong>x</strong></p>');
+});
+
+it('keeps inline code free of other marks', function (): void {
+    $plugins = [CodePlugin::make(), BoldPlugin::make(), LinkPlugin::make()];
+
+    expect(pluginParse('<p><code><strong>x</strong></code></p>', $plugins)['content'][0]['content'][0]['marks'])->toBe([['type' => 'code']])
+        ->and(pluginParse('<p><code><a href="https://example.com">x</a></code></p>', $plugins)['content'][0]['content'][0]['marks'])->toBe([['type' => 'code']]);
+});
+
+it('does not mark the code inside a code block as inline code', function (): void {
+    $document = pluginParse('<pre><code>x</code></pre>', [CodePlugin::make(), CodeBlockPlugin::make()]);
+
+    expect($document['content'][0]['content'][0])->toBe(['type' => 'text', 'text' => 'x']);
 });

@@ -1,19 +1,19 @@
 import { Extension } from '@tiptap/core'
 
 /**
- * The commands for one palette colour plugin (PHP: `PaletteColorPlugin`): set a palette name on the `textStyle` mark, or
+ * The commands for one palette style plugin (PHP: `PaletteStylePlugin`): set a palette name on the `textStyle` mark, or
  * clear it and drop the span once nothing is left on it. Both report false where the mark can't go, such as code.
  */
-export function paletteColorExtension({ name, attribute, setCommand, unsetCommand, colors }) {
+export function paletteStyleExtension({ name, attribute, setCommand, unsetCommand, values }) {
     return Extension.create({
         name,
 
         addCommands() {
             return {
                 [setCommand]:
-                    (colour) =>
+                    (value) =>
                     ({ chain }) =>
-                        colors.includes(colour) && chain().setMark('textStyle', { [attribute]: colour }).run(),
+                        values.includes(value) && chain().setMark('textStyle', { [attribute]: value }).run(),
 
                 [unsetCommand]:
                     () =>

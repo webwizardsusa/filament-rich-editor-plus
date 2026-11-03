@@ -10,7 +10,7 @@ import Italic from '@tiptap/extension-italic'
 import Link from '@tiptap/extension-link'
 import { BulletList, ListItem, ListKeymap, OrderedList, TaskList } from '@tiptap/extension-list'
 import { globalAttributesExtension } from './global-attributes'
-import { paletteColorExtension } from './palette-color'
+import { paletteStyleExtension } from './palette-style'
 import { textAlignExtension } from './text-align'
 import { TextStyle } from './text-style'
 import { ReadOnlyHtmlTaskItem } from './task-item'
@@ -32,11 +32,11 @@ registerExtension('core/text-align', (options) => textAlignExtension(options))
 
 registerExtension('core/text-color', ({ colors }) => [
     TextStyle,
-    paletteColorExtension({ name: 'textColorCommands', attribute: 'color', setCommand: 'setTextColor', unsetCommand: 'unsetTextColor', colors }),
+    paletteStyleExtension({ name: 'textColorCommands', attribute: 'color', setCommand: 'setTextColor', unsetCommand: 'unsetTextColor', values: colors }),
 ])
 registerExtension('core/background-color', ({ colors }) => [
     TextStyle,
-    paletteColorExtension({ name: 'backgroundColorCommands', attribute: 'backgroundColor', setCommand: 'setBackgroundColor', unsetCommand: 'unsetBackgroundColor', colors }),
+    paletteStyleExtension({ name: 'backgroundColorCommands', attribute: 'backgroundColor', setCommand: 'setBackgroundColor', unsetCommand: 'unsetBackgroundColor', values: colors }),
 ])
 
 registerExtension('core/bold', () => Bold)

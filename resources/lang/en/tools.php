@@ -20,6 +20,7 @@ return [
     'background_color' => 'Highlight',
     'background_color_current' => 'Highlight: :item',
     'color_default' => 'Default',
+    'style_default' => 'Default',
     'colors' => [
         'gray' => 'Gray',
         'red' => 'Red',

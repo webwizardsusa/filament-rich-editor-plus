@@ -181,3 +181,15 @@ it('keeps only the inner mark of two that exclude each other', function (): void
 it('keeps marks that do not exclude each other', function (): void {
     expect(excludingMarksParse('<p><strong><sub>x</sub></strong></p>'))->toBe([['type' => 'bold'], ['type' => 'subscript']]);
 });
+
+it('leaves existing marks untouched when an existing mark excludes the new one', function (): void {
+    $schema = new ContentSchema([NodeSpec::make('paragraph')->parseTags(['p'])], [
+        MarkSpec::make('x')->parseTags(['em']),
+        MarkSpec::make('y')->parseTags(['strong'])->excludes(['n']),
+        MarkSpec::make('n')->parseTags(['code'])->excludes(['x']),
+    ]);
+
+    $marks = (new HtmlParser($schema))->parse('<p><em><strong><code>t</code></strong></em></p>')['content'][0]['content'][0]['marks'];
+
+    expect($marks)->toBe([['type' => 'x'], ['type' => 'y']]);
+});

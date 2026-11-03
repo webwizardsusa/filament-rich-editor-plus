@@ -150,6 +150,27 @@ class HtmlParser
     }
 
     /**
+     * Whether a mark already on the text excludes the new one, in which case the new mark is not added at all. A mark
+     * that the new one excludes too does not count: the new mark replaces it instead.
+     *
+     * @param  array<string, array<string, mixed>>  $byType
+     */
+    protected function isExcludedByExistingMark(MarkSpec $spec, array $byType): bool
+    {
+        foreach (array_keys($byType) as $other) {
+            if ($other === $spec->getName() || $spec->excludesMark($other)) {
+                continue;
+            }
+
+            if ($this->schema->mark($other)?->excludesMark($spec->getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param  array<array<string, mixed>>  $marks
      * @return array<array<string, mixed>>
      */
@@ -166,19 +187,13 @@ class HtmlParser
                 $mark['attrs'] = $attributes;
             }
 
+            if ($this->isExcludedByExistingMark($spec, $byType)) {
+                continue;
+            }
+
             foreach (array_keys($byType) as $other) {
-                if ($other === $name) {
-                    continue;
-                }
-
-                if ($spec->excludesMark($other)) {
+                if ($other !== $name && $spec->excludesMark($other)) {
                     unset($byType[$other]);
-
-                    continue;
-                }
-
-                if ($this->schema->mark($other)?->excludesMark($name)) {
-                    continue 2;
                 }
             }
 

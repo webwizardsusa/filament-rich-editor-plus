@@ -737,6 +737,10 @@ class PluginRegistry
                     throw new InvalidArgumentException("The editor plugin [{$id}] registers a tool named [{$tool->getName()}], which is reserved for the toolbar.");
                 }
 
+                if ($tool->isMenu() && $tool->getMenu() === []) {
+                    throw new InvalidArgumentException("The editor plugin [{$id}] registers the menu tool [{$tool->getName()}] with no items.");
+                }
+
                 if ($tool->isMenu() && ($tool->getCommand() !== null || $tool->getAction() !== null)) {
                     throw new InvalidArgumentException("The editor plugin [{$id}] registers the tool [{$tool->getName()}] with a menu and a command or action. A menu tool runs its items instead.");
                 }

@@ -148,10 +148,12 @@ use Hollyit\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
 
 RichEditorPlus::make('body')->addPlugins([CodePlugin::make(), TaskListPlugin::make()]);
 
-TextAlignPlugin::make()
-    ->alignments(['left', 'center', 'right', 'justify']) // the default
-    ->types(['paragraph', 'heading'])                    // the default
-    ->defaultAlignment('left');                          // the default; choosing it clears the alignment
+RichEditorPlus::make('body')->addPlugins([
+    TextAlignPlugin::make()
+        ->alignments(['left', 'center', 'right', 'justify']) // the default
+        ->types(['paragraph', 'heading'])                    // the default
+        ->defaultAlignment('left'),                          // the default; choosing it clears the alignment
+]);
 
 RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class]);
 ```
@@ -161,7 +163,7 @@ RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class
 | `CodePlugin` | Inline code (`Mod-e`). Code text can't have other marks. |
 | `SubscriptPlugin`, `SuperscriptPlugin` | Subscript (`Mod-,`) and superscript (`Mod-.`), in the more menu. Each replaces the other. |
 | `TaskListPlugin` | A checkbox list, in the list menu next to bulleted and numbered lists. Saved and rendered checkboxes are `disabled`; style them with `ul[data-type="taskList"]` and `li[data-checked="true"]`. |
-| `TextAlignPlugin` | An alignment menu on the block toolbar, for paragraphs and headings. It stores `style="text-align: …"`. Configure it with the alignments on offer, the node types it applies to, and the default alignment, which is never stored: choosing it clears the attribute. On a right-to-left site, use `defaultAlignment('right')`. |
+| `TextAlignPlugin` | An alignment menu on the block toolbar, for paragraphs and headings. It stores `style="text-align: …"`. Configure it with the alignments on offer, the node types it applies to, and the default alignment, which is never stored: choosing it clears the attribute. On a right-to-left site, use `defaultAlignment('right')`. The menu appears in every block toolbar and is disabled where nothing can be aligned. Shortcuts: `Mod-Shift-l`, `Mod-Shift-e`, `Mod-Shift-r` and `Mod-Shift-j` for left, center, right and justify (Ctrl on Windows and Linux, Cmd on macOS), bound only for the configured alignments. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
 ## Global attributes
@@ -299,6 +301,9 @@ A tool with `menu()` opens a list of items instead of running a command of its o
 item's label through `currentLabel()`:
 
 ```php
+use Hollyit\RichEditorPlus\Support\Tool;
+use Hollyit\RichEditorPlus\Support\ToolMenuItem;
+
 Tool::make('textAlign')
     ->label('Text align')
     ->icon('mdi-format-align-left')

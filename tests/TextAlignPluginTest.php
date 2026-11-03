@@ -72,7 +72,14 @@ it('offers one block menu tool on the aligned types', function (): void {
         ->and($tool->getIcon())->toBe('mdi-format-align-left')
         ->and($tool->getLabel())->toBe('Text align')
         ->and($tool->getCurrentLabel())->toBe('Text align: :item')
-        ->and($tool->toArray())->toMatchArray(['scope' => 'block', 'nodes' => ['paragraph', 'heading'], 'group' => 'align']);
+        ->and($tool->toArray())->toMatchArray(['scope' => 'block', 'nodes' => ['*'], 'group' => 'align']);
+});
+
+it('ignores a repeated alignment', function (): void {
+    $plugin = TextAlignPlugin::make()->alignments(['left', 'center', 'center']);
+
+    expect(textAlignTool($plugin)->getMenu())->toHaveCount(2)
+        ->and($plugin->getGlobalAttributes()[0]->toArray()['values'])->toBe(['center']);
 });
 
 it('has one item per alignment, the default clearing the attribute', function (): void {

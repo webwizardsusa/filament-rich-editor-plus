@@ -11,7 +11,8 @@ use Hollyit\RichEditorPlus\Support\ToolMenuItem;
 use InvalidArgumentException;
 
 /**
- * Aligns paragraphs and headings with `style="text-align: …"`, from one block-toolbar menu. The default alignment is
+ * Aligns paragraphs and headings with `style="text-align: …"`, from one block-toolbar menu that every block toolbar
+ * shows and that is disabled where no aligned type is selected. The default alignment is
  * never stored: choosing it clears the attribute.
  */
 class TextAlignPlugin extends Plugin implements ProvidesGlobalAttributes
@@ -50,7 +51,7 @@ class TextAlignPlugin extends Plugin implements ProvidesGlobalAttributes
      */
     public function alignments(array $alignments): static
     {
-        $this->alignments = array_values($alignments);
+        $this->alignments = array_values(array_unique($alignments));
 
         return $this;
     }
@@ -116,7 +117,7 @@ class TextAlignPlugin extends Plugin implements ProvidesGlobalAttributes
                 ->currentLabel(__('rich-editor-plus::tools.text_align_current'))
                 ->menu(array_map($this->menuItem(...), $this->alignments))
                 ->block()
-                ->nodes($this->types)
+                ->nodes(['*'])
                 ->group('align')
                 ->order(10),
         ];

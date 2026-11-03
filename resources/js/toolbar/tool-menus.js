@@ -17,6 +17,8 @@ export function isToolActive(editor, active) {
     return active.name ? editor.isActive(active.name, attributes) : editor.isActive(attributes)
 }
 
+const escapeSelector = (value) => (typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(value) : String(value).replace(/["\\]/g, '\\$&'))
+
 const canRun = (editor, item) => {
     const can = editor.can()
 
@@ -70,7 +72,7 @@ export function createToolMenus({ editor, root, tools }) {
         const runnable = items.map((item) => canRun(editor, item))
 
         items.forEach((item, index) => {
-            const itemElement = element.querySelector(`[data-rep-menu-item="${item.name}"]`)
+            const itemElement = element.querySelector(`[data-rep-menu-item="${escapeSelector(item.name)}"]`)
 
             itemElement?.setAttribute('aria-checked', item === current ? 'true' : 'false')
             itemElement?.setAttribute('aria-disabled', runnable[index] ? 'false' : 'true')
@@ -88,7 +90,7 @@ export function createToolMenus({ editor, root, tools }) {
             genericIcons.set(button, button.innerHTML)
         }
 
-        const source = current && element.querySelector(`[data-rep-menu-item="${current.name}"] svg`)
+        const source = current && element.querySelector(`[data-rep-menu-item="${escapeSelector(current.name)}"] svg`)
 
         if (source) {
             button.replaceChildren(source.cloneNode(true))
@@ -100,7 +102,7 @@ export function createToolMenus({ editor, root, tools }) {
 
         button.setAttribute(
             'aria-label',
-            current && repLabel ? repLabel.replace(':item', current.label ?? current.name) : repGenericLabel,
+            current && repLabel ? repLabel.replace(':item', () => current.label ?? current.name) : repGenericLabel,
         )
         button.dataset.repCurrent = currentName
     }

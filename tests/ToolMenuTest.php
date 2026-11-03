@@ -118,6 +118,11 @@ it('rejects a menu tool in the more menu', function (): void {
         ->toThrow(InvalidArgumentException::class, 'more menu');
 });
 
+it('rejects a menu tool with no items', function (): void {
+    expect(fn () => PluginRegistry::make([toolMenuPlugin([Tool::make('level')->menu([])->block()])]))
+        ->toThrow(InvalidArgumentException::class, 'level');
+});
+
 it('lists the menu tools of a field', function (): void {
     $registry = PluginRegistry::make([toolMenuPlugin([levelMenuTool(), Tool::make('plain')->command('toggleBold')])]);
 

@@ -1,4 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { createBlockControls } from '../../resources/js/toolbar/block-controls'
+import { createFixedToolbar } from '../../resources/js/toolbar/fixed-toolbar'
+import { fixedToolbarMarkup, makeToolbarRoot } from './support/toolbar-markup'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { isToolActive } from '../../resources/js/toolbar/tool-menus'
 import { switchBlock } from '../../resources/js/blocks/block-types'
 import { blockTypes, named } from './support/block-types'
@@ -133,6 +136,15 @@ describe('shortcuts', () => {
         expect(alignments()).toEqual([null])
     })
 
+    it('claims the key in a code block, where nothing can be aligned', () => {
+        editor = makeEditor(doc({ type: 'codeBlock', content: [{ type: 'text', text: 'x' }] }), pluginIds())
+        editor.commands.setTextSelection(2)
+        const before = JSON.stringify(editor.getJSON())
+
+        expect(press('r').defaultPrevented).toBe(true)
+        expect(JSON.stringify(editor.getJSON())).toBe(before)
+    })
+
     it('binds no key for an alignment the field does not offer', () => {
         editor = makeEditor(doc(p('a')), pluginIds({ ...options, alignments: ['left', 'center'] }))
         editor.commands.setTextSelection(2)
@@ -176,5 +188,92 @@ describe('the menu items active state', () => {
 
         expect(isToolActive(editor, defaultItem)).toBe(false)
         expect(isToolActive(editor, centreItem)).toBe(false)
+    })
+})
+
+describe('one menu shared by a floating and a fixed toolbar', () => {
+    const names = ['left', 'center', 'right', 'justify']
+    const textAlignTools = {
+        textAlign: {
+            command: null,
+            action: null,
+            arguments: [],
+            checksAvailability: false,
+            hidesInListItem: false,
+            active: null,
+            menu: names.map((name) => ({
+                name,
+                label: name[0].toUpperCase() + name.slice(1),
+                icon: null,
+                shortcut: null,
+                command: name === 'left' ? 'unsetTextAlign' : 'setTextAlign',
+                arguments: name === 'left' ? [] : [name],
+                active: { name: null, attributes: { textAlign: name === 'left' ? null : name } },
+            })),
+        },
+    }
+    const buttonMarkup =
+        '<button data-rep-tool="textAlign" aria-haspopup="menu" aria-expanded="false" aria-label="Text align" data-rep-generic-label="Text align" data-rep-label="Text align: :item"><svg data-icon="generic"></svg></button>'
+    const menuMarkup = `<div class="rep-menu" role="menu" aria-label="Text align" data-rep-tool-menu="textAlign" hidden>${names
+        .map((name) => `<button type="button" role="menuitemradio" aria-checked="false" data-rep-menu-item="${name}"><svg data-icon="${name}"></svg><span class="rep-menu-item-label">${name}</span></button>`)
+        .join('')}</div>`
+
+    let root
+    let controls
+    let fixed
+
+    const floatingButton = () => root.querySelector('[data-rep-block-toolbar] [data-rep-tool="textAlign"]')
+    const fixedButton = () => root.querySelector('[data-rep-fixed-toolbar] [data-rep-tool="textAlign"]')
+
+    // The floating toolbar syncs when it is shown at the cursor.
+    const syncFloating = () => controls.sync(root.querySelector('[data-rep-block-toolbar]'))
+
+    const setUp = (content) => {
+        root = makeToolbarRoot()
+        root.insertAdjacentHTML('afterbegin', fixedToolbarMarkup)
+        root.insertAdjacentHTML('beforeend', menuMarkup)
+        root.querySelector('[data-rep-block-toolbar] [data-rep-block-tools]').insertAdjacentHTML('beforeend', buttonMarkup)
+        root.querySelector('[data-rep-fixed-toolbar] [data-rep-block-tools-for="*"]').insertAdjacentHTML('beforeend', buttonMarkup)
+
+        editor = makeEditor(content, pluginIds())
+        controls = createBlockControls({ editor, root, blockTypes, tools: textAlignTools })
+        fixed = createFixedToolbar({
+            editor,
+            toolbar: root.querySelector('[data-rep-fixed-toolbar]'),
+            tools: textAlignTools,
+            blockControls: controls,
+            mountAction: vi.fn(),
+        })
+    }
+
+    afterEach(() => {
+        fixed?.destroy()
+        controls?.destroy()
+        root?.remove()
+    })
+
+    it('centres from the fixed toolbar and shows it on both buttons', () => {
+        setUp(doc(p('a')))
+        editor.commands.setTextSelection(2)
+
+        fixedButton().click()
+        root.querySelector('[data-rep-tool-menu="textAlign"] [data-rep-menu-item="center"]').click()
+
+        expect(alignments()).toEqual(['center'])
+        syncFloating()
+
+        for (const button of [floatingButton(), fixedButton()]) {
+            expect(button.getAttribute('aria-label')).toBe('Text align: Center')
+            expect(button.querySelector('svg').dataset.icon).toBe('center')
+        }
+    })
+
+    it('disables both buttons in a code block', () => {
+        setUp(doc({ type: 'codeBlock', content: [{ type: 'text', text: 'x' }] }))
+        editor.commands.setTextSelection(2)
+        syncFloating()
+
+        expect(floatingButton().getAttribute('aria-disabled')).toBe('true')
+        expect(fixedButton().getAttribute('aria-disabled')).toBe('true')
     })
 })

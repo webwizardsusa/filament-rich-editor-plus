@@ -52,9 +52,19 @@ export function textAlignExtension({ alignments, types, defaultAlignment }) {
             }
         },
 
+        /**
+         * Each key is claimed even where alignment can't apply, so Ctrl/Cmd+Shift+R never reloads the page.
+         */
         addKeyboardShortcuts() {
             return Object.fromEntries(
-                alignments.map((alignment) => [SHORTCUTS[alignment], () => this.editor.commands.setTextAlign(alignment)]),
+                alignments.map((alignment) => [
+                    SHORTCUTS[alignment],
+                    () => {
+                        this.editor.commands.setTextAlign(alignment)
+
+                        return true
+                    },
+                ]),
             )
         },
     })

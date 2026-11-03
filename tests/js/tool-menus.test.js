@@ -159,6 +159,16 @@ describe('a menu tool', () => {
         expect(editor.state.doc.firstChild.type.name).toBe('paragraph')
     })
 
+    it('puts a label with replacement patterns in the button verbatim', () => {
+        tools.level.menu[0].label = 'Two $& $1'
+        setUp(doc(heading(2, 'a')))
+        editor.commands.setTextSelection(2)
+        sync()
+
+        expect(button().getAttribute('aria-label')).toBe('Level: Two $& $1')
+        tools.level.menu[0].label = 'Two'
+    })
+
     it('closes with Escape and with the other menus', () => {
         button().click()
         menu().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))

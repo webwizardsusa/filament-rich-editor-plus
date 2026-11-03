@@ -4,7 +4,7 @@ namespace Hollyit\RichEditorPlus\Plugins\Core;
 
 use DOMElement;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
+use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedHtml;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
@@ -15,7 +15,7 @@ use InvalidArgumentException;
  *
  * Give the renderer this plugin too, or mentions are left out of its output.
  */
-class MentionPlugin extends Plugin implements PreparesRenderedContent
+class MentionPlugin extends Plugin implements PatchesRenderedHtml
 {
     public const string ID = 'core/mention';
 
@@ -119,6 +119,14 @@ class MentionPlugin extends Plugin implements PreparesRenderedContent
                 $this->providers,
             )),
         ]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getRenderedNodes(): array
+    {
+        return ['mention'];
     }
 
     /**

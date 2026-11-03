@@ -4,6 +4,8 @@ namespace Hollyit\RichEditorPlus\Plugins\Core;
 
 /**
  * Background colour (highlight) from a palette, stored as `has-{name}-background-color` classes on the `textStyle` span.
+ * An entry may also have a `text` colour, so the highlighted text stays readable in dark mode; a text colour class on the
+ * same span wins over it. The default palette uses dark text. {@see TextColorPlugin} ignores a `text` key.
  */
 class BackgroundColorPlugin extends PaletteColorPlugin
 {
@@ -45,6 +47,16 @@ class BackgroundColorPlugin extends PaletteColorPlugin
     protected function cssProperty(): string
     {
         return 'background-color';
+    }
+
+    protected function supportsTextColor(): bool
+    {
+        return true;
+    }
+
+    protected function defaultTextColor(): ?string
+    {
+        return '#1f2937';
     }
 
     protected function swatchText(): ?string

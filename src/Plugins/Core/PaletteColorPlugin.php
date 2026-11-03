@@ -22,7 +22,7 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
     use HasTextStyleMark;
 
     /**
-     * @var ?array<string, array{label: string, color: string}>
+     * @var ?array<string, array{label: string, color: string, text?: string}>
      */
     protected ?array $colors = null;
 
@@ -64,9 +64,26 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
     abstract protected function defaultPalette(): array;
 
     /**
+     * Whether palette entries take an optional `text` colour, written as a zero-specificity rule so a text colour class
+     * on the same span always wins. Only the highlight plugin uses it.
+     */
+    protected function supportsTextColor(): bool
+    {
+        return false;
+    }
+
+    /**
+     * The `text` colour of every entry in the default palette, or null for none.
+     */
+    protected function defaultTextColor(): ?string
+    {
+        return null;
+    }
+
+    /**
      * Replaces the palette: names (lower-case letters, digits and hyphens) to a label and a CSS colour.
      *
-     * @param  array<string, array{label: string, color: string}>  $colors
+     * @param  array<string, array{label: string, color: string, text?: string}>  $colors
      */
     public function colors(array $colors): static
     {
@@ -88,7 +105,7 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
     }
 
     /**
-     * @return array<string, array{label: string, color: string}>
+     * @return array<string, array{label: string, color: string, text?: string}>
      */
     public function getColors(): array
     {
@@ -100,6 +117,10 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
 
         foreach ($this->defaultPalette() as $name => $color) {
             $colors[$name] = ['label' => __("rich-editor-plus::tools.colors.{$name}"), 'color' => $color];
+
+            if ($this->defaultTextColor() !== null) {
+                $colors[$name]['text'] = $this->defaultTextColor();
+            }
         }
 
         return $colors;
@@ -122,7 +143,7 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
 
     public function getJsExtension(): JsExtension
     {
-        return JsExtension::make($this->getId(), ['colors' => array_keys($this->classMap())]);
+        return JsExtension::make($this->getId(), ['colors' => array_map(strval(...), array_keys($this->classMap()))]);
     }
 
     public function getTools(): array
@@ -168,6 +189,10 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
 
         foreach ($this->classMap() as $name => $class) {
             $rules[] = ".{$class}{{$this->cssProperty()}:{$colors[$name]['color']}}";
+
+            if ($this->supportsTextColor() && isset($colors[$name]['text'])) {
+                $rules[] = ":where(.{$class}){color:{$colors[$name]['text']}}";
+            }
         }
 
         return implode("\n", $rules);
@@ -203,12 +228,18 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
                 throw new InvalidArgumentException("{$plugin} has the colour name [{$name}], which must be lower-case letters, digits and hyphens, and not [default].");
             }
 
-            if (! is_array($color) || ! is_string($color['label'] ?? null) || ! is_string($color['color'] ?? null)) {
+            if (! is_array($color) || ! is_string($color['label'] ?? null) || trim($color['label']) === '' || ! is_string($color['color'] ?? null)) {
                 throw new InvalidArgumentException("{$plugin} needs a label and a colour for [{$name}].");
             }
 
-            if (trim($color['color']) === '' || preg_match('/[;{}<>"\'\\\\]/', $color['color']) === 1) {
-                throw new InvalidArgumentException("{$plugin} has an empty colour, or one with characters that could break its CSS, for [{$name}].");
+            $this->assertSafeCssValue($plugin, $name, $color['color']);
+
+            if ($this->supportsTextColor() && array_key_exists('text', $color)) {
+                if (! is_string($color['text'])) {
+                    throw new InvalidArgumentException("{$plugin} needs the text colour for [{$name}] to be a string.");
+                }
+
+                $this->assertSafeCssValue($plugin, $name, $color['text']);
             }
 
             $class = $this->getClass($name);
@@ -225,5 +256,15 @@ abstract class PaletteColorPlugin extends Plugin implements ProvidesEditorStyles
         }
 
         return $classes;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function assertSafeCssValue(string $plugin, string $name, string $value): void
+    {
+        if (trim($value) === '' || preg_match('/[;{}<>"\'\\\\]/', $value) === 1 || str_contains($value, '/*') || str_contains($value, '*/')) {
+            throw new InvalidArgumentException("{$plugin} has an empty colour, or one with characters that could break its CSS, for [{$name}].");
+        }
     }
 }

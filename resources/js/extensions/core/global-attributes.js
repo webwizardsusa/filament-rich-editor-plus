@@ -55,10 +55,11 @@ function compilePattern(attribute) {
 
 const parse = (attribute) => (element) => {
     if (attribute.kind === 'class') {
-        const tokens = (element.getAttribute('class') ?? '').split(/\s+/).filter(Boolean)
+        const classes = attribute.classes ?? {}
+        const tokens = (element.getAttribute('class') ?? '').split(/[ \t\n\f\r]+/).filter(Boolean)
 
         for (const token of tokens) {
-            const value = Object.keys(attribute.classes).find((key) => attribute.classes[key] === token)
+            const value = Object.keys(classes).find((key) => classes[key] === token)
 
             if (value !== undefined) {
                 return value

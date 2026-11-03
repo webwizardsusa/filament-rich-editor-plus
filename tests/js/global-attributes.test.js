@@ -140,6 +140,12 @@ describe('the class kind', () => {
         expect(editor.getHTML()).toBe('<p><strong class="has-blue-color">a</strong><strong>b</strong></p>')
     })
 
+    it('splits classes on HTML whitespace only', () => {
+        editor = makeEditor('<p><strong class="x\u00a0has-red-color">a</strong><strong class="x\thas-red-color">b</strong></p>', withAttributes(colour))
+
+        expect(editor.getJSON().content[0].content.map((text) => text.marks[0].attrs.color)).toEqual([null, 'red'])
+    })
+
     it('renders nothing for a value not in the map', () => {
         editor = makeEditor(doc({ type: 'paragraph', content: [{ type: 'text', text: 'a', marks: [{ type: 'bold', attrs: { color: 'teal' } }] }] }), withAttributes(colour))
 

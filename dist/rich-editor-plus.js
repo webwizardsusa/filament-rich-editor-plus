@@ -15733,10 +15733,10 @@ function mb(e) {
 }
 var hb = (e) => (t) => {
 	if (e.kind === "class") {
-		let n = (t.getAttribute("class") ?? "").split(/\s+/).filter(Boolean);
-		for (let t of n) {
-			let n = Object.keys(e.classes).find((n) => e.classes[n] === t);
-			if (n !== void 0) return n;
+		let n = e.classes ?? {}, r = (t.getAttribute("class") ?? "").split(/[ \t\n\f\r]+/).filter(Boolean);
+		for (let e of r) {
+			let t = Object.keys(n).find((t) => n[t] === e);
+			if (t !== void 0) return t;
 		}
 		return null;
 	}
@@ -15835,7 +15835,7 @@ var Sb = (e) => Object.values(e.attrs).every((e) => e == null), Cb = gp.create({
 	addCommands() {
 		return { removeEmptyTextStyle: () => ({ tr: e }) => {
 			let { from: t, to: n } = e.selection;
-			return e.doc.nodesBetween(t, n, (r, i) => !r.isText || (r.marks.some((e) => e.type === this.type && Sb(e)) && e.removeMark(Math.max(i, t), Math.min(i + r.nodeSize, n), this.type), !1)), e.storedMarks?.some((e) => e.type === this.type && Sb(e)) && e.removeStoredMark(this.type), !0;
+			return e.doc.nodesBetween(t, n, (r, i) => !r.isInline || (r.marks.some((e) => e.type === this.type && Sb(e)) && e.removeMark(Math.max(i, t), Math.min(i + r.nodeSize, n), this.type), !1)), e.storedMarks?.some((e) => e.type === this.type && Sb(e)) && e.removeStoredMark(this.type), !0;
 		} };
 	}
 }), wb = ub.extend({ renderHTML({ node: e, HTMLAttributes: t }) {

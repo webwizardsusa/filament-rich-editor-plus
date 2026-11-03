@@ -39,7 +39,7 @@ export const TextStyle = Mark.create({
                     const { from, to } = tr.selection
 
                     tr.doc.nodesBetween(from, to, (node, pos) => {
-                        if (!node.isText) {
+                        if (!node.isInline) {
                             return true
                         }
 

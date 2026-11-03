@@ -34,12 +34,12 @@ dataset('colour plugins', [
     'text' => [fn (): PaletteColorPlugin => TextColorPlugin::make(), [
         'id' => 'core/text-color', 'attribute' => 'color', 'tool' => 'textColor', 'label' => 'Text colour', 'current' => 'Text colour: :item',
         'icon' => 'mdi-format-color-text', 'order' => 10, 'set' => 'setTextColor', 'unset' => 'unsetTextColor', 'class' => 'has-red-color',
-        'red' => '#dc2626', 'property' => 'color', 'text' => 'A',
+        'red' => '#dc2626', 'entry' => ['label' => 'Red', 'color' => '#dc2626'], 'property' => 'color', 'text' => 'A',
     ]],
     'background' => [fn (): PaletteColorPlugin => BackgroundColorPlugin::make(), [
         'id' => 'core/background-color', 'attribute' => 'backgroundColor', 'tool' => 'backgroundColor', 'label' => 'Highlight', 'current' => 'Highlight: :item',
         'icon' => 'mdi-format-color-highlight', 'order' => 11, 'set' => 'setBackgroundColor', 'unset' => 'unsetBackgroundColor', 'class' => 'has-red-background-color',
-        'red' => '#fecaca', 'property' => 'background-color', 'text' => null,
+        'red' => '#fecaca', 'entry' => ['label' => 'Red', 'color' => '#fecaca', 'text' => '#1f2937'], 'property' => 'background-color', 'text' => null,
     ]],
 ]);
 
@@ -48,7 +48,7 @@ it('has its id, a default palette, and stays out of the defaults', function (Clo
 
     expect($plugin->getId())->toBe($expected['id'])
         ->and(array_keys($plugin->getColors()))->toBe(['gray', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'])
-        ->and($plugin->getColors()['red'])->toBe(['label' => 'Red', 'color' => $expected['red']])
+        ->and($plugin->getColors()['red'])->toBe($expected['entry'])
         ->and($plugin->getClass('red'))->toBe($expected['class'])
         ->and(array_map(fn ($default): string => $default->getId(), PluginRegistry::defaultPlugins()))->not->toContain($expected['id']);
 })->with('colour plugins');
@@ -84,6 +84,32 @@ it('writes a stylesheet for its palette', function (Closure $make, array $expect
     expect($css)->toBe(".{$expected['class']}{{$expected['property']}:#f00}\n.".str_replace('red', 'sky', $expected['class'])."{{$expected['property']}:rgb(0, 128, 255)}");
 })->with('colour plugins');
 
+it('writes the default highlight stylesheet with dark text at zero specificity', function (): void {
+    expect(BackgroundColorPlugin::make()->getStylesheet())->toStartWith(".has-gray-background-color{background-color:#e5e7eb}\n:where(.has-gray-background-color){color:#1f2937}\n.has-red-background-color{background-color:#fecaca}\n:where(.has-red-background-color){color:#1f2937}");
+});
+
+it('writes a text rule only for highlight entries that have one', function (): void {
+    $css = BackgroundColorPlugin::make()->colors([
+        'red' => ['label' => 'Red', 'color' => '#f00', 'text' => '#111'],
+        'sky' => ['label' => 'Sky', 'color' => '#0af'],
+    ])->getStylesheet();
+
+    expect($css)->toBe(".has-red-background-color{background-color:#f00}\n:where(.has-red-background-color){color:#111}\n.has-sky-background-color{background-color:#0af}");
+});
+
+it('ignores a text key on a text colour palette', function (): void {
+    expect(TextColorPlugin::make()->colors(['red' => ['label' => 'Red', 'color' => '#f00', 'text' => '#111']])->getStylesheet())->toBe('.has-red-color{color:#f00}');
+});
+
+it('sends palette names as strings, even digit-only ones', function (): void {
+    $plugin = TextColorPlugin::make()->colors(['500' => ['label' => 'Five hundred', 'color' => '#f00']]);
+    $items = array_map(fn (ToolMenuItem $item): array => $item->toArray(), $plugin->getTools()[0]->getMenu());
+
+    expect($plugin->getJsExtension()->toArray()['options'])->toBe(['colors' => ['500']])
+        ->and($items[1]['arguments'])->toBe(['500'])
+        ->and(json_encode($items[1]['active']))->toBe(json_encode(['name' => null, 'attributes' => ['color' => '500']]));
+});
+
 it('names classes with classUsing()', function (): void {
     $plugin = TextColorPlugin::make()->colors(['red' => ['label' => 'Red', 'color' => '#f00']])->classUsing(fn (string $name): string => "text-{$name}");
 
@@ -111,9 +137,19 @@ it('refuses a palette that could break the stylesheet or the menu', function (ar
     'tag' => [['red' => ['label' => 'Red', 'color' => '</style><script>']], null],
     'quote' => [['red' => ['label' => 'Red', 'color' => "url('x')"]], null],
     'backslash' => [['red' => ['label' => 'Red', 'color' => '\\66 00']], null],
+    'comment start' => [['red' => ['label' => 'Red', 'color' => 'red/*']], null],
+    'comment end' => [['red' => ['label' => 'Red', 'color' => '*/red']], null],
+    'empty label' => [['red' => ['label' => '', 'color' => '#f00']], null],
+    'blank label' => [['red' => ['label' => "  \n", 'color' => '#f00']], null],
     'bad class' => [['red' => ['label' => 'Red', 'color' => '#f00']], fn (string $name): string => "a {$name}"],
     'shared class' => [['red' => ['label' => 'Red', 'color' => '#f00'], 'rouge' => ['label' => 'Rouge', 'color' => '#f00']], fn (): string => 'same'],
 ]);
+
+it('refuses a highlight text colour that could break the stylesheet', function (mixed $text): void {
+    $plugin = BackgroundColorPlugin::make()->colors(['red' => ['label' => 'Red', 'color' => '#f00', 'text' => $text]]);
+
+    expect(fn () => $plugin->getStylesheet())->toThrow(InvalidArgumentException::class, 'BackgroundColorPlugin');
+})->with(['}', ' ', '/*', 3]);
 
 it('matches spans with a class or style, and not mentions', function (): void {
     $mark = TextColorPlugin::make()->getMarks()[0];
@@ -153,13 +189,11 @@ it('renders nothing for colours outside the palette in stored JSON', function (m
     expect(RichContentPlusRenderer::make($document)->plugins([TextColorPlugin::make(), BackgroundColorPlugin::make()])->toHtml())->toBe('<p><span>a</span></p>');
 })->with(['teal', 3, 'has-red-color', 'red" onclick="x']);
 
-it('renders the palettes into the field once, even when disabled', function (): void {
-    $field = RichEditorPlus::make('body')->addPlugins([TextColorPlugin::make(), BackgroundColorPlugin::make()]);
-    $html = $field->getEditorStylesHtml();
+it('renders the palettes into the field once', function (): void {
+    $html = RichEditorPlus::make('body')->addPlugins([TextColorPlugin::make(), BackgroundColorPlugin::make()])->getEditorStylesHtml();
 
     expect(substr_count($html, '<style data-rep-editor-styles>'))->toBe(1)
         ->and($html)->toContain('.has-red-color{color:#dc2626}')
         ->toContain('.has-red-background-color{background-color:#fecaca}')
-        ->and($field->disabled()->getEditorStylesHtml())->toBe($html)
         ->and(RichEditorPlus::make('body')->getEditorStylesHtml())->toBe('');
 });

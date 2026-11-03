@@ -178,15 +178,32 @@ RichEditorPlus::make('body')->addPlugins([
 - Colours are stored as classes: `has-brand-color` and `has-yellow-background-color` by default. Change the names with
   `classUsing(fn (string $name) => …)`.
 - Each plugin has a default eight-colour palette, and `colors()` replaces it.
-- Palette names are lower-case letters, digits and hyphens.
-- The field includes the palette CSS itself, but a page that displays content must include it too, configured the
-  same way as the field:
+- Palette names are lower-case letters, digits and hyphens, and don't start with a hyphen. `default` is reserved for the
+  menu's "Default" item. Every label must be non-empty.
+- A colour may not contain `;`, `{`, `}`, `<`, `>`, `"`, `'`, `\`, `/*` or `*/`.
+- `BackgroundColorPlugin` entries take an optional `'text'` colour, validated the same way, for the text inside the
+  highlight. The default palette sets dark text (`#1f2937`) so highlights stay readable in dark mode. It is written as a
+  zero-specificity `:where()` rule, so a text colour on the same span always wins. `TextColorPlugin` ignores `'text'`.
+- The field includes the palette CSS itself, but a page that displays content must include it too. Configure each
+  plugin exactly as on the field, or the classes and colours won't match:
 
   ```blade
-  <style>{!! TextColorPlugin::make()->getStylesheet() !!}</style>
+  @php
+      use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+      use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
+  @endphp
+
+  <style>
+      {!! TextColorPlugin::make()->getStylesheet() !!}
+      {!! BackgroundColorPlugin::make()->getStylesheet() !!}
+  </style>
   ```
 
   Or copy the rules into the site CSS. Content shown without them appears uncoloured.
+- A class means one colour site-wide: two fields that give the same class different colours clash on a page that shows both.
+- Removing an entry from a palette strips that colour from content the next time it is saved; until then the class stays in
+  stored HTML.
+- The field prints its palette CSS in an inline `<style>`, so a Content-Security-Policy must allow inline styles.
 
 | Plugin | Adds |
 |---|---|

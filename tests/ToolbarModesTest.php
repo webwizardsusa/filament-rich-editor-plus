@@ -7,6 +7,8 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
+use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Livewire\Component;
@@ -58,6 +60,8 @@ class ToolbarModesTestForm extends Component implements HasActions, HasSchemas
             'bubble-default-fixed' => $field->toolbarTools([['bold', 'italic', 'link']], onlyListed: true)->fixedToolbar()->fixedToolbarTools(inherit: false),
             'bubble-unflagged' => $field->toolbarTools([['bold', 'italic', 'link']]),
             'empty-floating' => $field->toolbarTools([], onlyListed: true),
+            'colours' => $field->addPlugins([TextColorPlugin::make(), BackgroundColorPlugin::make()]),
+            'colours-disabled' => $field->addPlugins([TextColorPlugin::make(), BackgroundColorPlugin::make()])->disabled(),
             default => null,
         };
 
@@ -214,4 +218,13 @@ it('copies the formatting bubble into the fixed toolbar when it inherits', funct
 
     expect($fixed->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold', 'italic', 'link'])
         ->and($fixed->contains('data-rep-control'))->toBeFalse();
+});
+
+it('prints the colour styles once, also when disabled, and not without the colour plugins', function (): void {
+    $tag = '<style data-rep-editor-styles>';
+
+    expect(substr_count(toolbarModesHtml('colours'), $tag))->toBe(1)
+        ->and(substr_count(toolbarModesHtml('colours-disabled'), $tag))->toBe(1)
+        ->and(toolbarModesHtml('colours'))->toContain('.has-red-color{color:#dc2626}')
+        ->and(toolbarModesHtml('floating'))->not->toContain('data-rep-editor-styles');
 });

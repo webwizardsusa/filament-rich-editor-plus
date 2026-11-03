@@ -207,3 +207,16 @@ it('validates a class kind', function (Closure $make, string $message): void {
     'pattern too' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 'x'])->types(['textStyle'])->pattern('.+'), 'values() and pattern()'],
     'no types' => [fn (): GlobalAttribute => GlobalAttribute::classes('color', ['red' => 'x']), 'types()'],
 ]);
+
+it('splits class lists on HTML whitespace only', function (string $class, ?string $expected): void {
+    $document = new DOMDocument;
+    $document->loadHTML('<?xml encoding="utf-8" ?><html><body><span></span></body></html>', LIBXML_NOERROR);
+    $element = $document->getElementsByTagName('span')->item(0);
+    $element->setAttribute('class', $class);
+
+    expect(GlobalAttribute::classes('color', ['red' => 'has-red-color'])->parse($element))->toBe($expected);
+})->with([
+    'non-breaking space' => ["x\u{a0}has-red-color", null],
+    'tab' => ["x\thas-red-color", 'red'],
+    'newline' => ["x\nhas-red-color ", 'red'],
+]);

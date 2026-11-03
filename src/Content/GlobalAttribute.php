@@ -300,7 +300,7 @@ class GlobalAttribute
     public function parse(DOMElement $element): ?string
     {
         if ($this->kind === 'class') {
-            foreach (preg_split('/\s+/', trim($element->getAttribute('class')), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $token) {
+            foreach (preg_split('/[ \t\n\f\r]+/', $element->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $token) {
                 $value = array_search($token, $this->classes ?? [], true);
 
                 if ($value !== false) {

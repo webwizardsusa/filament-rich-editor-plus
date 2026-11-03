@@ -223,7 +223,7 @@ export default function richEditorPlusComponent({
             if (blockToolbars.size || fixedElement) {
                 const toolbars = [...blockToolbars.values()]
 
-                blockControls = createBlockControls({ editor, root: this.$el, blockTypes: blockTypeList })
+                blockControls = createBlockControls({ editor, root: this.$el, blockTypes: blockTypeList, tools })
                 toolbarTooltip = createToolbarTooltip({
                     root: this.$el,
                     toolbars: fixedElement ? [fixedElement, ...toolbars] : toolbars,

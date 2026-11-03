@@ -448,6 +448,13 @@
     font-weight: 600;
 }
 
+.rep-menu-item-shortcut {
+    margin-inline-start: auto;
+    padding-inline-start: 1rem;
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
 .rep-menu-item-text {
     display: flex;
     flex-direction: column;

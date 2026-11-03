@@ -1,6 +1,7 @@
 import { getActiveList } from '../blocks/active-block'
 import { resolveActionArguments } from '../registry'
 import { allowsFormatting } from './block-controls'
+import { isToolActive } from './tool-menus'
 
 const isHiddenWithin = (toolbar, element) => {
     for (let current = element; current && current !== toolbar; current = current.parentElement) {
@@ -16,8 +17,6 @@ const toolButtons = (toolbar) =>
     [...toolbar.querySelectorAll('[data-rep-tool], [data-rep-control]')].filter(
         (button) => !isHiddenWithin(toolbar, button),
     )
-
-const normalizeAttributes = (attributes) => (Array.isArray(attributes) ? {} : (attributes ?? {}))
 
 export function runTool(editor, tool, mountAction) {
     if (tool?.action) {
@@ -52,8 +51,12 @@ export function syncToolbar(editor, toolbar, tools, { hideUnavailable = true } =
 
     toolbar.querySelectorAll('[data-rep-tool]').forEach((button) => {
         const tool = tools[button.dataset.repTool]
-        const active = tool?.active
-        const isActive = Boolean(active) && editor.isActive(active.name, normalizeAttributes(active.attributes))
+
+        if (tool?.menu) {
+            return
+        }
+
+        const isActive = isToolActive(editor, tool?.active)
         const isUnavailable =
             Boolean(tool?.checksAvailability) && !editor.can()[tool.command](...(tool.arguments ?? []))
 

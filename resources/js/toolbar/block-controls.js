@@ -8,6 +8,7 @@ import {
 } from '../blocks/active-block'
 import { findBlockType, switchBlock } from '../blocks/block-types'
 import { FloatingMenu } from './floating-menu'
+import { createToolMenus } from './tool-menus'
 
 const setDisabled = (element, isDisabled) => element?.setAttribute('aria-disabled', isDisabled ? 'true' : 'false')
 
@@ -33,9 +34,10 @@ export function allowsFormatting({ selection }) {
 /**
  * The parts of the block toolbar that act on the whole block: the switcher, move buttons and more menu. One set of
  * menus serves every toolbar in the editor. `sync(toolbar, { hideUnavailable: false })` keeps the list button and
- * formatting in place, disabled, for the fixed toolbar.
+ * formatting in place, disabled, for the fixed toolbar. Menu tools (`Tool::menu()`) open and sync here too, through
+ * `createToolMenus`.
  */
-export function createBlockControls({ editor, root, blockTypes }) {
+export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
     const switcherElement = root.querySelector('[data-rep-switcher-menu]')
     const moreElement = root.querySelector('[data-rep-more-menu]')
     const listElement = root.querySelector('[data-rep-list-menu]')
@@ -84,6 +86,8 @@ export function createBlockControls({ editor, root, blockTypes }) {
               },
           })
         : null
+
+    const toolMenus = createToolMenus({ editor, root, tools })
 
     const announce = (message) => {
         if (live) {
@@ -180,6 +184,16 @@ export function createBlockControls({ editor, root, blockTypes }) {
     }
 
     const handleControlClick = (event) => {
+        const menuButton = event.target.closest('[data-rep-tool][aria-haspopup="menu"]')
+
+        if (menuButton) {
+            if (!isDisabled(menuButton)) {
+                toolMenus.open(menuButton.dataset.repTool, menuButton)
+            }
+
+            return
+        }
+
         const button = event.target.closest('[data-rep-control]')
 
         if (button && !isDisabled(button)) {
@@ -190,7 +204,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
     const boundToolbars = new Set()
 
     return {
-        floatingElements: [switcherElement, moreElement, listElement].filter(Boolean),
+        floatingElements: [switcherElement, moreElement, listElement, ...toolMenus.floatingElements].filter(Boolean),
 
         bind(toolbar) {
             toolbar.addEventListener('click', handleControlClick)
@@ -230,6 +244,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
 
             moreItems.forEach((item) => setDisabled(item, !editor.can()[item.dataset.repMoreAction]?.()))
             setDisabled(toolbar.querySelector('[data-rep-control="more"]'), moreItems.every(isDisabled))
+            toolMenus.sync(toolbar)
 
             if (hideUnavailable) {
                 toolbar.querySelectorAll('[data-rep-inline-tools]').forEach((formatting) => {
@@ -242,6 +257,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
             switcherMenu.close({ restoreFocus: false })
             moreMenu.close({ restoreFocus: false })
             listMenu?.close({ restoreFocus: false })
+            toolMenus.closeMenus()
         },
 
         destroy() {
@@ -249,6 +265,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
             switcherMenu.destroy()
             moreMenu.destroy()
             listMenu?.destroy()
+            toolMenus.destroy()
         },
     }
 }

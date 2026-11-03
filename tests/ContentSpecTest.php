@@ -180,10 +180,19 @@ it('rejects an invalid global attribute when the schema is built', function (): 
         ->toThrow(InvalidArgumentException::class);
 });
 
-it('keeps a spec its own attribute when a global one has the same name', function (): void {
-    $schema = new ContentSchema([NodeSpec::make('paragraph')->parseTags(['p'])->attribute('textAlign', default: 'own')->renderTag('p')], [], [alignAttribute()]);
+it('rejects a global attribute that shares its name with an attribute of the spec', function (): void {
+    expect(fn () => new ContentSchema([NodeSpec::make('paragraph')->parseTags(['p'])->attribute('textAlign')->renderTag('p')], [], [alignAttribute()]))
+        ->toThrow(InvalidArgumentException::class, 'textAlign');
+});
 
-    expect($schema->node('paragraph')->parseAttributes(specElement('<p style="text-align: center">x</p>'), []))->toBe(['textAlign' => 'own']);
+it('rejects two global attributes with the same name on one type', function (): void {
+    expect(fn () => globalSchema([alignAttribute(), alignAttribute(['paragraph', 'heading'])]))
+        ->toThrow(InvalidArgumentException::class, 'textAlign');
+});
+
+it('allows global attributes with the same name on different types', function (): void {
+    expect(fn () => globalSchema([alignAttribute(['paragraph']), alignAttribute(['heading'])], [NodeSpec::make('heading')->renderTag('h2')]))
+        ->not->toThrow(InvalidArgumentException::class);
 });
 
 it('parses global attributes before the spec its own, null included', function (): void {

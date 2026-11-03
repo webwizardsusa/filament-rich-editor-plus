@@ -229,7 +229,7 @@ class HtmlSerializer
                 continue;
             }
 
-            if (preg_match('/^[a-zA-Z][a-zA-Z0-9:_.-]*$/', $name) !== 1 || str_starts_with(strtolower($name), 'on')) {
+            if (preg_match('/^[a-zA-Z][a-zA-Z0-9:_.-]*\z/', $name) !== 1 || str_starts_with(strtolower($name), 'on')) {
                 continue;
             }
 

@@ -135,3 +135,17 @@ it('rejects an invalid declaration', function (): void {
     expect(fn () => RichContentPlusRenderer::make('<p>a</p>')->plugins([$plugin])->toHtml())->toThrow(InvalidArgumentException::class)
         ->and(fn () => PluginRegistry::make([$plugin])->getJsExtensions())->toThrow(InvalidArgumentException::class);
 });
+
+it('rejects a global attribute that collides with an attribute a node already has', function (): void {
+    $plugin = globalAttributePlugin([GlobalAttribute::html('level', 'data-level')->types(['heading'])->pattern('[0-9]')]);
+
+    expect(fn () => PluginRegistry::make([HeadingPlugin::make(), $plugin])->getJsExtensions())->toThrow(InvalidArgumentException::class, 'level')
+        ->and(fn () => RichContentPlusRenderer::make('<h2>a</h2>')->plugins([HeadingPlugin::make(), $plugin])->toHtml())->toThrow(InvalidArgumentException::class, 'level');
+});
+
+it('rejects two global attributes with the same name on one type', function (): void {
+    $plugin = globalAttributePlugin([alignment(), alignment()]);
+
+    expect(fn () => PluginRegistry::make([$plugin])->getJsExtensions())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => RichContentPlusRenderer::make('<p>a</p>')->plugins([$plugin])->toHtml())->toThrow(InvalidArgumentException::class);
+});

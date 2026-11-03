@@ -38,7 +38,14 @@ export function normalize(attribute, value) {
         return attribute.values.find((allowed) => allowed.toLowerCase() === trimmed.toLowerCase()) ?? null
     }
 
-    return new RegExp(`^(?:${attribute.pattern})$`, 'u').test(trimmed) ? trimmed : null
+    return (attribute.regex ?? compilePattern(attribute)).test(trimmed) ? trimmed : null
+}
+
+/**
+ * The attribute's pattern as the anchored `u` expression PHP runs. It throws when JavaScript can't compile the pattern.
+ */
+function compilePattern(attribute) {
+    return new RegExp(`^(?:${attribute.pattern})$`, 'u')
 }
 
 const parse = (attribute) => (element) => {
@@ -63,7 +70,9 @@ const render = (attribute) => (attrs) => {
  * The browser side of the global attributes one PHP plugin declares (see `GlobalAttribute`). PHP sends one of these
  * per plugin, named after it, with `types` already resolved to node and mark names.
  */
-export function globalAttributesExtension({ name, attributes }) {
+export function globalAttributesExtension({ name, attributes: declared }) {
+    const attributes = declared.map((attribute) => (attribute.pattern === null ? attribute : { ...attribute, regex: compilePattern(attribute) }))
+
     return Extension.create({
         name,
 

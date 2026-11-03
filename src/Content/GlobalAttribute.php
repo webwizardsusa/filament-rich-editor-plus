@@ -14,9 +14,19 @@ use InvalidArgumentException;
 class GlobalAttribute
 {
     /**
+     * @var array<string, string>
+     */
+    protected const array PCRE_ONLY_SYNTAX = [
+        '/(?<!\\\\)\\\\[AzZ]/' => 'the anchors \\A, \\z and \\Z',
+        '/(?<!\\\\)(?:[*+?]|\\})\\+/' => 'possessive quantifiers',
+        '/\\(\\?>/' => 'atomic groups',
+        '/\\[\\[:/' => 'POSIX classes',
+    ];
+
+    /**
      * @var array<string>
      */
-    protected const array URL_ATTRIBUTES = ['href', 'src', 'action', 'formaction', 'xlink:href', 'poster', 'background', 'srcset'];
+    protected const array URL_ATTRIBUTES = ['href', 'src', 'action', 'formaction', 'xlink:href', 'poster', 'background', 'srcset', 'srcdoc', 'ping', 'data', 'codebase', 'cite', 'longdesc', 'xml:base', 'xmlns'];
 
     /**
      * @var array<string> | string
@@ -128,6 +138,10 @@ class GlobalAttribute
     {
         $label = "The global attribute [{$this->name}]";
 
+        if (preg_match('/^[A-Za-z][A-Za-z0-9_]*\z/', $this->name) !== 1) {
+            throw new InvalidArgumentException("{$label} needs a name of letters, digits and underscores that starts with a letter.");
+        }
+
         if ($this->types === [] || (is_string($this->types) && ! in_array($this->types, ['*', 'nodes', 'marks'], true))) {
             throw new InvalidArgumentException("{$label} needs types(): a list of node and mark names, or '*', 'nodes' or 'marks'.");
         }
@@ -140,12 +154,24 @@ class GlobalAttribute
             throw new InvalidArgumentException("{$label} needs at least one value.");
         }
 
+        foreach ($this->values ?? [] as $value) {
+            if (! is_string($value)) {
+                throw new InvalidArgumentException("{$label} needs values() to be strings.");
+            }
+        }
+
+        foreach (static::PCRE_ONLY_SYNTAX as $regex => $description) {
+            if ($this->pattern !== null && preg_match($regex, $this->pattern) === 1) {
+                throw new InvalidArgumentException("{$label} uses {$description}, which JavaScript doesn't have. The pattern must use syntax PHP and JavaScript share.");
+            }
+        }
+
         if ($this->pattern !== null && @preg_match($this->regex(), '') === false) {
             throw new InvalidArgumentException("{$label} has an invalid pattern.");
         }
 
         if ($this->kind === 'style') {
-            if (preg_match('/^(--)?[a-z][a-z0-9-]*$/', $this->key) !== 1) {
+            if (preg_match('/^[a-z][a-z0-9-]*\z/', $this->key) !== 1) {
                 throw new InvalidArgumentException("{$label} names [{$this->key}], which is not a CSS property.");
             }
 
@@ -158,7 +184,7 @@ class GlobalAttribute
             return;
         }
 
-        if (preg_match('/^[a-z][a-z0-9:_.-]*$/', $this->key) !== 1) {
+        if (preg_match('/^[a-z][a-z0-9:_.-]*\z/', $this->key) !== 1) {
             throw new InvalidArgumentException("{$label} names [{$this->key}], which is not an HTML attribute name.");
         }
 

@@ -150,3 +150,11 @@ it('renders nothing for a global attribute value that is not valid', function (m
         ['type' => 'paragraph', 'attrs' => ['color' => $value], 'content' => [['type' => 'text', 'text' => 'a']]],
     ]]))->toBe('<p>a</p>');
 })->with(['red; background: url(x)', 'url(x)', 'red"><script>', [['red']], 12, null]);
+
+it('leaves out an attribute whose name ends in a newline', function (): void {
+    $schema = new ContentSchema([
+        NodeSpec::make('paragraph')->renderUsing(fn (): array => ['p', ["href\n" => 'javascript:x', "title\n" => 't', 'id' => 'ok'], 0]),
+    ], []);
+
+    expect((new HtmlSerializer($schema))->serialize(['type' => 'doc', 'content' => [['type' => 'paragraph']]]))->toBe('<p id="ok"></p>');
+});

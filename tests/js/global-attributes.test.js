@@ -94,6 +94,12 @@ describe('the generated extension', () => {
         expect(editor.getHTML()).toBe('<h2 id="intro">a</h2><h2>b</h2>')
     })
 
+    it('throws when the editor is built with a pattern JavaScript cannot compile', () => {
+        const broken = { ...color, pattern: '[a-z\\_]+' }
+
+        expect(() => makeEditor('<p>a</p>', withAttributes(broken))).toThrow()
+    })
+
     it('passes keepOnSplit through', () => {
         editor = makeEditor('<p>a</p>', withAttributes(textAlign, anchor))
 

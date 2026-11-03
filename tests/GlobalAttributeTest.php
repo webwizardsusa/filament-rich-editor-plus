@@ -44,7 +44,7 @@ it('needs types', function (): void {
 it('refuses attributes that can carry script or URLs', function (string $name): void {
     expect(fn () => GlobalAttribute::html('a', $name)->types(['paragraph'])->pattern('.+')->assertValid())
         ->toThrow(InvalidArgumentException::class);
-})->with(['style', 'onclick', 'ONLOAD', 'href', 'src', 'action', 'formaction', 'xlink:href', 'poster', 'background', 'srcset', 'bad name']);
+})->with(['style', 'onclick', 'ONLOAD', 'href', 'src', 'action', 'formaction', 'xlink:href', 'poster', 'background', 'srcset', 'srcdoc', 'ping', 'data', 'codebase', 'cite', 'longdesc', 'xml:base', 'xmlns', 'bad name', "href\n", "onclick\n"]);
 
 it('allows class and data attributes', function (string $name): void {
     expect(fn () => GlobalAttribute::html('a', $name)->types(['paragraph'])->values(['x'])->assertValid())
@@ -128,4 +128,29 @@ it('describes itself for the browser', function (): void {
         ->and(fn () => GlobalAttribute::style('a', 'color')->toArray())->toThrow(InvalidArgumentException::class)
         ->and(textAlign()->isProvidedByJsExtension())->toBeFalse()
         ->and(textAlign()->providedByJsExtension()->isProvidedByJsExtension())->toBeTrue();
+});
+
+it('refuses a style property with a custom property name or a trailing newline', function (string $property): void {
+    expect(fn () => GlobalAttribute::style('a', $property)->types(['paragraph'])->values(['x'])->assertValid())
+        ->toThrow(InvalidArgumentException::class);
+})->with(['--x', "color\n"]);
+
+it('needs a name of letters, digits and underscores', function (string $name): void {
+    expect(fn () => GlobalAttribute::style($name, 'color')->types(['paragraph'])->values(['red'])->assertValid())
+        ->toThrow(InvalidArgumentException::class, 'name');
+})->with(['', '1a', 'a-b', 'a b', "a\n"]);
+
+it('needs values to be strings', function (): void {
+    expect(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->values(['red', 1])->assertValid())
+        ->toThrow(InvalidArgumentException::class, 'strings');
+});
+
+it('refuses pattern syntax that only PCRE has', function (string $pattern): void {
+    expect(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->pattern($pattern)->assertValid())
+        ->toThrow(InvalidArgumentException::class, 'PHP and JavaScript share');
+})->with(['\\Ared', 'red\\z', 'red\\Z', 'a++', 'a*+', 'a?+', 'a{1,2}+', '(?>a|ab)', '[[:alpha:]]']);
+
+it('allows an escaped plus before a quantifier', function (): void {
+    expect(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->pattern('\\++a')->assertValid())
+        ->not->toThrow(InvalidArgumentException::class);
 });

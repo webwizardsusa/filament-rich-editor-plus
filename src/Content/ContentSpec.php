@@ -141,16 +141,19 @@ abstract class ContentSpec
 
     /**
      * Adds an attribute another plugin declared for this node or mark, which {@see ContentSchema} does on a copy of the
-     * spec. Global attributes are parsed and rendered before the spec's own, as in TipTap. One the spec declares
-     * itself keeps its own definition, and a later global attribute with the same name replaces an earlier one.
+     * spec. Global attributes are parsed and rendered before the spec's own, as in TipTap. {@see ContentSchema}
+     * refuses a name the spec already has or another global attribute already added, so none is replaced here.
      */
     public function globalAttribute(GlobalAttribute $attribute): static
     {
-        if (! array_key_exists($attribute->getName(), $this->attributes)) {
-            $this->globalAttributes[$attribute->getName()] = $attribute;
-        }
+        $this->globalAttributes[$attribute->getName()] = $attribute;
 
         return $this;
+    }
+
+    public function declaresAttribute(string $name): bool
+    {
+        return array_key_exists($name, $this->attributes);
     }
 
     public function renderTag(string $tag): static

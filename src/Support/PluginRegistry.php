@@ -4,6 +4,7 @@ namespace Hollyit\RichEditorPlus\Support;
 
 use Closure;
 use Filament\Actions\Action;
+use Hollyit\RichEditorPlus\Content\ContentSchema;
 use Hollyit\RichEditorPlus\Content\ContentSpec;
 use Hollyit\RichEditorPlus\Content\GlobalAttribute;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
@@ -309,8 +310,15 @@ class PluginRegistry
     public function getJsExtensions(): array
     {
         $descriptors = [];
-        $nodeNames = array_map(static fn (NodeSpec $node): string => $node->getName(), $this->getNodes());
-        $markNames = array_map(static fn (MarkSpec $mark): string => $mark->getName(), $this->getMarks());
+        $nodeNames = [];
+        $markNames = [];
+
+        if ($this->getGlobalAttributes() !== []) {
+            ContentSchema::fromRegistry($this);
+
+            $nodeNames = array_map(static fn (NodeSpec $node): string => $node->getName(), $this->getNodes());
+            $markNames = array_map(static fn (MarkSpec $mark): string => $mark->getName(), $this->getMarks());
+        }
 
         foreach ($this->plugins as $id => $plugin) {
             $descriptor = $plugin->getJsExtension()->toArray();

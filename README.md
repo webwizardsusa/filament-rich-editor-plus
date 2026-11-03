@@ -185,6 +185,7 @@ class AlignmentPlugin extends Plugin implements ProvidesGlobalAttributes
 To add one to an existing plugin, such as anchors on headings, extend it from a service provider:
 
 ```php
+use Hollyit\RichEditorPlus\Content\GlobalAttribute;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginExtension;
 
@@ -202,7 +203,9 @@ RichEditorPlus::extendPlugin('core/heading', fn (PluginExtension $extension) => 
   content is parsed and when it is rendered, so stored JSON can't smuggle CSS or markup through.
 - Values are strings, the default is `null`, and `null` is not rendered. `keepOnSplit(false)` stops Enter from copying
   the value to the new block.
-- `html()` refuses `style`, event handlers (`on*`) and URL attributes such as `href` and `src`.
+- `html()` refuses `style`, event handlers (`on*`) and URL or embedding attributes such as `href`, `src` and `srcdoc`.
+- A global attribute can't share its name with an attribute the node or mark already has, or with another global
+  attribute on the same type.
 - If a TipTap extension you load already declares the attribute in the browser, call `providedByJsExtension()` so
   only the server side is generated.
 - The editor writes `style` values in the browser's normalized form (a colour such as `#F00` is saved as

@@ -4,6 +4,7 @@ namespace Hollyit\RichEditorPlus\Content;
 
 use DOMElement;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use InvalidArgumentException;
 
 /**
  * The nodes and marks one editor understands. `doc` and `text` are built into the engine.
@@ -29,6 +30,8 @@ class ContentSchema
      * @param  array<NodeSpec>  $nodes
      * @param  array<MarkSpec>  $marks
      * @param  array<GlobalAttribute>  $globalAttributes  Added, in order, to copies of the specs they name.
+     *
+     * @throws InvalidArgumentException When a global attribute is invalid or shares its name with another attribute of a spec.
      */
     public function __construct(array $nodes, array $marks, array $globalAttributes = [])
     {
@@ -43,9 +46,15 @@ class ContentSchema
 
         $withGlobalAttributes = static function (ContentSpec $spec) use ($globalAttributes, $types): ContentSpec {
             $copy = null;
+            $added = [];
 
             foreach ($globalAttributes as $index => $attribute) {
                 if (in_array($spec->getName(), $types[$index], true)) {
+                    if ($spec->declaresAttribute($attribute->getName()) || isset($added[$attribute->getName()])) {
+                        throw new InvalidArgumentException("The global attribute [{$attribute->getName()}] can't be added to [{$spec->getName()}], which already has an attribute with that name.");
+                    }
+
+                    $added[$attribute->getName()] = true;
                     $copy ??= clone $spec;
                     $copy->globalAttribute($attribute);
                 }

@@ -277,3 +277,32 @@ it('closes open menus when asked', () => {
 
     expect(root.querySelector('[data-rep-more-menu]').hidden).toBe(true)
 })
+
+it('keeps the list button showing but disabled outside a list when told not to hide', () => {
+    setUp(doc(p('abc')))
+    editor.commands.setTextSelection(1)
+
+    controls.sync(toolbar, { hideUnavailable: false })
+
+    expect(toolbar.querySelector('[data-rep-list-tools]').hidden).toBe(false)
+    expect(control('list').getAttribute('aria-disabled')).toBe('true')
+})
+
+it('keeps formatting showing in a code block when told not to hide', () => {
+    setUp(doc({ type: 'codeBlock', content: [{ type: 'text', text: 'code' }] }))
+    editor.commands.setTextSelection(2)
+
+    controls.sync(toolbar, { hideUnavailable: false })
+
+    expect(toolbar.querySelector('[data-rep-inline-tools]').hidden).toBe(false)
+})
+
+it('hides every formatting section in a code block by default', () => {
+    toolbar.querySelector('[data-rep-inline-tools]').insertAdjacentHTML('afterend', '<span data-rep-inline-tools><button data-rep-tool="italic"></button></span>')
+    setUp(doc({ type: 'codeBlock', content: [{ type: 'text', text: 'code' }] }))
+    editor.commands.setTextSelection(2)
+
+    controls.sync(toolbar)
+
+    expect([...toolbar.querySelectorAll('[data-rep-inline-tools]')].map((section) => section.hidden)).toEqual([true, true])
+})

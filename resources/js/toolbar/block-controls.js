@@ -32,7 +32,8 @@ export function allowsFormatting({ selection }) {
 
 /**
  * The parts of the block toolbar that act on the whole block: the switcher, move buttons and more menu. One set of
- * menus serves every toolbar in the editor.
+ * menus serves every toolbar in the editor. `sync(toolbar, { hideUnavailable: false })` keeps the list button and
+ * formatting in place, disabled, for the fixed toolbar.
  */
 export function createBlockControls({ editor, root, blockTypes }) {
     const switcherElement = root.querySelector('[data-rep-switcher-menu]')
@@ -98,7 +99,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
         list: (button) => listMenu?.open(button),
     }
 
-    const syncListMenu = (toolbar, spans) => {
+    const syncListMenu = (toolbar, spans, hideUnavailable) => {
         const group = toolbar.querySelector('[data-rep-list-tools]')
 
         if (!group || !listElement) {
@@ -106,14 +107,15 @@ export function createBlockControls({ editor, root, blockTypes }) {
         }
 
         const list = getActiveList(editor.state.selection)
+        const button = group.querySelector('[data-rep-control="list"]')
 
-        group.hidden = !list
+        group.hidden = hideUnavailable && !list
 
         if (!list) {
+            setDisabled(button, true)
+
             return
         }
-
-        const button = group.querySelector('[data-rep-control="list"]')
         const name = list.type.name
         const type = listElement.querySelector(`[data-rep-list-type="${name}"]`)
 
@@ -183,7 +185,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
             boundToolbars.add(toolbar)
         },
 
-        sync(toolbar) {
+        sync(toolbar, { hideUnavailable = true } = {}) {
             const { state } = editor
             const block = getActiveBlock(state)
 
@@ -205,7 +207,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
                 : findBlockType(blockTypes, block.node)
 
             syncSwitcher(toolbar, current, paragraphs)
-            syncListMenu(toolbar, spans)
+            syncListMenu(toolbar, spans, hideUnavailable)
 
             setDisabled(switcher, (locked && !paragraphs) || !current?.switchable)
             setDisabled(toolbar.querySelector('[data-rep-control="moveUp"]'), locked || !editor.can().moveBlockUp())
@@ -217,10 +219,10 @@ export function createBlockControls({ editor, root, blockTypes }) {
             moreItems.forEach((item) => setDisabled(item, !editor.can()[item.dataset.repMoreAction]?.()))
             setDisabled(toolbar.querySelector('[data-rep-control="more"]'), moreItems.every(isDisabled))
 
-            const formatting = toolbar.querySelector('[data-rep-inline-tools]')
-
-            if (formatting) {
-                formatting.hidden = !allowsFormatting(state)
+            if (hideUnavailable) {
+                toolbar.querySelectorAll('[data-rep-inline-tools]').forEach((formatting) => {
+                    formatting.hidden = !allowsFormatting(state)
+                })
             }
         },
 

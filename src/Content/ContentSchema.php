@@ -28,14 +28,37 @@ class ContentSchema
     /**
      * @param  array<NodeSpec>  $nodes
      * @param  array<MarkSpec>  $marks
+     * @param  array<GlobalAttribute>  $globalAttributes  Added, in order, to copies of the specs they name.
      */
-    public function __construct(array $nodes, array $marks)
+    public function __construct(array $nodes, array $marks, array $globalAttributes = [])
     {
-        foreach ($this->sortByPriority($nodes) as $node) {
+        $nodeNames = array_map(static fn (NodeSpec $node): string => $node->getName(), $nodes);
+        $markNames = array_map(static fn (MarkSpec $mark): string => $mark->getName(), $marks);
+        $types = [];
+
+        foreach ($globalAttributes as $index => $attribute) {
+            $attribute->assertValid();
+            $types[$index] = $attribute->resolveTypes($nodeNames, $markNames);
+        }
+
+        $withGlobalAttributes = static function (ContentSpec $spec) use ($globalAttributes, $types): ContentSpec {
+            $copy = null;
+
+            foreach ($globalAttributes as $index => $attribute) {
+                if (in_array($spec->getName(), $types[$index], true)) {
+                    $copy ??= clone $spec;
+                    $copy->globalAttribute($attribute);
+                }
+            }
+
+            return $copy ?? $spec;
+        };
+
+        foreach ($this->sortByPriority(array_map($withGlobalAttributes, $nodes)) as $node) {
             $this->nodes[$node->getName()] = $node;
         }
 
-        foreach ($this->sortByPriority($marks) as $mark) {
+        foreach ($this->sortByPriority(array_map($withGlobalAttributes, $marks)) as $mark) {
             $this->marks[$mark->getName()] = $mark;
         }
 

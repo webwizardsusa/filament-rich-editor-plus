@@ -27,6 +27,11 @@ abstract class ContentSpec
     protected array $attributes = [];
 
     /**
+     * @var array<string, GlobalAttribute>
+     */
+    protected array $globalAttributes = [];
+
+    /**
      * @var array<string, mixed>
      */
     protected array $fixedAttributes = [];
@@ -134,6 +139,20 @@ abstract class ContentSpec
         return $this;
     }
 
+    /**
+     * Adds an attribute another plugin declared for this node or mark, which {@see ContentSchema} does on a copy of the
+     * spec. Global attributes are parsed and rendered before the spec's own, as in TipTap. One the spec declares
+     * itself keeps its own definition, and a later global attribute with the same name replaces an earlier one.
+     */
+    public function globalAttribute(GlobalAttribute $attribute): static
+    {
+        if (! array_key_exists($attribute->getName(), $this->attributes)) {
+            $this->globalAttributes[$attribute->getName()] = $attribute;
+        }
+
+        return $this;
+    }
+
     public function renderTag(string $tag): static
     {
         $this->renderTag = $tag;
@@ -190,6 +209,10 @@ abstract class ContentSpec
     public function parseAttributes(DOMElement $element, array $matched): array
     {
         $values = [];
+
+        foreach ($this->globalAttributes as $name => $attribute) {
+            $values[$name] = $attribute->parse($element);
+        }
 
         foreach ($this->attributes as $name => $attribute) {
             if ($attribute['transient']) {
@@ -277,6 +300,10 @@ abstract class ContentSpec
     {
         $html = [];
 
+        foreach ($this->globalAttributes as $name => $attribute) {
+            $html = static::mergeHtmlAttributes($html, $attribute->render($attrs[$name] ?? null));
+        }
+
         foreach ($this->attributes as $name => $attribute) {
             if ($forStorage && $attribute['transient']) {
                 continue;
@@ -292,9 +319,84 @@ abstract class ContentSpec
                 ? ($attribute['render'])([...$attrs, $name => $value])
                 : [$name => $value];
 
-            $html = [...$html, ...array_filter($rendered, static fn (mixed $item): bool => $item !== null)];
+            $html = static::mergeHtmlAttributes($html, $rendered);
         }
 
         return [...$html, ...$this->fixedAttributes];
+    }
+
+    /**
+     * Merges rendered attributes as TipTap's `mergeAttributes` does, so the server writes the same HTML as the editor:
+     * classes are appended without duplicates, `style` declarations are merged by property, and any other attribute
+     * takes the later value. Null values are skipped, and an empty earlier value is replaced.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $additional
+     * @return array<string, mixed>
+     */
+    public static function mergeHtmlAttributes(array $attributes, array $additional): array
+    {
+        foreach ($additional as $name => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            $existing = $attributes[$name] ?? null;
+
+            if ($existing === null || $existing === '' || $existing === false || $existing === 0) {
+                $attributes[$name] = $value;
+
+                continue;
+            }
+
+            $attributes[$name] = match ($name) {
+                'class' => static::mergeClasses((string) $existing, (string) $value),
+                'style' => static::mergeStyles((string) $existing, (string) $value),
+                default => $value,
+            };
+        }
+
+        return $attributes;
+    }
+
+    protected static function mergeClasses(string $existing, string $additional): string
+    {
+        $classes = explode(' ', $existing);
+
+        foreach (explode(' ', $additional) as $class) {
+            if (! in_array($class, $classes, true)) {
+                $classes[] = $class;
+            }
+        }
+
+        return implode(' ', $classes);
+    }
+
+    protected static function mergeStyles(string $existing, string $additional): string
+    {
+        $declarations = [];
+
+        foreach ([$existing, $additional] as $style) {
+            foreach (explode(';', $style) as $declaration) {
+                $colon = strpos($declaration, ':');
+
+                if ($colon === false) {
+                    continue;
+                }
+
+                $property = trim(substr($declaration, 0, $colon));
+                $value = trim(substr($declaration, $colon + 1));
+
+                if ($property !== '' && $value !== '') {
+                    $declarations[$property] = $value;
+                }
+            }
+        }
+
+        return implode('; ', array_map(
+            static fn (string $property, string $value): string => "{$property}: {$value}",
+            array_keys($declarations),
+            $declarations,
+        ));
     }
 }

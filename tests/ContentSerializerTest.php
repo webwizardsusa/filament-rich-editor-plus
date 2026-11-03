@@ -1,6 +1,7 @@
 <?php
 
 use Hollyit\RichEditorPlus\Content\ContentSchema;
+use Hollyit\RichEditorPlus\Content\GlobalAttribute;
 use Hollyit\RichEditorPlus\Content\HtmlSerializer;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
@@ -137,3 +138,15 @@ it('renders text and elements that come before the children', function (): void 
 
     expect($html)->toBe('<div>before<hr><p></p></div>');
 });
+
+it('renders nothing for a global attribute value that is not valid', function (mixed $value): void {
+    $schema = new ContentSchema(
+        [NodeSpec::make('paragraph')->renderTag('p')],
+        [],
+        [GlobalAttribute::style('color', 'color')->types(['paragraph'])->pattern('[a-z]+|#[0-9a-fA-F]{3,6}')],
+    );
+
+    expect((new HtmlSerializer($schema))->serialize(['type' => 'doc', 'content' => [
+        ['type' => 'paragraph', 'attrs' => ['color' => $value], 'content' => [['type' => 'text', 'text' => 'a']]],
+    ]]))->toBe('<p>a</p>');
+})->with(['red; background: url(x)', 'url(x)', 'red"><script>', [['red']], 12, null]);

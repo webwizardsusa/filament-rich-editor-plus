@@ -3,8 +3,10 @@
 namespace Hollyit\RichEditorPlus\Support;
 
 use Filament\Actions\Action;
+use Hollyit\RichEditorPlus\Content\GlobalAttribute;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
+use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
 
 /**
  * What another package or the app adds to an existing plugin, collected by `RichEditorPlus::extendPlugin()`.
@@ -40,6 +42,11 @@ class PluginExtension
      * @var array<BlockType>
      */
     protected array $blockTypes = [];
+
+    /**
+     * @var array<GlobalAttribute>
+     */
+    protected array $globalAttributes = [];
 
     /**
      * @param  array<Tool>  $tools
@@ -149,6 +156,27 @@ class PluginExtension
     public function getMarks(): array
     {
         return $this->marks;
+    }
+
+    /**
+     * Attributes for nodes and marks, such as an `id` on headings, on the terms of
+     * {@see ProvidesGlobalAttributes}.
+     *
+     * @param  array<GlobalAttribute>  $attributes
+     */
+    public function addGlobalAttributes(array $attributes): static
+    {
+        $this->globalAttributes = [...$this->globalAttributes, ...$attributes];
+
+        return $this;
+    }
+
+    /**
+     * @return array<GlobalAttribute>
+     */
+    public function getGlobalAttributes(): array
+    {
+        return $this->globalAttributes;
     }
 
     /**

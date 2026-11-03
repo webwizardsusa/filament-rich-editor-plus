@@ -5,10 +5,12 @@ namespace Hollyit\RichEditorPlus\Support;
 use Closure;
 use Filament\Actions\Action;
 use Hollyit\RichEditorPlus\Content\ContentSpec;
+use Hollyit\RichEditorPlus\Content\GlobalAttribute;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
+use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
 use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
@@ -269,11 +271,46 @@ class PluginRegistry
     }
 
     /**
+     * Every plugin's global attributes, then those added to it with {@see extendPlugin()}, in plugin order.
+     *
+     * @return array<GlobalAttribute>
+     */
+    public function getGlobalAttributes(): array
+    {
+        $attributes = [];
+
+        foreach (array_keys($this->plugins) as $id) {
+            $attributes = [...$attributes, ...$this->globalAttributesOf($id)];
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @return array<GlobalAttribute>
+     */
+    protected function globalAttributesOf(string $id): array
+    {
+        $plugin = $this->plugins[$id];
+
+        return [
+            ...($plugin instanceof ProvidesGlobalAttributes ? $plugin->getGlobalAttributes() : []),
+            ...$this->extensions[$id]->getGlobalAttributes(),
+        ];
+    }
+
+    /**
+     * Each plugin's extension, followed by a `core/global-attributes` extension for the global attributes it declares
+     * (other than those a TipTap extension provides), so the browser collects them in the same order as the server.
+     * `'*'`, `'nodes'` and `'marks'` are resolved here, so both sides target the same types.
+     *
      * @return array<array{id: string, options: array<string, mixed>, modules?: array<string>}>
      */
     public function getJsExtensions(): array
     {
         $descriptors = [];
+        $nodeNames = array_map(static fn (NodeSpec $node): string => $node->getName(), $this->getNodes());
+        $markNames = array_map(static fn (MarkSpec $mark): string => $mark->getName(), $this->getMarks());
 
         foreach ($this->plugins as $id => $plugin) {
             $descriptor = $plugin->getJsExtension()->toArray();
@@ -285,6 +322,26 @@ class PluginRegistry
             }
 
             $descriptors[] = $descriptor;
+
+            $attributes = array_values(array_filter(
+                $this->globalAttributesOf($id),
+                static fn (GlobalAttribute $attribute): bool => ! $attribute->isProvidedByJsExtension(),
+            ));
+
+            if ($attributes === []) {
+                continue;
+            }
+
+            $descriptors[] = JsExtension::make('core/global-attributes', [
+                'name' => "globalAttributes:{$id}",
+                'attributes' => array_map(
+                    static fn (GlobalAttribute $attribute): array => [
+                        ...$attribute->toArray(),
+                        'types' => $attribute->resolveTypes($nodeNames, $markNames),
+                    ],
+                    $attributes,
+                ),
+            ])->toArray();
         }
 
         return $descriptors;

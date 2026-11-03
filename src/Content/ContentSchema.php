@@ -67,7 +67,7 @@ class ContentSchema
 
     public static function fromRegistry(PluginRegistry $registry): static
     {
-        return new static($registry->getNodes(), $registry->getMarks());
+        return new static($registry->getNodes(), $registry->getMarks(), $registry->getGlobalAttributes());
     }
 
     public function node(string $name): ?NodeSpec

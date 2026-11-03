@@ -12,6 +12,8 @@ class Tool
 
     protected ?string $icon = null;
 
+    protected ?string $shortcut = null;
+
     protected ?string $command = null;
 
     protected ?string $action = null;
@@ -62,6 +64,17 @@ class Tool
     public function icon(?string $icon): static
     {
         $this->icon = $icon;
+
+        return $this;
+    }
+
+    /**
+     * The keyboard shortcut the button's tooltip shows, in TipTap's notation such as `Mod-b` or `Mod-Shift-s`. `Mod`
+     * shows as ⌘ on a Mac and Ctrl elsewhere. It only labels the button; the plugin's extension binds the key.
+     */
+    public function shortcut(?string $shortcut): static
+    {
+        $this->shortcut = $shortcut;
 
         return $this;
     }
@@ -199,6 +212,11 @@ class Tool
         return $this->icon;
     }
 
+    public function getShortcut(): ?string
+    {
+        return $this->shortcut;
+    }
+
     public function getCommand(): ?string
     {
         return $this->command;
@@ -269,7 +287,7 @@ class Tool
     }
 
     /**
-     * @return array{name: string, label: ?string, icon: ?string, command: ?string, action: ?string, arguments: array<int, mixed>, active: ?array{name: string, attributes: array<string, mixed>}, scope: string, nodes: array<string>, checksAvailability: bool, hidesInListItem: bool, group: ?string, order: int}
+     * @return array{name: string, label: ?string, icon: ?string, shortcut: ?string, command: ?string, action: ?string, arguments: array<int, mixed>, active: ?array{name: string, attributes: array<string, mixed>}, scope: string, nodes: array<string>, checksAvailability: bool, hidesInListItem: bool, group: ?string, order: int}
      */
     public function toArray(): array
     {
@@ -277,6 +295,7 @@ class Tool
             'name' => $this->name,
             'label' => $this->label,
             'icon' => $this->icon,
+            'shortcut' => $this->shortcut,
             'command' => $this->command,
             'action' => $this->action,
             'arguments' => $this->arguments,

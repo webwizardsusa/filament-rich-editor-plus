@@ -27,8 +27,8 @@ class ToolbarRenderer
 
         $html .= $this->renderDragHandle();
         $html .= $this->renderSwitcher();
-        $html .= $this->renderControl('moveUp', 'mdi-arrow-up', __('rich-editor-plus::toolbar.move_up'));
-        $html .= $this->renderControl('moveDown', 'mdi-arrow-down', __('rich-editor-plus::toolbar.move_down'));
+        $html .= $this->renderControl('moveUp', 'mdi-arrow-up', __('rich-editor-plus::toolbar.move_up'), shortcut: 'Alt-Shift-ArrowUp');
+        $html .= $this->renderControl('moveDown', 'mdi-arrow-down', __('rich-editor-plus::toolbar.move_down'), shortcut: 'Alt-Shift-ArrowDown');
 
         if ($inlineTools !== []) {
             $html .= '<span class="rep-toolbar-group" data-rep-inline-tools>'
@@ -55,14 +55,15 @@ class ToolbarRenderer
     }
 
     /**
-     * The handle is left out of keyboard navigation because Alt+Shift+Arrow does the same job.
+     * The handle is left out of keyboard navigation because Alt+Shift+Arrow does the same job. Being hidden from
+     * assistive technology, it has no accessible name, so its tooltip text is given separately.
      */
     protected function renderDragHandle(): string
     {
         $label = e(__('rich-editor-plus::toolbar.drag'));
 
         return '<button type="button" class="rep-tool rep-drag-handle" draggable="true" tabindex="-1" data-rep-drag-handle'
-            .' aria-hidden="true" title="'.$label.'">'.generate_icon_html('mdi-drag')->toHtml().'</button>';
+            .' aria-hidden="true" data-rep-tooltip="'.$label.'">'.generate_icon_html('mdi-drag')->toHtml().'</button>';
     }
 
     protected function renderSwitcher(): string
@@ -72,15 +73,15 @@ class ToolbarRenderer
         return '<button type="button" class="rep-tool rep-switcher" tabindex="-1" data-rep-control="switcher"'
             .' data-rep-generic-label="'.e(__('rich-editor-plus::blocks.generic')).'"'
             .' data-rep-multiple-label="'.e(__('rich-editor-plus::blocks.multiple')).'"'
-            .' aria-label="'.$label.'" title="'.$label.'" aria-haspopup="menu" aria-expanded="false">'
+            .' aria-label="'.$label.'" aria-haspopup="menu" aria-expanded="false">'
             .'<span data-rep-switcher-icon></span><span class="rep-switcher-label" data-rep-switcher-label></span>'
             .generate_icon_html('mdi-chevron-down')->toHtml().'</button>';
     }
 
-    protected function renderControl(string $control, string $icon, string $label, string $attributes = ''): string
+    protected function renderControl(string $control, string $icon, string $label, string $attributes = '', ?string $shortcut = null): string
     {
         return '<button type="button" class="rep-tool" tabindex="-1" data-rep-control="'.e($control).'"'
-            .' aria-label="'.e($label).'" title="'.e($label).'" '.$attributes.'>'
+            .' aria-label="'.e($label).'"'.$this->renderShortcut($shortcut).' '.$attributes.'>'
             .generate_icon_html($icon)->toHtml().'</button>';
     }
 
@@ -129,6 +130,14 @@ class ToolbarRenderer
         $icon = generate_icon_html($tool->getIcon())?->toHtml() ?? $label;
 
         return '<button type="button" class="rep-tool" tabindex="-1" data-rep-tool="'.e($tool->getName()).'"'
-            .' aria-label="'.$label.'" title="'.$label.'" aria-pressed="false">'.$icon.'</button>';
+            .' aria-label="'.$label.'"'.$this->renderShortcut($tool->getShortcut()).' aria-pressed="false">'.$icon.'</button>';
+    }
+
+    /**
+     * The browser turns this into the tooltip's key hint and `aria-keyshortcuts`, both of which depend on the platform.
+     */
+    protected function renderShortcut(?string $shortcut): string
+    {
+        return $shortcut === null ? '' : ' data-rep-shortcut="'.e($shortcut).'"';
     }
 }

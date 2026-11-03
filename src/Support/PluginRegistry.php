@@ -303,14 +303,40 @@ class PluginRegistry
     /**
      * The tools for the inline (text selection) toolbar, in display order.
      *
+     * @param  ?array<int, array<string>>  $groups  tool names to show, grouped and in order, in place of the plugins'
+     *                                              own order and groups. Names with no inline tool are skipped.
      * @return array<Tool>
      */
-    public function getInlineTools(): array
+    public function getInlineTools(?array $groups = null): array
     {
-        return $this->sortTools(array_filter(
+        $tools = array_filter(
             $this->getTools(),
             static fn (Tool $tool): bool => $tool->getScope() === ToolScope::Inline,
-        ));
+        );
+
+        if ($groups === null) {
+            return $this->sortTools($tools);
+        }
+
+        $toolsByName = [];
+
+        foreach ($tools as $tool) {
+            $toolsByName[$tool->getName()] = $tool;
+        }
+
+        $arranged = [];
+
+        foreach ($groups as $index => $names) {
+            foreach ($names as $name) {
+                if (isset($toolsByName[$name])) {
+                    // A copy, so the plugin's own tool keeps its group for any other field.
+                    $arranged[] = (clone $toolsByName[$name])->group("toolbar-{$index}");
+                    unset($toolsByName[$name]);
+                }
+            }
+        }
+
+        return $arranged;
     }
 
     /**

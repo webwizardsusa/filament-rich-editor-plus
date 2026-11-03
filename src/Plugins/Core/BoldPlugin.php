@@ -44,6 +44,7 @@ class BoldPlugin extends Plugin
             Tool::make('bold')
                 ->label(__('rich-editor-plus::tools.bold'))
                 ->icon('mdi-format-bold')
+                ->shortcut('Mod-b')
                 ->command('toggleBold')
                 ->active('bold')
                 ->inline()

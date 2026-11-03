@@ -259,3 +259,53 @@ it('renders plugin editor html and overflow tools with the toolbars', function (
         ->toContain('data-test-panel')
         ->toContain('data-rep-more-action="runExtra"');
 });
+
+it('renders a tool shortcut for the tooltip instead of a native title', function (): void {
+    $html = (new ToolbarRenderer)->renderBlockToolbar('*', [], [Tool::make('bold')->label('Bold')->shortcut('Mod-b')]);
+
+    expect($html)
+        ->toContain('data-rep-tool="bold" aria-label="Bold" data-rep-shortcut="Mod-b"')
+        ->toContain('data-rep-control="moveUp" aria-label="Move block up" data-rep-shortcut="Alt-Shift-ArrowUp"')
+        ->not->toContain(' title=');
+});
+
+it('gives the core formatting tools their shortcuts', function (): void {
+    $shortcuts = collect(RichEditorPlus::make('body')->getPluginRegistry()->getInlineTools())
+        ->mapWithKeys(fn (Tool $tool): array => [$tool->getName() => $tool->getShortcut()])
+        ->all();
+
+    expect($shortcuts)->toMatchArray(['bold' => 'Mod-b', 'italic' => 'Mod-i', 'underline' => 'Mod-u', 'strikethrough' => 'Mod-Shift-s']);
+});
+
+it('arranges the formatting tools per field', function (): void {
+    $html = RichEditorPlus::make('body')
+        ->toolbarTools([['link', 'bold'], ['italic', 'missing']])
+        ->getToolbarsHtml();
+
+    $toolbar = str($html)->betweenFirst('data-rep-block-toolbar="*"', '</div>');
+
+    expect($toolbar->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['link', 'bold', 'italic'])
+        ->and($toolbar->substrCount('rep-toolbar-group-divider'))->toBe(1);
+});
+
+it('treats a flat list of tools as one group', function (): void {
+    $tools = RichEditorPlus::make('body')->toolbarTools(['italic', 'bold'])->getToolbarTools();
+
+    expect($tools)->toBe([['italic', 'bold']]);
+});
+
+it('keeps the plugins order without a toolbar arrangement', function (): void {
+    $field = RichEditorPlus::make('body');
+
+    expect(collect($field->getPluginRegistry()->getInlineTools($field->getToolbarTools()))->map->getName()->all())
+        ->toBe(collect($field->getPluginRegistry()->getInlineTools())->map->getName()->all())
+        ->and($field->getToolbarTools())->toBeNull();
+});
+
+it('leaves the plugins own tools untouched when arranging', function (): void {
+    $registry = PluginRegistry::make([BoldPlugin::make()]);
+
+    $registry->getInlineTools([['bold']]);
+
+    expect($registry->getInlineTools()[0]->getGroup())->toBe('format');
+});

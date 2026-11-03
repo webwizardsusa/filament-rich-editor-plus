@@ -48,6 +48,11 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     protected StateFormat|Closure $stateFormat = StateFormat::Html;
 
     /**
+     * @var array<string | array<string>> | Closure | null
+     */
+    protected array|Closure|null $toolbarTools = null;
+
+    /**
      * Replaces the default plugin set. Each entry is a plugin instance or class name.
      *
      * @param  array<EditorPlugin | class-string<EditorPlugin>> | Closure | null  $plugins
@@ -107,6 +112,42 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         $this->excludedPlugins = $plugins;
 
         return $this;
+    }
+
+    /**
+     * Chooses which formatting tools the toolbar shows and in what order, by tool name. Each inner array is a group,
+     * with a divider between groups; a flat list is one group. Tools left out are hidden, though their keyboard
+     * shortcuts still work (remove the plugin with `withoutPlugins()` to drop those too), and names of tools the
+     * field doesn't have are skipped. `null` keeps the plugins' own order.
+     *
+     * @param  array<string | array<string>> | Closure | null  $tools
+     */
+    public function toolbarTools(array|Closure|null $tools): static
+    {
+        $this->toolbarTools = $tools;
+
+        return $this;
+    }
+
+    /**
+     * @return ?array<int, array<string>>
+     */
+    public function getToolbarTools(): ?array
+    {
+        $tools = $this->evaluate($this->toolbarTools);
+
+        if ($tools === null) {
+            return null;
+        }
+
+        if (array_filter($tools, is_array(...)) === []) {
+            return [array_values($tools)];
+        }
+
+        return array_map(
+            static fn (string|array $group): array => array_values((array) $group),
+            array_values($tools),
+        );
     }
 
     public function storeAs(StateFormat|Closure $format): static
@@ -301,7 +342,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         $toolbarRenderer = new ToolbarRenderer;
         $menuRenderer = new BlockMenuRenderer;
 
-        $inlineTools = $registry->getInlineTools();
+        $inlineTools = $registry->getInlineTools($this->getToolbarTools());
         $blockTypes = $registry->getBlockTypes();
 
         $listTypes = $registry->getListTypes();

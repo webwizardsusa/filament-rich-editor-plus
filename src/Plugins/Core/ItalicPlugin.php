@@ -40,6 +40,7 @@ class ItalicPlugin extends Plugin
             Tool::make('italic')
                 ->label(__('rich-editor-plus::tools.italic'))
                 ->icon('mdi-format-italic')
+                ->shortcut('Mod-i')
                 ->command('toggleItalic')
                 ->active('italic')
                 ->inline()

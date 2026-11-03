@@ -36,6 +36,7 @@ class UnderlinePlugin extends Plugin
             Tool::make('underline')
                 ->label(__('rich-editor-plus::tools.underline'))
                 ->icon('mdi-format-underline')
+                ->shortcut('Mod-u')
                 ->command('toggleUnderline')
                 ->active('underline')
                 ->inline()

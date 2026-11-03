@@ -132,7 +132,6 @@ export function createBlockControls({ editor, root, blockTypes }) {
 
             button.querySelector('[data-rep-list-icon]').replaceChildren(type.querySelector('svg').cloneNode(true))
             button.setAttribute('aria-label', label)
-            button.setAttribute('title', label)
             button.dataset.repCurrent = name
         }
     }

@@ -130,7 +130,6 @@ it('shows the icon and name of the current list type', () => {
 
     expect(listButton().querySelector('[data-rep-list-icon] svg').dataset.icon).toBe('ordered')
     expect(listButton().getAttribute('aria-label')).toBe('List options: Numbered list')
-    expect(listButton().getAttribute('title')).toBe('List options: Numbered list')
 })
 
 it('updates the icon when the cursor moves to a list of another type', () => {

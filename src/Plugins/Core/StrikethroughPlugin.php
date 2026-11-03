@@ -36,6 +36,7 @@ class StrikethroughPlugin extends Plugin
             Tool::make('strikethrough')
                 ->label(__('rich-editor-plus::tools.strikethrough'))
                 ->icon('mdi-format-strikethrough')
+                ->shortcut('Mod-Shift-s')
                 ->command('toggleStrike')
                 ->active('strike')
                 ->inline()

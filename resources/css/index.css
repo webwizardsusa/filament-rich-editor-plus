@@ -9,6 +9,8 @@
     --rep-tool-active-background: var(--gray-900);
     --rep-tool-active-color: #fff;
     --rep-divider: var(--gray-300);
+    --rep-tooltip-background: var(--gray-900);
+    --rep-tooltip-color: #fff;
     --rep-font: inherit;
     --rep-text: var(--gray-950);
     --rep-muted: var(--gray-500);
@@ -33,6 +35,8 @@
     --rep-tool-active-background: #fff;
     --rep-tool-active-color: var(--gray-900);
     --rep-divider: rgb(255 255 255 / 0.2);
+    --rep-tooltip-background: var(--gray-100);
+    --rep-tooltip-color: var(--gray-900);
     --rep-text: var(--gray-100);
     --rep-muted: var(--gray-400);
     --rep-code-background: rgb(255 255 255 / 0.05);
@@ -214,8 +218,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 0.25rem;
     color: var(--rep-tool-color);
     cursor: pointer;
@@ -231,8 +235,8 @@
 }
 
 .rep-tool svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.375rem;
+    height: 1.375rem;
 }
 
 .rep-tool[aria-pressed='true'] {
@@ -250,7 +254,7 @@
 }
 
 .rep-drag-handle {
-    width: 1.5rem;
+    width: 1.75rem;
     cursor: grab;
 }
 
@@ -278,6 +282,37 @@
 
 .rep-list-button [data-rep-list-icon] {
     display: inline-flex;
+}
+
+.rep-tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 32;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--rep-tooltip-background);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.16);
+    color: var(--rep-tooltip-color);
+    font-family: var(--rep-font);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.rep-tooltip[hidden],
+.rep-tooltip-keys[hidden] {
+    display: none;
+}
+
+.rep-tooltip-keys {
+    font-family: inherit;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
 }
 
 .rep-menu {

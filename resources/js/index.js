@@ -12,6 +12,7 @@ import { registerSuggestion } from './slash/suggestion-list'
 import { createBlockDrag } from './toolbar/block-drag'
 import { createBlockToolbarPlugin } from './toolbar/block-toolbar'
 import { bindToolbar, syncToolbar } from './toolbar/tools'
+import { createToolbarTooltip } from './toolbar/tooltip'
 import { tiptap } from './shared-modules'
 
 const { Selection } = tiptap.pmState
@@ -45,6 +46,7 @@ export default function richEditorPlusComponent({
     let blockControls = null
     let blockDrag = null
     let mentionLabels = null
+    let toolbarTooltip = null
 
     const blockTypeList = toBlockTypeList(blockTypes)
 
@@ -214,6 +216,7 @@ export default function richEditorPlusComponent({
             const mountAction = (action, args) => this.mountAction(action, args)
 
             blockControls = createBlockControls({ editor, root: this.$el, blockTypes: blockTypeList })
+            toolbarTooltip = createToolbarTooltip({ root: this.$el, toolbars })
 
             const sync = () =>
                 toolbars.forEach((toolbar) => {
@@ -234,7 +237,10 @@ export default function richEditorPlusComponent({
                     root: this.$el,
                     floatingElements: blockControls.floatingElements,
                     onShow: sync,
-                    onHide: () => blockControls.closeMenus(),
+                    onHide: () => {
+                        toolbarTooltip.hide()
+                        blockControls.closeMenus()
+                    },
                 }),
             )
 
@@ -307,6 +313,7 @@ export default function richEditorPlusComponent({
 
             mentionLabels?.destroy()
             blockDrag?.destroy()
+            toolbarTooltip?.destroy()
             blockControls?.destroy()
             editor?.destroy()
             editor = null

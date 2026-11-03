@@ -63,6 +63,28 @@ $html = Cache::remember(
 Mentions are looked up when the HTML is rendered, so a cached copy keeps a renamed user's old name until the entry
 expires. Keep the lifetime as short as that staleness allows.
 
+## Toolbar
+
+Choose which formatting tools a field's toolbar shows, and in what order, by tool name. Each inner array is a group,
+with a divider between groups:
+
+```php
+RichEditorPlus::make('body')->toolbarTools([
+    ['bold', 'italic', 'underline'],
+    ['link'],
+]);
+```
+
+Tools you leave out are hidden, but their keyboard shortcuts still work. To drop a tool completely, remove its plugin
+with `withoutPlugins()`. A flat list is treated as one group.
+
+Hovering over a button, or focusing it from the keyboard, shows its name and shortcut. A plugin labels its own tool's
+shortcut in TipTap's notation; `Mod` shows as ⌘ on a Mac and Ctrl elsewhere:
+
+```php
+Tool::make('highlight')->shortcut('Mod-Shift-h');
+```
+
 ## Writing a plugin with JavaScript
 
 A plugin that adds editor behaviour ships an ES module. The editor imports it before it builds the editor, and calls

@@ -139,11 +139,13 @@ These plugins ship with the package but aren't in the default set. Add them to a
 service provider:
 
 ```php
+use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TextAlignPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
 
 RichEditorPlus::make('body')->addPlugins([CodePlugin::make(), TaskListPlugin::make()]);
@@ -158,12 +160,42 @@ RichEditorPlus::make('body')->addPlugins([
 RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class]);
 ```
 
+The colour plugins take a palette of named colours. Each entry has a label for the menu and a CSS colour:
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
+
+RichEditorPlus::make('body')->addPlugins([
+    TextColorPlugin::make()->colors([
+        'brand' => ['label' => 'Brand', 'color' => '#7c3aed'],
+        'muted' => ['label' => 'Muted', 'color' => '#6b7280'],
+    ]),
+    BackgroundColorPlugin::make(), // the default palette
+]);
+```
+
+- Colours are stored as classes: `has-brand-color` and `has-yellow-background-color` by default. Change the names with
+  `classUsing(fn (string $name) => …)`.
+- Each plugin has a default eight-colour palette, and `colors()` replaces it.
+- Palette names are lower-case letters, digits and hyphens.
+- The field includes the palette CSS itself, but a page that displays content must include it too, configured the
+  same way as the field:
+
+  ```blade
+  <style>{!! TextColorPlugin::make()->getStylesheet() !!}</style>
+  ```
+
+  Or copy the rules into the site CSS. Content shown without them appears uncoloured.
+
 | Plugin | Adds |
 |---|---|
 | `CodePlugin` | Inline code (`Mod-e`). Code text can't have other marks. |
 | `SubscriptPlugin`, `SuperscriptPlugin` | Subscript (`Mod-,`) and superscript (`Mod-.`), in the more menu. Each replaces the other. |
 | `TaskListPlugin` | A checkbox list, in the list menu next to bulleted and numbered lists. Saved and rendered checkboxes are `disabled`; style them with `ul[data-type="taskList"]` and `li[data-checked="true"]`. |
 | `TextAlignPlugin` | An alignment menu on the block toolbar, for paragraphs and headings. It stores `style="text-align: …"`. Configure it with the alignments on offer, the node types it applies to, and the default alignment, which is never stored: choosing it clears the attribute. On a right-to-left site, use `defaultAlignment('right')`. The menu appears in every block toolbar and is disabled where nothing can be aligned. Shortcuts: `Mod-Shift-l`, `Mod-Shift-e`, `Mod-Shift-r` and `Mod-Shift-j` for left, center, right and justify (Ctrl on Windows and Linux, Cmd on macOS), bound only for the configured alignments. |
+| `TextColorPlugin` | A text colour menu on the toolbar, from a palette of eight colours by default. It stores the colour as a class on a span. |
+| `BackgroundColorPlugin` | A highlight menu on the toolbar, from a palette of eight pale colours by default. It stores the highlight as a class on a span. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
 ## Global attributes
@@ -217,6 +249,8 @@ RichEditorPlus::extendPlugin('core/heading', fn (PluginExtension $extension) => 
   attribute on the same type.
 - If a TipTap extension you load already declares the attribute in the browser, call `providedByJsExtension()` so
   only the server side is generated.
+- `classes($name, ['value' => 'class', …])` sets one class per value, such as `has-red-color` for `red`. Other classes on
+  the element are left alone. Keys are lower-case letters, digits and hyphens.
 - The editor writes `style` values in the browser's normalized form (a colour such as `#F00` is saved as
   `rgb(255, 0, 0)`), and that HTML is parsed again when the field loads. A `style()` pattern must accept that form
   too, or the value is dropped.
@@ -321,6 +355,10 @@ Tool::make('textAlign')
 - A menu tool runs its items, not a command of its own.
 - `active()` without a name matches any node or mark with those attributes.
 - Menu tools can be inline or block tools, not in the more menu.
+- `swatch($class, $text = null)` shows a small box filled by the class (a palette colour, say) instead of an icon, with optional text such as `'A'`.
+- `fallback()` marks the item that is current when no other item is active, such as "Default" in a colour menu.
+- A plugin whose content needs CSS in the editor, such as palette classes, implements `ProvidesEditorStyles` and
+  returns the CSS from `getEditorStyles()`. The field prints it in a `<style>` element, so return only validated CSS.
 
 ### JS side
 

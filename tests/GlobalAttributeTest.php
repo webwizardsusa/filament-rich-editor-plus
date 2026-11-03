@@ -1,0 +1,131 @@
+<?php
+
+use Hollyit\RichEditorPlus\Content\GlobalAttribute;
+use Tests\TestCase;
+
+uses(TestCase::class);
+
+function globalAttributeElement(string $html): DOMElement
+{
+    $document = new DOMDocument;
+    $document->loadHTML('<?xml encoding="utf-8" ?><html><body>'.$html.'</body></html>', LIBXML_NOERROR);
+
+    return $document->getElementsByTagName('body')->item(0)->firstElementChild;
+}
+
+function textAlign(): GlobalAttribute
+{
+    return GlobalAttribute::style('textAlign', 'text-align')
+        ->types(['paragraph', 'heading'])
+        ->values(['left', 'center', 'right', 'justify']);
+}
+
+function anchor(): GlobalAttribute
+{
+    return GlobalAttribute::html('anchor', 'id')->types(['heading'])->pattern('[A-Za-z][A-Za-z0-9_-]*');
+}
+
+it('needs values or a pattern, but not both', function (): void {
+    expect(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->assertValid())
+        ->toThrow(InvalidArgumentException::class, 'values() or pattern()')
+        ->and(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->values(['red'])->pattern('.+')->assertValid())
+        ->toThrow(InvalidArgumentException::class, 'values() or pattern()')
+        ->and(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->values([])->assertValid())
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('needs types', function (): void {
+    expect(fn () => GlobalAttribute::style('a', 'color')->values(['red'])->assertValid())
+        ->toThrow(InvalidArgumentException::class, 'types()')
+        ->and(fn () => GlobalAttribute::style('a', 'color')->types('blocks')->values(['red'])->assertValid())
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('refuses attributes that can carry script or URLs', function (string $name): void {
+    expect(fn () => GlobalAttribute::html('a', $name)->types(['paragraph'])->pattern('.+')->assertValid())
+        ->toThrow(InvalidArgumentException::class);
+})->with(['style', 'onclick', 'ONLOAD', 'href', 'src', 'action', 'formaction', 'xlink:href', 'poster', 'background', 'srcset', 'bad name']);
+
+it('allows class and data attributes', function (string $name): void {
+    expect(fn () => GlobalAttribute::html('a', $name)->types(['paragraph'])->values(['x'])->assertValid())
+        ->not->toThrow(InvalidArgumentException::class);
+})->with(['class', 'data-tone', 'id']);
+
+it('refuses a style value list that could add declarations, and a broken pattern', function (): void {
+    expect(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->values(['red; top: 0'])->assertValid())
+        ->toThrow(InvalidArgumentException::class)
+        ->and(fn () => GlobalAttribute::style('a', 'color')->types(['paragraph'])->pattern('(')->assertValid())
+        ->toThrow(InvalidArgumentException::class, 'pattern')
+        ->and(fn () => GlobalAttribute::style('a', 'not a property')->types(['paragraph'])->values(['x'])->assertValid())
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('keeps listed values in their listed spelling, matched without regard to case', function (): void {
+    $attribute = GlobalAttribute::style('a', 'text-align')->types(['paragraph'])->values(['Center', 'left']);
+
+    expect($attribute->normalize('center'))->toBe('Center')
+        ->and($attribute->normalize(' LEFT '))->toBe('left')
+        ->and($attribute->normalize('middle'))->toBeNull();
+});
+
+it('anchors patterns', function (): void {
+    expect(anchor()->normalize('intro'))->toBe('intro')
+        ->and(anchor()->normalize('intro section'))->toBeNull()
+        ->and(anchor()->normalize('1intro'))->toBeNull();
+});
+
+it('treats non-strings, empty values and style values with a semicolon as invalid', function (mixed $value): void {
+    expect(GlobalAttribute::style('a', 'color')->types(['paragraph'])->pattern('.+')->normalize($value))->toBeNull();
+})->with([null, 1, 1.5, true, [['red']], '', '   ', 'red; background: url(x)']);
+
+it('allows a semicolon in an html attribute value', function (): void {
+    expect(GlobalAttribute::html('a', 'title')->types(['paragraph'])->pattern('.+')->normalize('a; b'))->toBe('a; b');
+});
+
+it('reads a style property from raw style text, the last declaration winning', function (): void {
+    expect(GlobalAttribute::styleValue('color: red; TEXT-ALIGN : Center ;', 'text-align'))->toBe('Center')
+        ->and(GlobalAttribute::styleValue('text-align: left; text-align: right', 'text-align'))->toBe('right')
+        ->and(GlobalAttribute::styleValue('color: #F00', 'color'))->toBe('#F00')
+        ->and(GlobalAttribute::styleValue('color red', 'color'))->toBeNull()
+        ->and(GlobalAttribute::styleValue('', 'color'))->toBeNull();
+});
+
+it('parses from an element', function (): void {
+    expect(textAlign()->parse(globalAttributeElement('<p style="text-align: CENTER">x</p>')))->toBe('center')
+        ->and(textAlign()->parse(globalAttributeElement('<p style="text-align: middle">x</p>')))->toBeNull()
+        ->and(textAlign()->parse(globalAttributeElement('<p>x</p>')))->toBeNull()
+        ->and(anchor()->parse(globalAttributeElement('<h2 id="intro">x</h2>')))->toBe('intro')
+        ->and(anchor()->parse(globalAttributeElement('<h2>x</h2>')))->toBeNull();
+});
+
+it('renders valid values only', function (): void {
+    expect(textAlign()->render('center'))->toBe(['style' => 'text-align: center'])
+        ->and(textAlign()->render('center; background: url(x)'))->toBe([])
+        ->and(textAlign()->render(null))->toBe([])
+        ->and(anchor()->render('intro'))->toBe(['id' => 'intro']);
+});
+
+it('resolves its types against the schema', function (): void {
+    $nodes = ['paragraph', 'heading'];
+    $marks = ['bold'];
+
+    expect(textAlign()->types('*')->resolveTypes($nodes, $marks))->toBe(['paragraph', 'heading', 'bold'])
+        ->and(textAlign()->types('nodes')->resolveTypes($nodes, $marks))->toBe(['paragraph', 'heading'])
+        ->and(textAlign()->types('marks')->resolveTypes($nodes, $marks))->toBe(['bold'])
+        ->and(textAlign()->types(['heading', 'missing', 'bold'])->resolveTypes($nodes, $marks))->toBe(['heading', 'bold']);
+});
+
+it('describes itself for the browser', function (): void {
+    expect(textAlign()->keepOnSplit(false)->toArray())->toBe([
+        'name' => 'textAlign',
+        'kind' => 'style',
+        'key' => 'text-align',
+        'types' => ['paragraph', 'heading'],
+        'values' => ['left', 'center', 'right', 'justify'],
+        'pattern' => null,
+        'keepOnSplit' => false,
+    ])
+        ->and(fn () => GlobalAttribute::style('a', 'color')->toArray())->toThrow(InvalidArgumentException::class)
+        ->and(textAlign()->isProvidedByJsExtension())->toBeFalse()
+        ->and(textAlign()->providedByJsExtension()->isProvidedByJsExtension())->toBeTrue();
+});

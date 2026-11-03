@@ -18,15 +18,26 @@ export function getActiveBlock({ selection, doc }) {
 }
 
 /**
+ * Whether a node type is a list, such as a bullet, numbered or task list. TipTap puts every list in the `list` group.
+ */
+export function isListNode(nodeType) {
+    return (nodeType.spec.group ?? '').split(' ').includes('list')
+}
+
+/**
  * The nearest list item or quote around the cursor, with its depth. Lists and quotes can nest inside each other, and
- * this is the one the cursor is really in.
+ * this is the one the cursor is really in. A list item is any node directly inside a list, so task items count too.
  */
 export function getLevelContainer({ $from }) {
     for (let depth = $from.depth; depth > 0; depth--) {
         const { name } = $from.node(depth).type
 
-        if (name === 'listItem' || name === 'blockquote') {
-            return { name, depth }
+        if (name === 'blockquote') {
+            return { name, depth, isListItem: false }
+        }
+
+        if (isListNode($from.node(depth - 1).type)) {
+            return { name, depth, isListItem: true }
         }
     }
 
@@ -39,7 +50,7 @@ export function getLevelContainer({ $from }) {
 export function getActiveList(selection) {
     const container = getLevelContainer(selection)
 
-    return container?.name === 'listItem' ? selection.$from.node(container.depth - 1) : null
+    return container?.isListItem ? selection.$from.node(container.depth - 1) : null
 }
 
 /**

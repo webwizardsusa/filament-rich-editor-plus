@@ -1,6 +1,8 @@
 import { Extension } from '@tiptap/core'
 import { NodeSelection } from '@tiptap/pm/state'
-import { getActiveBlock, getActiveList, getLevelContainer, selectionSpansBlocks, selectsNestedBlock } from './active-block'
+import { Mapping } from '@tiptap/pm/transform'
+import { getActiveBlock, getLevelContainer, isListNode, selectionSpansBlocks, selectsNestedBlock } from './active-block'
+import { convertList, itemTypeOf } from './convert-list'
 import { deleteBlockAt, duplicateBlockAt, moveBlock } from './move-block'
 
 /**
@@ -10,10 +12,10 @@ import { deleteBlockAt, duplicateBlockAt, moveBlock } from './move-block'
 const singleBlock = (tr) => (selectionSpansBlocks(tr) || selectsNestedBlock(tr) ? null : getActiveBlock(tr))
 
 /**
- * The blocks "select parent" stops at. Paragraphs and list items are skipped: there is nothing useful to do with them
- * once selected, and they would mean extra clicks to reach the list.
+ * Whether "select parent" stops at a node. Paragraphs and list items are skipped: there is nothing useful to do with
+ * them once selected, and they would mean extra clicks to reach the list.
  */
-const PARENT_BLOCKS = ['bulletList', 'orderedList', 'blockquote']
+const isParentBlock = (nodeType) => isListNode(nodeType) || nodeType.name === 'blockquote'
 
 const moveByOne = (direction) => ({ tr, dispatch }) => {
     const block = singleBlock(tr)
@@ -86,7 +88,7 @@ export const BlockCommands = Extension.create({
                 const { $from, to } = tr.selection
 
                 for (let depth = $from.sharedDepth(to); depth > 0; depth--) {
-                    if (PARENT_BLOCKS.includes($from.node(depth).type.name)) {
+                    if (isParentBlock($from.node(depth).type)) {
                         if (dispatch) {
                             tr.setSelection(NodeSelection.create(tr.doc, $from.before(depth)))
                         }
@@ -99,36 +101,56 @@ export const BlockCommands = Extension.create({
             },
 
             /**
-             * TipTap's toggle removes the list when it is already that type, so that case is a no-op here.
+             * TipTap's toggle removes the list when it is already that type, so that case is a no-op here. Between list
+             * types with different items, such as bullet and task lists, the list is rebuilt in place so nesting stays.
              */
-            setListType: (name) => ({ state, commands }) => {
-                const list = getActiveList(state.selection)
+            setListType: (name) => ({ state, tr, dispatch, commands }) => {
+                const container = getLevelContainer(state.selection)
+                const targetType = state.schema.nodes[name]
 
-                if (!list) {
+                if (!container?.isListItem || !targetType || !isListNode(targetType)) {
                     return false
                 }
 
-                return list.type.name === name || commands.toggleList(name, 'listItem')
+                const listDepth = container.depth - 1
+                const list = state.selection.$from.node(listDepth)
+
+                if (list.type === targetType) {
+                    return true
+                }
+
+                if (itemTypeOf(list.type) === itemTypeOf(targetType)) {
+                    return commands.toggleList(name, itemTypeOf(targetType).name)
+                }
+
+                if (dispatch) {
+                    const pos = state.selection.$from.before(listDepth)
+
+                    tr.replaceWith(pos, pos + list.nodeSize, convertList(list, targetType))
+                    tr.setSelection(state.selection.map(tr.doc, new Mapping()))
+                }
+
+                return true
             },
 
             increaseBlockLevel: () => ({ state, commands }) => {
-                const container = getLevelContainer(state.selection)?.name
+                const container = getLevelContainer(state.selection)
 
-                if (container === 'listItem') {
-                    return commands.sinkListItem('listItem')
+                if (container?.isListItem) {
+                    return commands.sinkListItem(container.name)
                 }
 
-                return container === 'blockquote' && commands.wrapIn('blockquote')
+                return container?.name === 'blockquote' && commands.wrapIn('blockquote')
             },
 
             decreaseBlockLevel: () => ({ state, commands }) => {
-                const container = getLevelContainer(state.selection)?.name
+                const container = getLevelContainer(state.selection)
 
-                if (container === 'listItem') {
-                    return commands.liftListItem('listItem')
+                if (container?.isListItem) {
+                    return commands.liftListItem(container.name)
                 }
 
-                return container === 'blockquote' && commands.lift('blockquote')
+                return container?.name === 'blockquote' && commands.lift('blockquote')
             },
         }
     },

@@ -41,7 +41,7 @@ class BackgroundColorPlugin extends PaletteColorPlugin
 
     protected function toolOrder(): int
     {
-        return 11;
+        return 66;
     }
 
     protected function cssProperty(): string

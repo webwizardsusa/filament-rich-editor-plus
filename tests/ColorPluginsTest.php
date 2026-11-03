@@ -33,12 +33,12 @@ function colourElement(string $html): DOMElement
 dataset('colour plugins', [
     'text' => [fn (): PaletteColorPlugin => TextColorPlugin::make(), [
         'id' => 'core/text-color', 'attribute' => 'color', 'tool' => 'textColor', 'label' => 'Text colour', 'current' => 'Text colour: :item',
-        'icon' => 'mdi-format-color-text', 'order' => 10, 'set' => 'setTextColor', 'unset' => 'unsetTextColor', 'class' => 'has-red-color',
+        'icon' => 'mdi-format-color-text', 'order' => 65, 'set' => 'setTextColor', 'unset' => 'unsetTextColor', 'class' => 'has-red-color',
         'red' => '#dc2626', 'entry' => ['label' => 'Red', 'color' => '#dc2626'], 'property' => 'color', 'text' => 'A',
     ]],
     'background' => [fn (): PaletteColorPlugin => BackgroundColorPlugin::make(), [
         'id' => 'core/background-color', 'attribute' => 'backgroundColor', 'tool' => 'backgroundColor', 'label' => 'Highlight', 'current' => 'Highlight: :item',
-        'icon' => 'mdi-format-color-highlight', 'order' => 11, 'set' => 'setBackgroundColor', 'unset' => 'unsetBackgroundColor', 'class' => 'has-red-background-color',
+        'icon' => 'mdi-format-color-highlight', 'order' => 66, 'set' => 'setBackgroundColor', 'unset' => 'unsetBackgroundColor', 'class' => 'has-red-background-color',
         'red' => '#fecaca', 'entry' => ['label' => 'Red', 'color' => '#fecaca', 'text' => '#1f2937'], 'property' => 'background-color', 'text' => null,
     ]],
 ]);
@@ -137,6 +137,10 @@ it('refuses a palette that could break the stylesheet or the menu', function (ar
     'tag' => [['red' => ['label' => 'Red', 'color' => '</style><script>']], null],
     'quote' => [['red' => ['label' => 'Red', 'color' => "url('x')"]], null],
     'backslash' => [['red' => ['label' => 'Red', 'color' => '\\66 00']], null],
+    'open parenthesis' => [['red' => ['label' => 'Red', 'color' => 'rgb(1 2 3']], null],
+    'url open' => [['red' => ['label' => 'Red', 'color' => 'url(']], null],
+    'close first' => [['red' => ['label' => 'Red', 'color' => ')']], null],
+    'extra close' => [['red' => ['label' => 'Red', 'color' => 'rgb(1 2 3))']], null],
     'comment start' => [['red' => ['label' => 'Red', 'color' => 'red/*']], null],
     'comment end' => [['red' => ['label' => 'Red', 'color' => '*/red']], null],
     'control character' => [['red' => ['label' => 'Red', 'color' => "#f00\n"]], null],
@@ -150,7 +154,11 @@ it('refuses a highlight text colour that could break the stylesheet', function (
     $plugin = BackgroundColorPlugin::make()->colors(['red' => ['label' => 'Red', 'color' => '#f00', 'text' => $text]]);
 
     expect(fn () => $plugin->getStylesheet())->toThrow(InvalidArgumentException::class, 'BackgroundColorPlugin');
-})->with(['}', ' ', '/*', 3]);
+})->with(['}', ' ', '/*', 3, 'rgb(0 0 0']);
+
+it('accepts colours with balanced parentheses', function (string $color): void {
+    expect(TextColorPlugin::make()->colors(['x' => ['label' => 'X', 'color' => $color]])->getStylesheet())->toBe(".has-x-color{color:{$color}}");
+})->with(['rgb(1 2 3)', 'hsl(10 20% 30% / 50%)']);
 
 it('matches spans with a class or style, and not mentions', function (): void {
     $mark = TextColorPlugin::make()->getMarks()[0];

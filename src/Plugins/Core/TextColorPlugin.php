@@ -39,7 +39,7 @@ class TextColorPlugin extends PaletteColorPlugin
 
     protected function toolOrder(): int
     {
-        return 10;
+        return 65;
     }
 
     protected function cssProperty(): string

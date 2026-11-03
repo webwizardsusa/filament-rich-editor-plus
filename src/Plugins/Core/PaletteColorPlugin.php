@@ -85,6 +85,28 @@ abstract class PaletteColorPlugin extends PaletteStylePlugin
         if (preg_match('/["\']/', $value) === 1) {
             throw new InvalidArgumentException("{$plugin} has a colour with quotes for [{$name}], which could break its CSS.");
         }
+
+        if (! $this->hasBalancedParentheses($value)) {
+            throw new InvalidArgumentException("{$plugin} has a colour with unbalanced parentheses for [{$name}], which could break the rules after it.");
+        }
+    }
+
+    /**
+     * Whether every `)` closes an earlier `(` and every `(` is closed.
+     */
+    private function hasBalancedParentheses(string $value): bool
+    {
+        $depth = 0;
+
+        foreach (str_split($value) as $character) {
+            if ($character === '(') {
+                $depth++;
+            } elseif ($character === ')' && --$depth < 0) {
+                return false;
+            }
+        }
+
+        return $depth === 0;
     }
 
     protected function assertEntry(string $plugin, string $name, array $entry): void

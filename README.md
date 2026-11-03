@@ -239,12 +239,16 @@ RichEditorPlus::make('body')->addPlugins([
   (`1.5em`) and `xx-large` (`2em`); and line heights `tight` (`1.25`), `relaxed` (`1.75`) and `loose` (`2`). `fonts()`,
   `sizes()` and `heights()` replace them. Palette names follow the colour rules above.
 - A font is a comma-separated list of names, such as `ui-serif, Georgia, serif`. Quote a name that needs it, as in
-  `"Open Sans"`. A bare name may start with a hyphen, as in `-apple-system`. Quoted names may not contain quotes,
-  backslashes or line breaks.
+  `"Open Sans"`. Names with characters other than ASCII letters, digits, hyphens and spaces (for example
+  `"游ゴシック"`) must be quoted. A bare name may start with a hyphen, as in `-apple-system`. Quoted names may not
+  contain quotes, backslashes or line breaks.
 - A size is a length (`1.25rem`, `120%`), `0`, a size keyword (`large`), `var(--name)`, or one `clamp()`, `min()`,
-  `max()` or `calc()`. Those hold only numbers with units `px`, `rem`, `em`, `%`, `pt`, `vw` or `vh`, the operators
+  `max()` or `calc()`. Those hold only numbers with units `px`, `rem`, `em`, `%`, `pt`, `vw`, `vh`, `ch`, `ex`, `lh`, `vmin`, `vmax`, `svw`, `svh`, `dvw`, `dvh`, `lvw`, `lvh`, `cqi` or
+  `cqb` (also allowed on plain lengths), the operators
   `+ - * /`, commas, spaces, `var(--name)` and nested math functions, with balanced parentheses.
-- A line height is a number (`1.5`), a length, `normal` or `var(--name)`.
+- A line height is a number (`1.5`), or a number with `px`, `rem`, `em`, `%` or one of the letter units above, `normal` or
+  `var(--name)`.
+- The colour and type menus come after the formatting buttons in the default inline toolbar.
 - No value may contain `;`, `{`, `}`, `<`, `>`, `\`, `/*`, `*/` or a control character. Only font names may contain
   quotes.
 - The font menu shows each font's swatch in its own typeface. The size and line height menus are plain lists. Every menu

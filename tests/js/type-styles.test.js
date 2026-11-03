@@ -7,6 +7,7 @@ let editor
 
 afterEach(() => editor?.destroy())
 
+const sizeOnlyPluginIds = typeStylePluginIds.filter((entry) => entry.id === 'core/font-size' || entry.options?.name === 'globalAttributes:core/font-size')
 const pluginIds = [...defaultPluginIds, ...colourPluginIds, ...typeStylePluginIds]
 
 const styled = (text, attrs) => ({
@@ -69,7 +70,7 @@ it('puts every style on one span in plugin order', () => {
 })
 
 it('works on a field with only one of the plugins', () => {
-    editor = makeEditor('<p><span class="has-red-color has-large-font-size">a</span></p>', [...defaultPluginIds, ...typeStylePluginIds.slice(2, 4)])
+    editor = makeEditor('<p><span class="has-red-color has-large-font-size">a</span></p>', [...defaultPluginIds, ...sizeOnlyPluginIds])
 
     expect(editor.getJSON().content[0].content[0].marks).toEqual([{ type: 'textStyle', attrs: { fontSize: 'large' } }])
     expect(editor.getHTML()).toBe('<p><span class="has-large-font-size">a</span></p>')

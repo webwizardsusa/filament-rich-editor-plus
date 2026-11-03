@@ -60,7 +60,7 @@ class LineHeightPlugin extends PaletteStylePlugin
 
     protected function toolOrder(): int
     {
-        return 22;
+        return 72;
     }
 
     protected function toolGroup(): string
@@ -108,7 +108,7 @@ class LineHeightPlugin extends PaletteStylePlugin
     protected function assertValue(string $plugin, string $name, string $value): void
     {
         $patterns = [
-            '/^'.static::CSS_NUMBER.'(?:px|rem|em|%)?\z/',
+            '/^'.static::CSS_NUMBER.'(?:px|rem|em|%|ch|ex|lh|vmin|vmax|svw|svh|dvw|dvh|lvw|lvh|cqi|cqb)?\z/',
             '/^normal\z/',
             '/^var\(--[A-Za-z0-9_-]+\)\z/',
         ];

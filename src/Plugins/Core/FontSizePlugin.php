@@ -59,7 +59,7 @@ class FontSizePlugin extends PaletteStylePlugin
 
     protected function toolOrder(): int
     {
-        return 21;
+        return 71;
     }
 
     protected function toolGroup(): string
@@ -110,7 +110,7 @@ class FontSizePlugin extends PaletteStylePlugin
     protected function assertValue(string $plugin, string $name, string $value): void
     {
         $patterns = [
-            '/^'.static::CSS_NUMBER.'(?:px|rem|em|%|pt|vw|vh)\z/',
+            '/^'.static::CSS_NUMBER.'(?:px|rem|em|%|pt|vw|vh|ch|ex|lh|vmin|vmax|svw|svh|dvw|dvh|lvw|lvh|cqi|cqb)\z/',
             '/^0\z/',
             '/^(?:xx-small|x-small|small|medium|large|x-large|xx-large|xxx-large|smaller|larger)\z/',
             '/^var\(--[A-Za-z0-9_-]+\)\z/',
@@ -134,7 +134,7 @@ class FontSizePlugin extends PaletteStylePlugin
      */
     private function isMathFunction(string $value): bool
     {
-        $token = '/\G(?:(?<open>(?:clamp|min|max|calc)\()|(?<close>\))|var\(--[A-Za-z0-9_-]+\)|'.static::CSS_NUMBER.'(?:px|rem|em|%|pt|vw|vh)?|[-+*\/, ])/';
+        $token = '/\G(?:(?<open>(?:clamp|min|max|calc)\()|(?<close>\))|var\(--[A-Za-z0-9_-]+\)|'.static::CSS_NUMBER.'(?:px|rem|em|%|pt|vw|vh|ch|ex|lh|vmin|vmax|svw|svh|dvw|dvh|lvw|lvh|cqi|cqb)?|[-+*\/, ])/';
         $length = strlen($value);
         $offset = 0;
         $depth = 0;

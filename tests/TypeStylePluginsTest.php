@@ -1,11 +1,14 @@
 <?php
 
 use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\FontSizePlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\LineHeightPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\PaletteStylePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\ToolMenuItem;
@@ -20,19 +23,19 @@ afterEach(fn (): mixed => PluginRegistry::flush());
 dataset('type style plugins', [
     'font family' => [fn (): PaletteStylePlugin => FontFamilyPlugin::make(), [
         'id' => 'core/font-family', 'attribute' => 'fontFamily', 'tool' => 'fontFamily', 'label' => 'Font', 'current' => 'Font: :item',
-        'icon' => 'mdi-format-font', 'order' => 20, 'set' => 'setFontFamily', 'unset' => 'unsetFontFamily', 'getter' => 'getFonts', 'setter' => 'fonts', 'key' => 'family',
+        'icon' => 'mdi-format-font', 'order' => 70, 'set' => 'setFontFamily', 'unset' => 'unsetFontFamily', 'getter' => 'getFonts', 'setter' => 'fonts', 'key' => 'family',
         'names' => ['sans', 'serif', 'mono'], 'first' => ['label' => 'Sans serif', 'family' => 'ui-sans-serif, system-ui, sans-serif'],
         'class' => 'has-serif-font-family', 'property' => 'font-family', 'sample' => 'Georgia, serif', 'swatch' => 'Aa',
     ]],
     'font size' => [fn (): PaletteStylePlugin => FontSizePlugin::make(), [
         'id' => 'core/font-size', 'attribute' => 'fontSize', 'tool' => 'fontSize', 'label' => 'Size', 'current' => 'Size: :item',
-        'icon' => 'mdi-format-size', 'order' => 21, 'set' => 'setFontSize', 'unset' => 'unsetFontSize', 'getter' => 'getSizes', 'setter' => 'sizes', 'key' => 'size',
+        'icon' => 'mdi-format-size', 'order' => 71, 'set' => 'setFontSize', 'unset' => 'unsetFontSize', 'getter' => 'getSizes', 'setter' => 'sizes', 'key' => 'size',
         'names' => ['small', 'large', 'x-large', 'xx-large'], 'first' => ['label' => 'Small', 'size' => '0.875em'],
         'class' => 'has-serif-font-size', 'property' => 'font-size', 'sample' => '1.25rem', 'swatch' => null,
     ]],
     'line height' => [fn (): PaletteStylePlugin => LineHeightPlugin::make(), [
         'id' => 'core/line-height', 'attribute' => 'lineHeight', 'tool' => 'lineHeight', 'label' => 'Line height', 'current' => 'Line height: :item',
-        'icon' => 'mdi-format-line-spacing', 'order' => 22, 'set' => 'setLineHeight', 'unset' => 'unsetLineHeight', 'getter' => 'getHeights', 'setter' => 'heights', 'key' => 'height',
+        'icon' => 'mdi-format-line-spacing', 'order' => 72, 'set' => 'setLineHeight', 'unset' => 'unsetLineHeight', 'getter' => 'getHeights', 'setter' => 'heights', 'key' => 'height',
         'names' => ['tight', 'relaxed', 'loose'], 'first' => ['label' => 'Tight', 'height' => '1.25'],
         'class' => 'has-serif-line-height', 'property' => 'line-height', 'sample' => '1.6', 'swatch' => null,
     ]],
@@ -95,6 +98,7 @@ it('checks font families', function (string $family, bool $accepted): void {
     'empty quotes' => ['""', false],
     'comment' => ['Arial /* x */', false],
     'leading hyphen' => ['-apple-system, BlinkMacSystemFont, sans-serif', true],
+    'digit word' => ['Font 1', false],
     'newline' => ["\"a\nb\"", false],
     'form feed' => ["\"a\fb\"", false],
     'carriage return' => ["'x\ry'", false],
@@ -117,6 +121,8 @@ it('checks font sizes', function (string $size, bool $accepted): void {
     'variable' => ['var(--size-lg)', true],
     'clamp' => ['clamp(1rem, 2vw, 2rem)', true],
     'calc' => ['calc(1em + 2px)', true],
+    'ch unit' => ['2ch', true],
+    'viewport unit in clamp' => ['clamp(1rem, 1rem + 2svw, 3rem)', true],
     'nested' => ['min(1rem, calc(0.5rem + 1vw))', true],
     'calc with variable' => ['calc(var(--base) * 1.25)', true],
     'open parenthesis' => ['calc((1em)', false],
@@ -146,6 +152,7 @@ it('checks line heights', function (string $height, bool $accepted): void {
     'number' => ['1.5', true],
     'px' => ['24px', true],
     'percent' => ['150%', true],
+    'line unit' => ['2lh', true],
     'normal' => ['normal', true],
     'variable' => ['var(--lh)', true],
     'semicolon' => ['1.5;', false],
@@ -153,6 +160,16 @@ it('checks line heights', function (string $height, bool $accepted): void {
     'important' => ['1.5 !important', false],
     'quote' => ["'1.5'", false],
 ]);
+
+it('orders the inline tools after the formatting tools', function (): void {
+    $registry = PluginRegistry::make([
+        BoldPlugin::make(), ItalicPlugin::make(), UnderlinePlugin::make(),
+        TextColorPlugin::make(), BackgroundColorPlugin::make(), FontFamilyPlugin::make(), FontSizePlugin::make(), LineHeightPlugin::make(),
+    ]);
+    $names = array_map(fn ($tool): string => $tool->getName(), $registry->getInlineTools());
+
+    expect($names)->toBe(['bold', 'italic', 'underline', 'textColor', 'backgroundColor', 'fontFamily', 'fontSize', 'lineHeight']);
+});
 
 it('keeps all styles on one span through parse and render', function (): void {
     $plugins = [TextColorPlugin::make(), BackgroundColorPlugin::make(), FontFamilyPlugin::make(), FontSizePlugin::make(), LineHeightPlugin::make()];

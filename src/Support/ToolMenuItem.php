@@ -30,6 +30,13 @@ class ToolMenuItem
      */
     protected array $activeAttributes = [];
 
+    /**
+     * @var ?array{class: string, text: ?string}
+     */
+    protected ?array $swatch = null;
+
+    protected bool $isFallback = false;
+
     final public function __construct(protected string $name) {}
 
     public static function make(string $name): static
@@ -87,6 +94,28 @@ class ToolMenuItem
         return $this;
     }
 
+    /**
+     * Shows a swatch instead of an icon: a small box with the given class (such as a palette colour's class) and
+     * optional text, such as "A" for a text colour.
+     */
+    public function swatch(string $class, ?string $text = null): static
+    {
+        $this->swatch = ['class' => $class, 'text' => $text];
+
+        return $this;
+    }
+
+    /**
+     * The item that is current when no other item is active, such as "Default" in a colour menu, whose "no colour"
+     * state `active()` can't express.
+     */
+    public function fallback(bool $condition = true): static
+    {
+        $this->isFallback = $condition;
+
+        return $this;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -121,7 +150,20 @@ class ToolMenuItem
     }
 
     /**
-     * @return array{name: string, label: ?string, icon: ?string, shortcut: ?string, command: ?string, arguments: array<int, mixed>, active: ?array{name: ?string, attributes: object}}
+     * @return ?array{class: string, text: ?string}
+     */
+    public function getSwatch(): ?array
+    {
+        return $this->swatch;
+    }
+
+    public function isFallback(): bool
+    {
+        return $this->isFallback;
+    }
+
+    /**
+     * @return array{name: string, label: ?string, icon: ?string, shortcut: ?string, command: ?string, arguments: array<int, mixed>, active: ?array{name: ?string, attributes: object}, swatch: ?array{class: string, text: ?string}, fallback: bool}
      */
     public function toArray(): array
     {
@@ -136,6 +178,8 @@ class ToolMenuItem
                 'name' => $this->activeName,
                 'attributes' => (object) $this->activeAttributes,
             ] : null,
+            'swatch' => $this->swatch,
+            'fallback' => $this->isFallback,
         ];
     }
 }

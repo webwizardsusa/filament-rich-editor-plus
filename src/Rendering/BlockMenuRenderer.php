@@ -4,6 +4,7 @@ namespace Hollyit\RichEditorPlus\Rendering;
 
 use Hollyit\RichEditorPlus\Support\BlockType;
 use Hollyit\RichEditorPlus\Support\Tool;
+use Hollyit\RichEditorPlus\Support\ToolMenuItem;
 
 use function Filament\Support\generate_icon_html;
 
@@ -108,7 +109,7 @@ class BlockMenuRenderer
 
                 $html .= '<button type="button" class="rep-menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"'
                     .' data-rep-menu-item="'.e($item->getName()).'">'
-                    .(generate_icon_html($item->getIcon())?->toHtml() ?? '')
+                    .$this->renderMenuItemIcon($item)
                     .'<span class="rep-menu-item-label">'.e($item->getLabel() ?? $item->getName()).'</span>'
                     .($shortcut === null ? '' : '<span class="rep-menu-item-shortcut" data-rep-shortcut="'.e($shortcut).'"></span>')
                     .'</button>';
@@ -171,6 +172,17 @@ class BlockMenuRenderer
             .(generate_icon_html($icon)?->toHtml() ?? '')
             .'<span class="rep-menu-item-label">'.e($label).'</span>'
             .'</button>';
+    }
+
+    protected function renderMenuItemIcon(ToolMenuItem $item): string
+    {
+        $swatch = $item->getSwatch();
+
+        if ($swatch === null) {
+            return generate_icon_html($item->getIcon())?->toHtml() ?? '';
+        }
+
+        return '<span class="rep-swatch '.e($swatch['class']).'" data-rep-menu-icon aria-hidden="true">'.e($swatch['text'] ?? '').'</span>';
     }
 
     protected function renderIcon(BlockType $blockType): string

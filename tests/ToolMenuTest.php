@@ -173,3 +173,34 @@ it('puts the tool menus in the field markup', function (): void {
     expect($withMenu)->toContain('data-rep-tool-menu="level"')
         ->and($without)->not->toContain('data-rep-tool-menu');
 });
+
+function colourMenuTool(): Tool
+{
+    return Tool::make('colour')
+        ->label('Colour')
+        ->icon('mdi-format-color-text')
+        ->menu([
+            ToolMenuItem::make('default')->label('Default')->swatch('rep-swatch-default', 'A')->command('unsetTextColor')->fallback(),
+            ToolMenuItem::make('red')->label('Red')->swatch('has-red-color', 'A')->command('setTextColor', ['red'])->active(attributes: ['color' => 'red']),
+            ToolMenuItem::make('fill')->label('Fill <b>')->swatch('has-"x"', null)->command('setTextColor', ['fill']),
+        ])
+        ->inline();
+}
+
+it('describes swatches and fallback items for the browser', function (): void {
+    $items = array_map(fn (ToolMenuItem $item): array => $item->toArray(), colourMenuTool()->getMenu());
+
+    expect($items[0])->toMatchArray(['swatch' => ['class' => 'rep-swatch-default', 'text' => 'A'], 'fallback' => true])
+        ->and($items[1])->toMatchArray(['swatch' => ['class' => 'has-red-color', 'text' => 'A'], 'fallback' => false])
+        ->and(ToolMenuItem::make('plain')->toArray())->toMatchArray(['swatch' => null, 'fallback' => false]);
+});
+
+it('renders a swatch in place of an icon, escaped', function (): void {
+    $html = (new BlockMenuRenderer)->renderToolMenus([colourMenuTool()]);
+
+    expect($html)
+        ->toContain('<span class="rep-swatch has-red-color" data-rep-menu-icon aria-hidden="true">A</span>')
+        ->toContain('<span class="rep-swatch rep-swatch-default" data-rep-menu-icon aria-hidden="true">A</span>')
+        ->toContain('<span class="rep-swatch has-&quot;x&quot;" data-rep-menu-icon aria-hidden="true"></span>')
+        ->toContain('Fill &lt;b&gt;');
+});

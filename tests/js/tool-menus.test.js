@@ -192,3 +192,71 @@ describe('a menu tool', () => {
         plain.destroy()
     })
 })
+
+describe('a menu with swatches and a fallback item', () => {
+    const swatchTools = {
+        size: {
+            command: null,
+            action: null,
+            arguments: [],
+            checksAvailability: false,
+            hidesInListItem: false,
+            active: null,
+            menu: [
+                { name: 'plain', label: 'Plain', icon: null, shortcut: null, command: 'setParagraph', arguments: [], active: null, swatch: { class: 'rep-swatch-default', text: 'A' }, fallback: true },
+                { name: 'big', label: 'Big', icon: null, shortcut: null, command: 'setHeading', arguments: [{ level: 2 }], active: { name: 'heading', attributes: { level: 2 } }, swatch: { class: 'is-big', text: 'A' }, fallback: false },
+            ],
+        },
+    }
+
+    const swatchMenu = `
+        <div class="rep-menu" role="menu" aria-label="Size" data-rep-tool-menu="size" hidden>
+            <button type="button" role="menuitemradio" aria-checked="false" data-rep-menu-item="plain"><span class="rep-swatch rep-swatch-default" data-rep-menu-icon aria-hidden="true">A</span><span class="rep-menu-item-label">Plain</span></button>
+            <button type="button" role="menuitemradio" aria-checked="false" data-rep-menu-item="big"><span class="rep-swatch is-big" data-rep-menu-icon aria-hidden="true">A</span><span class="rep-menu-item-label">Big</span></button>
+        </div>
+    `
+
+    let sizeButton
+    let sizeMenu
+
+    beforeEach(() => {
+        editor = makeEditor(doc(p('para'), heading(2, 'title')))
+        root = makeToolbarRoot()
+        root.insertAdjacentHTML('beforeend', swatchMenu)
+        toolbar = root.querySelector('[data-rep-block-toolbar="*"]')
+        toolbar.querySelector('[data-rep-block-tools]').insertAdjacentHTML(
+            'beforeend',
+            '<button data-rep-tool="size" aria-haspopup="menu" aria-expanded="false" aria-label="Size" data-rep-generic-label="Size" data-rep-label="Size: :item"><svg data-icon="generic"></svg></button>',
+        )
+        controls = createBlockControls({ editor, root, blockTypes, tools: swatchTools })
+        bindToolbar(editor, toolbar, swatchTools, () => {})
+        controls.bind(toolbar)
+        sizeButton = toolbar.querySelector('[data-rep-tool="size"]')
+        sizeMenu = root.querySelector('[data-rep-tool-menu="size"]')
+    })
+
+    const syncSize = () => {
+        syncToolbar(editor, toolbar, swatchTools)
+        controls.sync(toolbar)
+    }
+
+    it('makes the fallback item current when nothing else is active', () => {
+        editor.commands.setTextSelection(2)
+        syncSize()
+
+        expect(sizeMenu.querySelector('[data-rep-menu-item="plain"]').getAttribute('aria-checked')).toBe('true')
+        expect(sizeButton.getAttribute('aria-label')).toBe('Size: Plain')
+        expect(sizeButton.querySelector('[data-rep-menu-icon]').classList.contains('rep-swatch-default')).toBe(true)
+    })
+
+    it('copies the active item its swatch onto the button', () => {
+        editor.commands.setTextSelection(8)
+        syncSize()
+
+        expect(sizeMenu.querySelector('[data-rep-menu-item="big"]').getAttribute('aria-checked')).toBe('true')
+        expect(sizeMenu.querySelector('[data-rep-menu-item="plain"]').getAttribute('aria-checked')).toBe('false')
+        expect(sizeButton.getAttribute('aria-label')).toBe('Size: Big')
+        expect(sizeButton.querySelector('[data-rep-menu-icon]').classList.contains('is-big')).toBe(true)
+        expect(sizeButton.querySelector('svg')).toBeNull()
+    })
+})

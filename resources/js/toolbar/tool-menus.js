@@ -68,7 +68,7 @@ export function createToolMenus({ editor, root, tools }) {
     })
 
     const syncButton = (button, { element, items }) => {
-        const current = items.find((item) => isToolActive(editor, item.active))
+        const current = items.find((item) => isToolActive(editor, item.active)) ?? items.find((item) => item.fallback) ?? null
         const runnable = items.map((item) => canRun(editor, item))
 
         items.forEach((item, index) => {
@@ -90,7 +90,8 @@ export function createToolMenus({ editor, root, tools }) {
             genericIcons.set(button, button.innerHTML)
         }
 
-        const source = current && element.querySelector(`[data-rep-menu-item="${escapeSelector(current.name)}"] svg`)
+        const itemElement = current && element.querySelector(`[data-rep-menu-item="${escapeSelector(current.name)}"]`)
+        const source = itemElement?.querySelector('[data-rep-menu-icon]') ?? itemElement?.querySelector('svg')
 
         if (source) {
             button.replaceChildren(source.cloneNode(true))

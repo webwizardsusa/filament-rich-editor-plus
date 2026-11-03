@@ -27,7 +27,8 @@ const canRun = (editor, item) => {
 
 /**
  * The menus behind menu tools (`Tool::menu()` in PHP), one per tool and shared by every toolbar showing it. A menu
- * tool's button shows the current item's icon and name, and is disabled while none of its items can run.
+ * tool's button shows the current item's icon (or swatch) and name, and is disabled while none of its items can run. The
+ * current item is the first active one, else the one marked `fallback`.
  */
 export function createToolMenus({ editor, root, tools }) {
     const menus = new Map()

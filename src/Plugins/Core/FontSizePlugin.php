@@ -103,8 +103,9 @@ class FontSizePlugin extends PaletteStylePlugin
     }
 
     /**
-     * A number with a unit, `0`, a size keyword, `var(--name)`, or `clamp()`, `min()`, `max()` or `calc()` of plain
-     * numbers, units and operators.
+     * A number with a unit, `0`, a size keyword, `var(--name)`, or one `clamp()`, `min()`, `max()` or `calc()` with
+     * balanced parentheses, made only of numbers with optional units, `+ - * /`, commas, spaces, `var(--name)` and
+     * nested `clamp()`, `min()`, `max()` and `calc()`.
      */
     protected function assertValue(string $plugin, string $name, string $value): void
     {
@@ -113,7 +114,6 @@ class FontSizePlugin extends PaletteStylePlugin
             '/^0\z/',
             '/^(?:xx-small|x-small|small|medium|large|x-large|xx-large|xxx-large|smaller|larger)\z/',
             '/^var\(--[A-Za-z0-9_-]+\)\z/',
-            '/^(?:clamp|min|max|calc)\([A-Za-z0-9.%+\-*\/, ()]+\)\z/',
         ];
 
         foreach ($patterns as $pattern) {
@@ -122,6 +122,45 @@ class FontSizePlugin extends PaletteStylePlugin
             }
         }
 
+        if ($this->isMathFunction($value)) {
+            return;
+        }
+
         throw new InvalidArgumentException("{$plugin} has the size [{$value}] for [{$name}], which must be a CSS length, a size keyword, var(--name), or clamp(), min(), max() or calc().");
+    }
+
+    /**
+     * Whether the value is one math function whose parentheses balance, and which holds only the allowed tokens.
+     */
+    private function isMathFunction(string $value): bool
+    {
+        $token = '/\G(?:(?<open>(?:clamp|min|max|calc)\()|(?<close>\))|var\(--[A-Za-z0-9_-]+\)|'.static::CSS_NUMBER.'(?:px|rem|em|%|pt|vw|vh)?|[-+*\/, ])/';
+        $length = strlen($value);
+        $offset = 0;
+        $depth = 0;
+
+        while ($offset < $length) {
+            if (preg_match($token, $value, $match, PREG_UNMATCHED_AS_NULL, $offset) !== 1) {
+                return false;
+            }
+
+            if ($offset === 0 && $match['open'] === null) {
+                return false;
+            }
+
+            if ($match['open'] !== null) {
+                $depth++;
+            } elseif ($match['close'] !== null) {
+                $depth--;
+            }
+
+            $offset += strlen($match[0]);
+
+            if ($depth < 0 || ($depth === 0 && $offset < $length)) {
+                return false;
+            }
+        }
+
+        return $depth === 0;
     }
 }

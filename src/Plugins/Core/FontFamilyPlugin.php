@@ -112,7 +112,7 @@ class FontFamilyPlugin extends PaletteStylePlugin
      */
     protected function assertValue(string $plugin, string $name, string $value): void
     {
-        $font = '(?:[A-Za-z][A-Za-z0-9 -]*|"[^"\'\\\\]+"|\'[^"\'\\\\]+\')';
+        $font = '(?:-?[A-Za-z][A-Za-z0-9 -]*|"[^"\'\\\\]+"|\'[^"\'\\\\]+\')';
 
         if (preg_match('/^\s*'.$font.'\s*(?:,\s*'.$font.'\s*)*\z/', $value) !== 1) {
             throw new InvalidArgumentException("{$plugin} has the font [{$value}] for [{$name}], which must be a comma-separated list of font names, with quotes around names that need them.");

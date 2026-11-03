@@ -318,13 +318,14 @@ abstract class PaletteStylePlugin extends Plugin implements ProvidesEditorStyles
     }
 
     /**
-     * The checks every value goes through, since it is printed raw into a `<style>` element.
+     * The checks every value goes through, since it is printed raw into a `<style>` element: not empty, and no control
+     * characters, semicolons, braces, angle brackets, backslashes or comment markers.
      *
      * @throws InvalidArgumentException
      */
     protected function assertSafeCssValue(string $plugin, string $name, string $value): void
     {
-        if (trim($value) === '' || preg_match('/[;{}<>\\\\]/', $value) === 1 || str_contains($value, '/*') || str_contains($value, '*/')) {
+        if (trim($value) === '' || preg_match('/[;{}<>\\\\\x00-\x1F\x7F]/', $value) === 1 || str_contains($value, '/*') || str_contains($value, '*/')) {
             throw new InvalidArgumentException("{$plugin} has an empty value, or one with characters that could break its CSS, for [{$name}].");
         }
     }

@@ -94,6 +94,10 @@ it('checks font families', function (string $family, bool $accepted): void {
     'digit first' => ['1font', false],
     'empty quotes' => ['""', false],
     'comment' => ['Arial /* x */', false],
+    'leading hyphen' => ['-apple-system, BlinkMacSystemFont, sans-serif', true],
+    'newline' => ["\"a\nb\"", false],
+    'form feed' => ["\"a\fb\"", false],
+    'carriage return' => ["'x\ry'", false],
 ]);
 
 it('checks font sizes', function (string $size, bool $accepted): void {
@@ -113,6 +117,14 @@ it('checks font sizes', function (string $size, bool $accepted): void {
     'variable' => ['var(--size-lg)', true],
     'clamp' => ['clamp(1rem, 2vw, 2rem)', true],
     'calc' => ['calc(1em + 2px)', true],
+    'nested' => ['min(1rem, calc(0.5rem + 1vw))', true],
+    'calc with variable' => ['calc(var(--base) * 1.25)', true],
+    'open parenthesis' => ['calc((1em)', false],
+    'extra close' => ['calc(1em))', false],
+    'url inside' => ['calc(url(x))', false],
+    'second value' => ['max(1px), url(x)', false],
+    'two functions' => ['min(1px) image-set(a)', false],
+    'newline' => ["1em\n", false],
     'semicolon' => ['1.5;x', false],
     'no unit' => ['16', false],
     'unknown keyword' => ['huge', false],

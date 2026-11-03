@@ -139,6 +139,7 @@ it('refuses a palette that could break the stylesheet or the menu', function (ar
     'backslash' => [['red' => ['label' => 'Red', 'color' => '\\66 00']], null],
     'comment start' => [['red' => ['label' => 'Red', 'color' => 'red/*']], null],
     'comment end' => [['red' => ['label' => 'Red', 'color' => '*/red']], null],
+    'control character' => [['red' => ['label' => 'Red', 'color' => "#f00\n"]], null],
     'empty label' => [['red' => ['label' => '', 'color' => '#f00']], null],
     'blank label' => [['red' => ['label' => "  \n", 'color' => '#f00']], null],
     'bad class' => [['red' => ['label' => 'Red', 'color' => '#f00']], fn (string $name): string => "a {$name}"],

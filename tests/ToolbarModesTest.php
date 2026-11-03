@@ -54,6 +54,8 @@ class ToolbarModesTestForm extends Component implements HasActions, HasSchemas
             'other' => $field->fixedToolbar()->stickyFixedToolbar(false)->toolbarTools(['italic']),
             'split' => $field->fixedToolbar()->toolbarTools(['bold'])->fixedToolbarTools([['blockSwitcher'], ['italic']]),
             'bubble' => $field->toolbarTools([['bold', 'italic', 'link']], onlyListed: true),
+            'bubble-fixed' => $field->toolbarTools([['bold', 'italic', 'link']], onlyListed: true)->fixedToolbar(),
+            'bubble-default-fixed' => $field->toolbarTools([['bold', 'italic', 'link']], onlyListed: true)->fixedToolbar()->fixedToolbarTools(inherit: false),
             'bubble-unflagged' => $field->toolbarTools([['bold', 'italic', 'link']]),
             'empty-floating' => $field->toolbarTools([], onlyListed: true),
             default => null,
@@ -147,6 +149,21 @@ it('uses the floating arrangement for the fixed toolbar unless it has its own', 
         ->and(RichEditorPlus::make('body')->getFixedToolbarTools())->toBeNull();
 });
 
+it('gives the fixed toolbar its own default layout when told not to inherit', function (): void {
+    $field = RichEditorPlus::make('body')->toolbarTools([['bold', 'link']], onlyListed: true)->fixedToolbarTools(inherit: false);
+
+    expect($field->inheritsToolbarTools())->toBeFalse()
+        ->and($field->getFixedToolbarTools())->toBeNull()
+        ->and($field->isFixedToolbarOnlyListed())->toBeFalse()
+        ->and(RichEditorPlus::make('body')->inheritsToolbarTools())->toBeTrue();
+});
+
+it('uses the fixed toolbar own tools whether or not it inherits', function (): void {
+    $field = RichEditorPlus::make('body')->toolbarTools(['bold'], onlyListed: true)->fixedToolbarTools(['italic'], inherit: false);
+
+    expect($field->getFixedToolbarTools())->toBe([['italic']]);
+});
+
 it('keys the editor on its toolbar modes so a changed toolbar refreshes', function (): void {
     $key = fn (string $mode): string => preg_match('/wire:key="[^"]*\.([0-9a-f]{32})"/', toolbarModesHtml($mode), $matches) === 1 ? $matches[1] : '';
 
@@ -155,7 +172,8 @@ it('keys the editor on its toolbar modes so a changed toolbar refreshes', functi
         ->and($key('static'))->not->toBe($key('fixed'))
         ->and($key('split'))->not->toBe($key('both'))
         ->and($key('other'))->not->toBe($key('static'))
-        ->and($key('bubble'))->not->toBe($key('bubble-unflagged'));
+        ->and($key('bubble'))->not->toBe($key('bubble-unflagged'))
+        ->and($key('bubble-fixed'))->not->toBe($key('bubble-default-fixed'));
 });
 
 it('can make a formatting-only list the whole floating toolbar', function (): void {
@@ -177,4 +195,23 @@ it('lets the fixed toolbar inherit the floating flag only when it has no list of
     expect(RichEditorPlus::make('body')->toolbarTools(['bold'], onlyListed: true)->isFixedToolbarOnlyListed())->toBeTrue()
         ->and(RichEditorPlus::make('body')->toolbarTools(['bold'], onlyListed: true)->fixedToolbarTools(['italic'])->isFixedToolbarOnlyListed())->toBeFalse()
         ->and(RichEditorPlus::make('body')->toolbarTools(['bold'])->isToolbarOnlyListed())->toBeFalse();
+});
+
+it('renders a full fixed toolbar next to a formatting bubble when the fixed toolbar does not inherit', function (): void {
+    $html = toolbarModesHtml('bubble-default-fixed');
+    $fixed = str($html)->betweenFirst('data-rep-fixed-toolbar', '</div>');
+    $floating = str($html)->betweenFirst('data-rep-block-toolbar="*"', '</div>');
+
+    expect($fixed->contains('data-rep-control="switcher"'))->toBeTrue()
+        ->and($fixed->contains('data-rep-control="more"'))->toBeTrue()
+        ->and($fixed->matchAll('/data-rep-tool="([^"]+)"/')->all())->toContain('bold', 'italic', 'underline', 'strikethrough', 'link')
+        ->and($floating->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold', 'italic', 'link'])
+        ->and($floating->contains('data-rep-control'))->toBeFalse();
+});
+
+it('copies the formatting bubble into the fixed toolbar when it inherits', function (): void {
+    $fixed = str(toolbarModesHtml('bubble-fixed'))->betweenFirst('data-rep-fixed-toolbar', '</div>');
+
+    expect($fixed->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold', 'italic', 'link'])
+        ->and($fixed->contains('data-rep-control'))->toBeFalse();
 });

@@ -65,6 +65,8 @@ class RichEditorPlus extends Field implements HasEmbeddedView
 
     protected bool|Closure $isFixedToolbarOnlyListed = false;
 
+    protected bool|Closure $inheritsToolbarTools = true;
+
     /**
      * Replaces the default plugin set. Each entry is a plugin instance or class name.
      *
@@ -210,16 +212,18 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     }
 
     /**
-     * Chooses what the fixed toolbar shows, the same way `toolbarTools()` does for the floating one, which it falls
-     * back to when `null`, flag included. The drag handle is never shown in the fixed toolbar.
-     * `onlyListed: true` makes the list the whole toolbar even when it names no control.
+     * Chooses what the fixed toolbar shows, the same way `toolbarTools()` does for the floating one. With no tools it
+     * uses the floating arrangement, `onlyListed` flag included, or with `inherit: false` its own default layout,
+     * so a formatting-only bubble can sit next to a full fixed toolbar. The drag handle is never shown in the fixed
+     * toolbar. `onlyListed: true` makes the list the whole toolbar even when it names no control.
      *
      * @param  array<string | array<string>> | Closure | null  $tools
      */
-    public function fixedToolbarTools(array|Closure|null $tools, bool|Closure $onlyListed = false): static
+    public function fixedToolbarTools(array|Closure|null $tools = null, bool|Closure $onlyListed = false, bool|Closure $inherit = true): static
     {
         $this->fixedToolbarTools = $tools;
         $this->isFixedToolbarOnlyListed = $onlyListed;
+        $this->inheritsToolbarTools = $inherit;
 
         return $this;
     }
@@ -231,16 +235,28 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     {
         $tools = $this->evaluate($this->fixedToolbarTools);
 
-        return $tools === null ? $this->getToolbarTools() : $this->normalizeToolbarGroups($tools);
+        if ($tools !== null) {
+            return $this->normalizeToolbarGroups($tools);
+        }
+
+        return $this->inheritsToolbarTools() ? $this->getToolbarTools() : null;
     }
 
     public function isFixedToolbarOnlyListed(): bool
     {
-        if ($this->evaluate($this->fixedToolbarTools) === null) {
-            return $this->isToolbarOnlyListed();
+        if ($this->evaluate($this->fixedToolbarTools) !== null) {
+            return (bool) $this->evaluate($this->isFixedToolbarOnlyListed);
         }
 
-        return (bool) $this->evaluate($this->isFixedToolbarOnlyListed);
+        return $this->inheritsToolbarTools() && $this->isToolbarOnlyListed();
+    }
+
+    /**
+     * Whether a fixed toolbar with no tools of its own uses the floating toolbar's arrangement.
+     */
+    public function inheritsToolbarTools(): bool
+    {
+        return (bool) $this->evaluate($this->inheritsToolbarTools);
     }
 
     /**
@@ -528,7 +544,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
                             state: $wire.<?= $this->applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) ?>,
                         })"
             wire:ignore
-            wire:key="<?= e($this->getLivewireKey()) ?>.<?= substr(md5(serialize([$isDisabled, $this->hasFloatingToolbar(), $this->hasFixedToolbar(), $this->isFixedToolbarSticky(), $this->getToolbarTools(), $this->getFixedToolbarTools(), $this->isToolbarOnlyListed(), $this->isFixedToolbarOnlyListed()])), 0, 64) ?>"
+            wire:key="<?= e($this->getLivewireKey()) ?>.<?= substr(md5(serialize([$isDisabled, $this->hasFloatingToolbar(), $this->hasFixedToolbar(), $this->isFixedToolbarSticky(), $this->getToolbarTools(), $this->getFixedToolbarTools(), $this->isToolbarOnlyListed(), $this->isFixedToolbarOnlyListed(), $this->inheritsToolbarTools()])), 0, 64) ?>"
             class="rep-editor"
         >
             <p x-show="error" x-text="error" class="rep-error" role="alert" style="display: none"></p>

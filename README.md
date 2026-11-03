@@ -84,7 +84,8 @@ inside a container that scrolls on its own, such as a modal or slide-over.
 
 Choose what a toolbar shows, and in what order, by name. Each inner array is a group, with a divider between groups;
 a flat list is one group. `toolbarTools()` arranges the floating toolbar and `fixedToolbarTools()` the fixed one, which
-uses the floating arrangement when it has none of its own.
+uses the floating arrangement when it has none of its own. To keep the fixed toolbar's default layout instead, for
+example next to a formatting-only bubble, use `->fixedToolbarTools(inherit: false)`.
 
 A list of tool names only arranges the formatting tools, and the controls stay where they are:
 

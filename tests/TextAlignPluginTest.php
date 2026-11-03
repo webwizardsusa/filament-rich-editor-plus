@@ -55,7 +55,7 @@ it('takes its alignments, types and default', function (): void {
 });
 
 it('rejects unknown alignments, an empty list, a default outside the list, and nothing besides the default', function (Closure $configure): void {
-    expect(fn () => $configure(TextAlignPlugin::make())->getGlobalAttributes())->toThrow(InvalidArgumentException::class);
+    expect(fn () => $configure(TextAlignPlugin::make())->getGlobalAttributes())->toThrow(InvalidArgumentException::class, 'TextAlignPlugin');
 })->with([
     'unknown' => fn (TextAlignPlugin $plugin): TextAlignPlugin => $plugin->alignments(['left', 'middle']),
     'empty' => fn (TextAlignPlugin $plugin): TextAlignPlugin => $plugin->alignments([]),

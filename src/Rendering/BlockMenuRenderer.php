@@ -91,6 +91,36 @@ class BlockMenuRenderer
     }
 
     /**
+     * The menu behind each menu tool, once per editor. Every toolbar showing the tool opens the same menu.
+     *
+     * @param  array<Tool>  $tools
+     */
+    public function renderToolMenus(array $tools): string
+    {
+        $html = '';
+
+        foreach ($tools as $tool) {
+            $html .= '<div class="rep-menu" role="menu" aria-label="'.e($tool->getLabel() ?? $tool->getName()).'"'
+                .' data-rep-tool-menu="'.e($tool->getName()).'" hidden>';
+
+            foreach ($tool->getMenu() ?? [] as $item) {
+                $shortcut = $item->getShortcut();
+
+                $html .= '<button type="button" class="rep-menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"'
+                    .' data-rep-menu-item="'.e($item->getName()).'">'
+                    .(generate_icon_html($item->getIcon())?->toHtml() ?? '')
+                    .'<span class="rep-menu-item-label">'.e($item->getLabel() ?? $item->getName()).'</span>'
+                    .($shortcut === null ? '' : '<span class="rep-menu-item-shortcut" data-rep-shortcut="'.e($shortcut).'"></span>')
+                    .'</button>';
+            }
+
+            $html .= '</div>';
+        }
+
+        return $html;
+    }
+
+    /**
      * The menu behind the list button. With one list type there is nothing to switch to, but the type stays in the
      * markup because the browser takes the button's icon and name from it.
      *

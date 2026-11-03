@@ -47,6 +47,15 @@ class Tool
 
     protected int $order = 0;
 
+    protected bool $hasActiveState = false;
+
+    /**
+     * @var ?array<ToolMenuItem>
+     */
+    protected ?array $menu = null;
+
+    protected ?string $currentLabel = null;
+
     public function __construct(protected string $name) {}
 
     public static function make(string $name): static
@@ -102,12 +111,14 @@ class Tool
     }
 
     /**
-     * The node or mark name TipTap's `isActive()` is checked against.
+     * The node or mark name TipTap's `isActive()` is checked against. With no name, the attributes alone are checked
+     * (`isActive($attributes)`), matching any node or mark that has them.
      *
      * @param  array<string, mixed>  $attributes
      */
-    public function active(string $name, array $attributes = []): static
+    public function active(?string $name = null, array $attributes = []): static
     {
+        $this->hasActiveState = true;
         $this->activeName = $name;
         $this->activeAttributes = $attributes;
 
@@ -197,6 +208,30 @@ class Tool
         return $this;
     }
 
+    /**
+     * Makes the button open a menu of items instead of running a command. A menu tool has no command or action of its
+     * own, and can't go in the more menu. Its button shows the current item's icon.
+     *
+     * @param  array<ToolMenuItem>  $items
+     */
+    public function menu(array $items): static
+    {
+        $this->menu = array_values($items);
+
+        return $this;
+    }
+
+    /**
+     * The menu button's accessible name while an item is current, with `:item` for that item's label, such as
+     * "Text align: :item". Without it the button keeps its own label.
+     */
+    public function currentLabel(?string $pattern): static
+    {
+        $this->currentLabel = $pattern;
+
+        return $this;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -248,6 +283,29 @@ class Tool
         return $this->activeAttributes;
     }
 
+    public function hasActiveState(): bool
+    {
+        return $this->hasActiveState;
+    }
+
+    /**
+     * @return ?array<ToolMenuItem>
+     */
+    public function getMenu(): ?array
+    {
+        return $this->menu;
+    }
+
+    public function isMenu(): bool
+    {
+        return $this->menu !== null;
+    }
+
+    public function getCurrentLabel(): ?string
+    {
+        return $this->currentLabel;
+    }
+
     public function getScope(): ToolScope
     {
         return $this->scope;
@@ -287,7 +345,7 @@ class Tool
     }
 
     /**
-     * @return array{name: string, label: ?string, icon: ?string, shortcut: ?string, command: ?string, action: ?string, arguments: array<int, mixed>, active: ?array{name: string, attributes: array<string, mixed>}, scope: string, nodes: array<string>, checksAvailability: bool, hidesInListItem: bool, group: ?string, order: int}
+     * @return array{name: string, label: ?string, icon: ?string, shortcut: ?string, command: ?string, action: ?string, arguments: array<int, mixed>, active: ?array{name: ?string, attributes: array<string, mixed>}, menu: ?array<int, array<string, mixed>>, scope: string, nodes: array<string>, checksAvailability: bool, hidesInListItem: bool, group: ?string, order: int}
      */
     public function toArray(): array
     {
@@ -299,10 +357,11 @@ class Tool
             'command' => $this->command,
             'action' => $this->action,
             'arguments' => $this->arguments,
-            'active' => $this->activeName === null ? null : [
+            'active' => $this->hasActiveState ? [
                 'name' => $this->activeName,
                 'attributes' => $this->activeAttributes,
-            ],
+            ] : null,
+            'menu' => $this->menu === null ? null : array_map(static fn (ToolMenuItem $item): array => $item->toArray(), $this->menu),
             'scope' => $this->scope->value,
             'nodes' => $this->nodes,
             'checksAvailability' => $this->checksAvailability,

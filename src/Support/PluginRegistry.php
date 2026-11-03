@@ -552,7 +552,7 @@ class PluginRegistry
     /**
      * What the browser needs to run a tool and to know when it is active, keyed by tool name.
      *
-     * @return array<string, array{command: ?string, action: ?string, arguments: array<int, mixed>, checksAvailability: bool, hidesInListItem: bool, active: ?array{name: string, attributes: array<string, mixed>}}>
+     * @return array<string, array{command: ?string, action: ?string, arguments: array<int, mixed>, checksAvailability: bool, hidesInListItem: bool, active: ?array{name: ?string, attributes: array<string, mixed>}}>
      */
     public function getToolsConfig(): array
     {
@@ -565,14 +565,27 @@ class PluginRegistry
                 'arguments' => $tool->getArguments(),
                 'checksAvailability' => $tool->checksAvailability(),
                 'hidesInListItem' => $tool->hidesInListItem(),
-                'active' => $tool->getActiveName() === null ? null : [
+                'active' => $tool->hasActiveState() ? [
                     'name' => $tool->getActiveName(),
                     'attributes' => (object) $tool->getActiveAttributes(),
-                ],
+                ] : null,
+                'menu' => $tool->isMenu()
+                    ? array_map(static fn (ToolMenuItem $item): array => $item->toArray(), $tool->getMenu())
+                    : null,
             ];
         }
 
         return $config;
+    }
+
+    /**
+     * The tools that open a menu, each of whose menus is rendered once per editor.
+     *
+     * @return array<Tool>
+     */
+    public function getMenuTools(): array
+    {
+        return array_values(array_filter($this->getTools(), static fn (Tool $tool): bool => $tool->isMenu()));
     }
 
     /**
@@ -713,7 +726,8 @@ class PluginRegistry
     }
 
     /**
-     * Toolbar arrangements place controls by name, so a tool with one of those names could never be placed.
+     * Toolbar arrangements place controls by name, so a tool with one of those names could never be placed. Menu tools
+     * must not also have a command or action, and can't go in the more menu.
      */
     protected function assertToolNamesAreNotReserved(): void
     {
@@ -721,6 +735,14 @@ class PluginRegistry
             foreach ([...$plugin->getTools(), ...$this->extensions[$id]->getTools()] as $tool) {
                 if (ToolbarControl::tryFrom($tool->getName()) !== null) {
                     throw new InvalidArgumentException("The editor plugin [{$id}] registers a tool named [{$tool->getName()}], which is reserved for the toolbar.");
+                }
+
+                if ($tool->isMenu() && ($tool->getCommand() !== null || $tool->getAction() !== null)) {
+                    throw new InvalidArgumentException("The editor plugin [{$id}] registers the tool [{$tool->getName()}] with a menu and a command or action. A menu tool runs its items instead.");
+                }
+
+                if ($tool->isMenu() && $tool->getScope() === ToolScope::Overflow) {
+                    throw new InvalidArgumentException("The editor plugin [{$id}] puts the menu tool [{$tool->getName()}] in the more menu, which can't hold menus.");
                 }
             }
         }

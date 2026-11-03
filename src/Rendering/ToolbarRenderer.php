@@ -229,8 +229,19 @@ class ToolbarRenderer
     {
         $label = e($tool->getLabel() ?? $tool->getName());
         $icon = generate_icon_html($tool->getIcon())?->toHtml() ?? $label;
+        $name = e($tool->getName());
 
-        return '<button type="button" class="rep-tool" tabindex="-1" data-rep-tool="'.e($tool->getName()).'"'
+        if ($tool->isMenu()) {
+            $currentLabel = $tool->getCurrentLabel();
+
+            return '<button type="button" class="rep-tool" tabindex="-1" data-rep-tool="'.$name.'"'
+                .' aria-label="'.$label.'" aria-haspopup="menu" aria-expanded="false"'
+                .' data-rep-generic-label="'.$label.'"'
+                .($currentLabel === null ? '' : ' data-rep-label="'.e($currentLabel).'"')
+                .'>'.$icon.'</button>';
+        }
+
+        return '<button type="button" class="rep-tool" tabindex="-1" data-rep-tool="'.$name.'"'
             .' aria-label="'.$label.'"'.$this->renderShortcut($tool->getShortcut()).' aria-pressed="false">'.$icon.'</button>';
     }
 

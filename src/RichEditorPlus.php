@@ -482,6 +482,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
             .$menuRenderer->renderSwitcherMenu($blockTypes)
             .$menuRenderer->renderMoreMenu($registry->getOverflowTools())
             .$menuRenderer->renderListMenu($listTypes)
+            .$menuRenderer->renderToolMenus($registry->getMenuTools())
             .$menuRenderer->renderLiveRegion()
             .$registry->getEditorHtml();
     }

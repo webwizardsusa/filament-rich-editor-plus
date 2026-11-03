@@ -157,6 +157,58 @@ RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class
 | `TaskListPlugin` | A checkbox list, in the list menu next to bulleted and numbered lists. Saved and rendered checkboxes are `disabled`; style them with `ul[data-type="taskList"]` and `li[data-checked="true"]`. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
+## Global attributes
+
+A plugin can add an attribute to nodes and marks that other plugins own, such as an alignment on paragraphs and
+headings. Declare it once in PHP: the server parses and renders it, and the editor gets a matching TipTap extension,
+so no JavaScript is needed.
+
+```php
+use Hollyit\RichEditorPlus\Content\GlobalAttribute;
+use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+
+class AlignmentPlugin extends Plugin implements ProvidesGlobalAttributes
+{
+    public function getGlobalAttributes(): array
+    {
+        return [
+            GlobalAttribute::style('textAlign', 'text-align')
+                ->types(['paragraph', 'heading'])
+                ->values(['left', 'center', 'right', 'justify']),
+        ];
+    }
+
+    // getId(), getJsExtension(), ...
+}
+```
+
+To add one to an existing plugin, such as anchors on headings, extend it from a service provider:
+
+```php
+use Hollyit\RichEditorPlus\RichEditorPlus;
+use Hollyit\RichEditorPlus\Support\PluginExtension;
+
+RichEditorPlus::extendPlugin('core/heading', fn (PluginExtension $extension) => $extension->addGlobalAttributes([
+    GlobalAttribute::html('anchor', 'id')->types(['heading'])->pattern('[A-Za-z][A-Za-z0-9_-]*'),
+]));
+```
+
+- `style($name, $property)` reads and writes one CSS property of the `style` attribute. Several style attributes on
+  one element are merged into one `style`. `html($name, $attribute)` reads and writes a plain HTML attribute; `class`
+  values are merged.
+- `types()` takes node and mark names, or `'*'`, `'nodes'` or `'marks'`. Names the field doesn't have are ignored.
+- Every attribute must validate its value with `values([...])` (matched without regard to case, stored as listed) or
+  `pattern('...')` (anchored for you; use regex syntax PHP and JavaScript share). Invalid values are dropped when
+  content is parsed and when it is rendered, so stored JSON can't smuggle CSS or markup through.
+- Values are strings, the default is `null`, and `null` is not rendered. `keepOnSplit(false)` stops Enter from copying
+  the value to the new block.
+- `html()` refuses `style`, event handlers (`on*`) and URL attributes such as `href` and `src`.
+- If a TipTap extension you load already declares the attribute in the browser, call `providedByJsExtension()` so
+  only the server side is generated.
+- The editor writes `style` values in the browser's normalized form (a colour such as `#F00` is saved as
+  `rgb(255, 0, 0)`), and that HTML is parsed again when the field loads. A `style()` pattern must accept that form
+  too, or the value is dropped.
+
 ## Writing a plugin with JavaScript
 
 A plugin that adds editor behaviour ships an ES module. The editor imports it before it builds the editor, and calls

@@ -29,7 +29,8 @@ class ToolbarRenderer
     {
         $layout ??= ToolbarLayout::default(ToolbarPlacement::Floating, $inlineTools);
 
-        $showsWithCursor = array_filter($blockTools, static fn (Tool $tool): bool => $tool->showsWithCursor()) !== [];
+        $showsWithCursor = $layout->has(ToolbarControl::BlockTools)
+            && array_filter($blockTools, static fn (Tool $tool): bool => $tool->showsWithCursor()) !== [];
 
         return '<div class="rep-toolbar" role="toolbar" aria-orientation="horizontal"'
             .' aria-label="'.e(__('rich-editor-plus::toolbar.block')).'" data-rep-block-toolbar="'.e($node).'"'
@@ -50,7 +51,7 @@ class ToolbarRenderer
         $html = '<div class="rep-toolbar rep-fixed-toolbar'.($isSticky ? ' rep-fixed-toolbar-sticky' : '').'"'
             .' role="toolbar" aria-orientation="horizontal" aria-label="'.e(__('rich-editor-plus::toolbar.fixed')).'"'
             .' data-rep-fixed-toolbar'.($attributes === '' ? '' : ' '.$attributes).'>'
-            .$this->renderItems($layout, $this->renderBlockToolGroups($blockToolGroups), $hasListTypes, ToolbarPlacement::Fixed)
+            .$this->renderItems($layout, $this->renderBlockToolGroups($blockToolGroups), $hasListTypes, ToolbarPlacement::Fixed, ($blockToolGroups['*'] ?? []) === [])
             .'</div>';
 
         return $isDisabled ? str_replace('<button ', '<button disabled ', $html) : $html;
@@ -59,9 +60,9 @@ class ToolbarRenderer
     /**
      * Writes the layout's groups in order. Formatting tools, the list button and the block tools each sit in a
      * section the browser can hide, with the divider that starts their group inside it, so hiding one leaves no
-     * stray divider. A section with nothing to show, such as the list button on a field with no lists, is skipped.
+     * stray divider. The block tools section starts hidden when nothing shows for every block. A section with nothing to show, such as the list button on a field with no lists, is skipped.
      */
-    protected function renderItems(ToolbarLayout $layout, string $blockToolsHtml, bool $hasListTypes, ToolbarPlacement $placement): string
+    protected function renderItems(ToolbarLayout $layout, string $blockToolsHtml, bool $hasListTypes, ToolbarPlacement $placement, bool $hidesBlockTools = false): string
     {
         $html = '';
         $hasItems = false;
@@ -70,7 +71,7 @@ class ToolbarRenderer
             $startsGroup = true;
 
             foreach ($this->splitSections($group) as $section) {
-                $sectionHtml = $this->renderSection($section, $blockToolsHtml, $hasListTypes, $placement, $hasItems && $startsGroup);
+                $sectionHtml = $this->renderSection($section, $blockToolsHtml, $hasListTypes, $placement, $hasItems && $startsGroup, $hidesBlockTools);
 
                 if ($sectionHtml === '') {
                     continue;
@@ -111,7 +112,7 @@ class ToolbarRenderer
     /**
      * @param  array<Tool> | ToolbarControl  $section
      */
-    protected function renderSection(array|ToolbarControl $section, string $blockToolsHtml, bool $hasListTypes, ToolbarPlacement $placement, bool $withDivider): string
+    protected function renderSection(array|ToolbarControl $section, string $blockToolsHtml, bool $hasListTypes, ToolbarPlacement $placement, bool $withDivider, bool $hidesBlockTools = false): string
     {
         $divider = $withDivider ? $this->renderDivider() : '';
 
@@ -122,7 +123,7 @@ class ToolbarRenderer
         return match ($section) {
             ToolbarControl::BlockTools => $blockToolsHtml === ''
                 ? ''
-                : '<span class="rep-toolbar-group" data-rep-block-tools>'.$divider.$blockToolsHtml.'</span>',
+                : '<span class="rep-toolbar-group" data-rep-block-tools'.($hidesBlockTools ? ' hidden' : '').'>'.$divider.$blockToolsHtml.'</span>',
             ToolbarControl::ListOptions => $hasListTypes ? $this->renderListButton($divider, $placement) : '',
             ToolbarControl::DragHandle => $divider.$this->renderDragHandle(),
             ToolbarControl::BlockSwitcher => $divider.$this->renderSwitcher(),
@@ -168,7 +169,7 @@ class ToolbarRenderer
             .' data-rep-generic-label="'.e(__('rich-editor-plus::blocks.generic')).'"'
             .' data-rep-multiple-label="'.e(__('rich-editor-plus::blocks.multiple')).'"'
             .' aria-label="'.$label.'" aria-haspopup="menu" aria-expanded="false">'
-            .'<span data-rep-switcher-icon></span><span class="rep-switcher-label" data-rep-switcher-label></span>'
+            .'<span data-rep-switcher-icon></span><span class="rep-switcher-label" data-rep-switcher-label>'.e(__('rich-editor-plus::blocks.generic')).'</span>'
             .generate_icon_html('mdi-chevron-down')->toHtml().'</button>';
     }
 
@@ -192,7 +193,7 @@ class ToolbarRenderer
             .$divider
             .'<button type="button" class="rep-tool rep-list-button" tabindex="-1" data-rep-control="list"'
             .' data-rep-label="'.e(__('rich-editor-plus::toolbar.list_options')).'"'
-            .($isFixed ? ' aria-label="'.e(__('rich-editor-plus::toolbar.list_menu')).'" aria-disabled="true"' : '')
+            .($isFixed ? ' aria-label="'.e(__('rich-editor-plus::toolbar.list_menu')).'" data-rep-generic-label="'.e(__('rich-editor-plus::toolbar.list_menu')).'" aria-disabled="true"' : '')
             .' aria-haspopup="menu" aria-expanded="false">'
             .'<span data-rep-list-icon>'.($isFixed ? generate_icon_html('mdi-format-list-bulleted')->toHtml() : '').'</span>'
             .generate_icon_html('mdi-chevron-down')->toHtml()

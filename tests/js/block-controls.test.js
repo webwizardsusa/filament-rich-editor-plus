@@ -4,7 +4,7 @@ import { createBlockControls } from '../../resources/js/toolbar/block-controls'
 import { focusToolbar, syncToolbar } from '../../resources/js/toolbar/tools'
 import { blockTypes } from './support/block-types'
 import { blockSummary, doc, makeEditor, p } from './support/make-editor'
-import { makeToolbarRoot } from './support/toolbar-markup'
+import { fixedToolbarMarkup, makeToolbarRoot } from './support/toolbar-markup'
 
 let editor
 let root
@@ -286,6 +286,28 @@ it('keeps the list button showing but disabled outside a list when told not to h
 
     expect(toolbar.querySelector('[data-rep-list-tools]').hidden).toBe(false)
     expect(control('list').getAttribute('aria-disabled')).toBe('true')
+})
+
+it('restores the generic list button name and icon after leaving a list when told not to hide', () => {
+    root.insertAdjacentHTML('afterbegin', fixedToolbarMarkup)
+    toolbar = root.querySelector('[data-rep-fixed-toolbar]')
+    toolbar.querySelector('[data-rep-control="list"]').dataset.repGenericLabel = 'List options'
+    toolbar.querySelector('[data-rep-list-icon]').innerHTML = '<svg data-icon="generic"></svg>'
+    setUp(doc({ type: 'bulletList', content: [{ type: 'listItem', content: [p('item')] }] }, p('after')))
+    const sync = () => controls.sync(toolbar, { hideUnavailable: false })
+
+    editor.commands.setTextSelection(3)
+    sync()
+
+    expect(control('list').getAttribute('aria-label')).toBe('List options: Bulleted list')
+    expect(control('list').querySelector('svg').dataset.icon).toBe('bullet')
+
+    editor.commands.setTextSelection(editor.state.doc.content.size - 1)
+    sync()
+
+    expect(control('list').getAttribute('aria-label')).toBe('List options')
+    expect(control('list').querySelector('svg').dataset.icon).toBe('generic')
+    expect(control('list').dataset.repCurrent).toBeUndefined()
 })
 
 it('keeps formatting showing in a code block when told not to hide', () => {

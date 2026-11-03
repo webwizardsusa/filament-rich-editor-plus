@@ -16968,24 +16968,26 @@ function AS({ editor: e, root: t, blockTypes: n }) {
 		switcher: (e) => c.open(e),
 		more: (e) => l.open(e),
 		list: (e) => u?.open(e)
-	}, p = (t, n, r) => {
+	}, p = null, m = (t, n, r) => {
 		let i = t.querySelector("[data-rep-list-tools]");
 		if (!i || !a) return;
 		let o = Lh(e.state.selection), s = i.querySelector("[data-rep-control=\"list\"]");
-		if (i.hidden = r && !o, !o) {
-			DS(s, !0);
+		i.hidden = r && !o;
+		let c = s.querySelector("[data-rep-list-icon]");
+		if (p ??= c.innerHTML, !o) {
+			DS(s, !0), !r && s.dataset.repCurrent && (s.setAttribute("aria-label", s.dataset.repGenericLabel), c.innerHTML = p, delete s.dataset.repCurrent);
 			return;
 		}
-		let c = o.type.name, l = a.querySelector(`[data-rep-list-type="${c}"]`);
+		let l = o.type.name, u = a.querySelector(`[data-rep-list-type="${l}"]`);
 		if (DS(s, n), a.querySelectorAll("[data-rep-list-type]").forEach((e) => {
-			e.setAttribute("aria-checked", e.dataset.repListType === c ? "true" : "false");
+			e.setAttribute("aria-checked", e.dataset.repListType === l ? "true" : "false");
 		}), a.querySelectorAll("[data-rep-list-action]").forEach((t) => {
 			DS(t, !e.can()[t.dataset.repListAction]());
-		}), l && s.dataset.repCurrent !== c) {
-			let e = s.dataset.repLabel.replace(":type", l.querySelector(".rep-menu-item-label").textContent);
-			s.querySelector("[data-rep-list-icon]").replaceChildren(l.querySelector("svg").cloneNode(!0)), s.setAttribute("aria-label", e), s.dataset.repCurrent = c;
+		}), u && s.dataset.repCurrent !== l) {
+			let e = s.dataset.repLabel.replace(":type", u.querySelector(".rep-menu-item-label").textContent);
+			c.replaceChildren(u.querySelector("svg").cloneNode(!0)), s.setAttribute("aria-label", e), s.dataset.repCurrent = l;
 		}
-	}, m = n.some(({ multiBlock: e }) => e), h = (e, t, i) => {
+	}, h = n.some(({ multiBlock: e }) => e), g = (e, t, i) => {
 		let a = e.querySelector("[data-rep-control=\"switcher\"]");
 		if (!a) return;
 		let o = t?.name ?? "";
@@ -16997,10 +16999,10 @@ function AS({ editor: e, root: t, blockTypes: n }) {
 			let { repBlockType: t } = e.dataset;
 			e.setAttribute("aria-checked", t === o ? "true" : "false"), e.hidden = i > 0 && !n.find((e) => e.name === t)?.multiBlock;
 		});
-	}, g = (e) => {
+	}, _ = (e) => {
 		let t = e.target.closest("[data-rep-control]");
 		t && !OS(t) && f[t.dataset.repControl]?.(t);
-	}, _ = /* @__PURE__ */ new Set();
+	}, v = /* @__PURE__ */ new Set();
 	return {
 		floatingElements: [
 			r,
@@ -17008,7 +17010,7 @@ function AS({ editor: e, root: t, blockTypes: n }) {
 			a
 		].filter(Boolean),
 		bind(e) {
-			e.addEventListener("click", g), _.add(e);
+			e.addEventListener("click", _), v.add(e);
 		},
 		sync(t, { hideUnavailable: r = !0 } = {}) {
 			let { state: a } = e, o = Fh(a);
@@ -17016,9 +17018,9 @@ function AS({ editor: e, root: t, blockTypes: n }) {
 			let s = Bh(a), c = s || Rh(a), l = zh(a), u = t.querySelector("[data-rep-control=\"switcher\"]"), d = l ? {
 				name: `blocks:${l}`,
 				label: u?.dataset.repMultipleLabel.replace(":count", l),
-				switchable: m
+				switchable: h
 			} : Hh(n, o.node);
-			h(t, d, l), p(t, s, r), DS(u, c && !l || !d?.switchable), DS(t.querySelector("[data-rep-control=\"moveUp\"]"), c || !e.can().moveBlockUp()), DS(t.querySelector("[data-rep-control=\"moveDown\"]"), c || !e.can().moveBlockDown()), DS(t.querySelector("[data-rep-drag-handle]"), c);
+			g(t, d, l), m(t, s, r), DS(u, c && !l || !d?.switchable), DS(t.querySelector("[data-rep-control=\"moveUp\"]"), c || !e.can().moveBlockUp()), DS(t.querySelector("[data-rep-control=\"moveDown\"]"), c || !e.can().moveBlockDown()), DS(t.querySelector("[data-rep-drag-handle]"), c);
 			let f = [...i.querySelectorAll("[data-rep-more-action]")];
 			f.forEach((t) => DS(t, !e.can()[t.dataset.repMoreAction]?.())), DS(t.querySelector("[data-rep-control=\"more\"]"), f.every(OS)), r && t.querySelectorAll("[data-rep-inline-tools]").forEach((e) => {
 				e.hidden = !kS(a);
@@ -17028,7 +17030,7 @@ function AS({ editor: e, root: t, blockTypes: n }) {
 			c.close({ restoreFocus: !1 }), l.close({ restoreFocus: !1 }), u?.close({ restoreFocus: !1 });
 		},
 		destroy() {
-			_.forEach((e) => e.removeEventListener("click", g)), c.destroy(), l.destroy(), u?.destroy();
+			v.forEach((e) => e.removeEventListener("click", _)), c.destroy(), l.destroy(), u?.destroy();
 		}
 	};
 }

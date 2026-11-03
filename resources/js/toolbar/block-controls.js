@@ -99,6 +99,8 @@ export function createBlockControls({ editor, root, blockTypes }) {
         list: (button) => listMenu?.open(button),
     }
 
+    let listIconHtml = null
+
     const syncListMenu = (toolbar, spans, hideUnavailable) => {
         const group = toolbar.querySelector('[data-rep-list-tools]')
 
@@ -111,8 +113,18 @@ export function createBlockControls({ editor, root, blockTypes }) {
 
         group.hidden = hideUnavailable && !list
 
+        const icon = button.querySelector('[data-rep-list-icon]')
+
+        listIconHtml ??= icon.innerHTML
+
         if (!list) {
             setDisabled(button, true)
+
+            if (!hideUnavailable && button.dataset.repCurrent) {
+                button.setAttribute('aria-label', button.dataset.repGenericLabel)
+                icon.innerHTML = listIconHtml
+                delete button.dataset.repCurrent
+            }
 
             return
         }
@@ -132,7 +144,7 @@ export function createBlockControls({ editor, root, blockTypes }) {
         if (type && button.dataset.repCurrent !== name) {
             const label = button.dataset.repLabel.replace(':type', type.querySelector('.rep-menu-item-label').textContent)
 
-            button.querySelector('[data-rep-list-icon]').replaceChildren(type.querySelector('svg').cloneNode(true))
+            icon.replaceChildren(type.querySelector('svg').cloneNode(true))
             button.setAttribute('aria-label', label)
             button.dataset.repCurrent = name
         }

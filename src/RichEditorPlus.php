@@ -497,7 +497,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
                             state: $wire.<?= $this->applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) ?>,
                         })"
             wire:ignore
-            wire:key="<?= e($this->getLivewireKey()) ?>.<?= substr(md5(serialize([$isDisabled])), 0, 64) ?>"
+            wire:key="<?= e($this->getLivewireKey()) ?>.<?= substr(md5(serialize([$isDisabled, $this->hasFloatingToolbar(), $this->hasFixedToolbar(), $this->isFixedToolbarSticky(), $this->getToolbarTools(), $this->getFixedToolbarTools()])), 0, 64) ?>"
             class="rep-editor"
         >
             <p x-show="error" x-text="error" class="rep-error" role="alert" style="display: none"></p>

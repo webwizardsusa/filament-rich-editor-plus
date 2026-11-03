@@ -415,3 +415,46 @@ it('adds extra attributes to the fixed toolbar', function (): void {
 
     expect($html)->toMatch('/<div[^>]*data-rep-fixed-toolbar x-show="! error">/');
 });
+
+it('renders the fixed toolbar block tools section hidden when no tools show for every block', function (array $groups): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(
+        ToolbarLayout::default(ToolbarPlacement::Fixed, [Tool::make('bold')->icon('mdi-format-bold')]),
+        $groups,
+        hasListTypes: false,
+    );
+
+    expect($html)->toContain('data-rep-block-tools hidden>');
+})->with([
+    'no group for every block' => [['table' => [Tool::make('addRow')->block()->nodes(['table'])]]],
+    'an empty group for every block' => [['*' => [], 'table' => [Tool::make('addRow')->block()->nodes(['table'])]]],
+]);
+
+it('leaves the fixed toolbar block tools section showing when tools show for every block', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(
+        ToolbarLayout::default(ToolbarPlacement::Fixed, []),
+        ['*' => [Tool::make('quote')->block()]],
+        hasListTypes: false,
+    );
+
+    expect($html)->toContain('data-rep-block-tools>')->not->toContain('data-rep-block-tools hidden');
+});
+
+it('names the fixed toolbar switcher generically until the browser knows the block', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(ToolbarLayout::default(ToolbarPlacement::Fixed, []), [], false);
+
+    expect($html)->toContain('data-rep-switcher-label>'.e(__('rich-editor-plus::blocks.generic')).'</span>');
+});
+
+it('gives the fixed toolbar list button its generic label for the browser to restore', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(ToolbarLayout::default(ToolbarPlacement::Fixed, []), [], true);
+
+    expect($html)->toContain('data-rep-generic-label="'.e(__('rich-editor-plus::toolbar.list_menu')).'"');
+});
+
+it('does not show a floating table toolbar with only a cursor when the layout has no block tools slot', function (): void {
+    $layout = PluginRegistry::make([BoldPlugin::make()])->getToolbarLayout([['bold'], ['blockSwitcher']], ToolbarPlacement::Floating);
+
+    $html = (new ToolbarRenderer)->renderBlockToolbar('table', [Tool::make('b')->block()->showWithCursor()], [], layout: $layout);
+
+    expect($html)->not->toContain('data-rep-show-with-cursor');
+});

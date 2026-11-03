@@ -51,6 +51,7 @@ class ToolbarModesTestForm extends Component implements HasActions, HasSchemas
             'none' => $field->floatingToolbar(false),
             'disabled' => $field->fixedToolbar()->disabled(),
             'static' => $field->fixedToolbar()->stickyFixedToolbar(false),
+            'other' => $field->fixedToolbar()->stickyFixedToolbar(false)->toolbarTools(['italic']),
             'split' => $field->fixedToolbar()->toolbarTools(['bold'])->fixedToolbarTools([['blockSwitcher'], ['italic']]),
             default => null,
         };
@@ -141,4 +142,14 @@ it('uses the floating arrangement for the fixed toolbar unless it has its own', 
     expect(RichEditorPlus::make('body')->toolbarTools(['bold'])->getFixedToolbarTools())->toBe([['bold']])
         ->and(RichEditorPlus::make('body')->toolbarTools(['bold'])->fixedToolbarTools(['italic', 'more'])->getFixedToolbarTools())->toBe([['italic', 'more']])
         ->and(RichEditorPlus::make('body')->getFixedToolbarTools())->toBeNull();
+});
+
+it('keys the editor on its toolbar modes so a changed toolbar refreshes', function (): void {
+    $key = fn (string $mode): string => preg_match('/wire:key="[^"]*\.([0-9a-f]{32})"/', toolbarModesHtml($mode), $matches) === 1 ? $matches[1] : '';
+
+    expect($key('floating'))->not->toBe('')
+        ->and($key('floating'))->not->toBe($key('fixed'))
+        ->and($key('static'))->not->toBe($key('fixed'))
+        ->and($key('split'))->not->toBe($key('both'))
+        ->and($key('other'))->not->toBe($key('static'));
 });

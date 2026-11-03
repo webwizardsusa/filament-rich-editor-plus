@@ -204,7 +204,7 @@ export default function richEditorPlusComponent({
 
         /**
          * Binds whichever toolbars the field rendered: the floating ones, the fixed one, both or neither. The slash
-         * menu and block drag work either way. A disabled field has no menus, so nothing is bound.
+         * menu and block drag work either way. A disabled field has no menus, so nothing is set up.
          */
         setUpToolbars() {
             if (isDisabled) {

@@ -74,6 +74,7 @@ class PluginRegistry
         $this->assertDependenciesAreMet();
         $this->sortByPriority();
         $this->collectExtensions();
+        $this->assertToolNamesAreNotReserved();
         $this->assertBlockTypesAreValid();
     }
 
@@ -340,6 +341,79 @@ class PluginRegistry
     }
 
     /**
+     * What a toolbar shows, grouped and in order. With no arrangement, or one that only names tools, the placement's
+     * default layout is used around the formatting tools, arranged as {@see getInlineTools()} does. Naming any
+     * {@see ToolbarControl} makes the arrangement the whole layout, so only what it names is shown. Each name is
+     * placed once, unknown names are skipped, and the drag handle never goes in the fixed toolbar.
+     *
+     * @param  ?array<int, array<string>>  $groups
+     */
+    public function getToolbarLayout(?array $groups, ToolbarPlacement $placement): ToolbarLayout
+    {
+        if ($groups === null || ! $this->namesAControl($groups)) {
+            return ToolbarLayout::default($placement, $this->getInlineTools($groups));
+        }
+
+        $toolsByName = [];
+
+        foreach ($this->getInlineTools() as $tool) {
+            $toolsByName[$tool->getName()] = $tool;
+        }
+
+        $placed = [];
+        $layout = [];
+
+        foreach ($groups as $index => $names) {
+            $items = [];
+
+            foreach ($names as $name) {
+                if (isset($placed[$name])) {
+                    continue;
+                }
+
+                $control = ToolbarControl::tryFrom($name);
+
+                if ($control === ToolbarControl::DragHandle && $placement === ToolbarPlacement::Fixed) {
+                    continue;
+                }
+
+                if ($control !== null) {
+                    $items[] = $control;
+                } elseif (isset($toolsByName[$name])) {
+                    // A copy, so the plugin's own tool keeps its group for any other field.
+                    $items[] = (clone $toolsByName[$name])->group("toolbar-{$index}");
+                } else {
+                    continue;
+                }
+
+                $placed[$name] = true;
+            }
+
+            if ($items !== []) {
+                $layout[] = $items;
+            }
+        }
+
+        return new ToolbarLayout($layout);
+    }
+
+    /**
+     * @param  array<int, array<string>>  $groups
+     */
+    protected function namesAControl(array $groups): bool
+    {
+        foreach ($groups as $names) {
+            foreach ($names as $name) {
+                if (ToolbarControl::tryFrom($name) !== null) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * The tools for the more menu, in display order.
      *
      * @return array<Tool>
@@ -384,6 +458,29 @@ class PluginRegistry
         }
 
         return $toolbars;
+    }
+
+    /**
+     * The block tools for the fixed toolbar, keyed by node type. `*` holds the tools for every block and each node
+     * type only its own, because the fixed toolbar shows the `*` group next to the active block's.
+     *
+     * @return array<string, array<Tool>>
+     */
+    public function getBlockToolGroups(): array
+    {
+        $groups = ['*' => []];
+
+        foreach ($this->getTools() as $tool) {
+            if ($tool->getScope() !== ToolScope::Block) {
+                continue;
+            }
+
+            foreach (in_array('*', $tool->getNodes(), true) ? ['*'] : $tool->getNodes() as $node) {
+                $groups[$node][] = $tool;
+            }
+        }
+
+        return array_map($this->sortTools(...), array_filter($groups));
     }
 
     /**
@@ -544,6 +641,20 @@ class PluginRegistry
             foreach ($plugin->getDependencies() as $dependency) {
                 if (! array_key_exists($dependency, $this->plugins)) {
                     throw new LogicException("The editor plugin [{$plugin->getId()}] requires [{$dependency}], which is not registered.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Toolbar arrangements place controls by name, so a tool with one of those names could never be placed.
+     */
+    protected function assertToolNamesAreNotReserved(): void
+    {
+        foreach ($this->plugins as $id => $plugin) {
+            foreach ([...$plugin->getTools(), ...$this->extensions[$id]->getTools()] as $tool) {
+                if (ToolbarControl::tryFrom($tool->getName()) !== null) {
+                    throw new InvalidArgumentException("The editor plugin [{$id}] registers a tool named [{$tool->getName()}], which is reserved for the toolbar.");
                 }
             }
         }

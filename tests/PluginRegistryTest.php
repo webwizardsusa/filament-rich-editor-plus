@@ -5,6 +5,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\DocumentPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\Support\JsExtension;
+use Hollyit\RichEditorPlus\Support\PluginExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\Tool;
 use Tests\TestCase;
@@ -13,6 +14,8 @@ uses(TestCase::class);
 
 // Package tests must not depend on plugins the host app registers globally.
 beforeEach(fn (): mixed => PluginRegistry::flush());
+
+afterEach(fn (): mixed => PluginRegistry::flush());
 
 function makeTestPlugin(string $id, int $priority = 100, array $dependencies = []): Plugin
 {
@@ -188,3 +191,33 @@ it('joins the editor html from every plugin that has some', function (): void {
     expect(PluginRegistry::make([$withHtml])->getEditorHtml())->toBe('<div data-test-panel></div>')
         ->and(PluginRegistry::make([])->getEditorHtml())->toBe('');
 });
+
+it('rejects a tool named like a toolbar control', function (string $name): void {
+    $plugin = new class($name) extends Plugin
+    {
+        public function __construct(protected string $toolName) {}
+
+        public function getId(): string
+        {
+            return 'test/reserved';
+        }
+
+        public function getJsExtension(): JsExtension
+        {
+            return JsExtension::make($this->getId());
+        }
+
+        public function getTools(): array
+        {
+            return [Tool::make($this->toolName)->command('x')];
+        }
+    };
+
+    PluginRegistry::make([$plugin]);
+})->with(['more', 'blockTools', 'dragHandle'])->throws(InvalidArgumentException::class, 'is reserved for the toolbar');
+
+it('rejects a reserved tool name added to a plugin from outside', function (): void {
+    PluginRegistry::extendPlugin('core/bold', fn (PluginExtension $extension): PluginExtension => $extension->addTool(Tool::make('moveUp')->command('x')));
+
+    PluginRegistry::make([BoldPlugin::make()]);
+})->throws(InvalidArgumentException::class, '[core/bold] registers a tool named [moveUp]');

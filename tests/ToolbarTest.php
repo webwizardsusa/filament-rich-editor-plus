@@ -309,3 +309,20 @@ it('leaves the plugins own tools untouched when arranging', function (): void {
 
     expect($registry->getInlineTools()[0]->getGroup())->toBe('format');
 });
+
+it('groups block tools for the fixed toolbar without repeating the tools for every block', function (): void {
+    $groups = PluginRegistry::make([
+        makeBlockToolPlugin('test/table', Tool::make('addRow')->block()->nodes(['table'])->order(5)),
+        makeBlockToolPlugin('test/quote', Tool::make('quote')->block()->order(10)),
+    ])->getBlockToolGroups();
+
+    expect(array_keys($groups))->toBe(['*', 'table'])
+        ->and(collect($groups['*'])->map->getName()->all())->toBe(['quote'])
+        ->and(collect($groups['table'])->map->getName()->all())->toBe(['addRow']);
+});
+
+it('has no group for every block when every block tool belongs to a node', function (): void {
+    $groups = PluginRegistry::make([makeBlockToolPlugin('test/table', Tool::make('addRow')->block()->nodes(['table']))])->getBlockToolGroups();
+
+    expect(array_keys($groups))->toBe(['table']);
+});

@@ -143,9 +143,15 @@ use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TextAlignPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
 
 RichEditorPlus::make('body')->addPlugins([CodePlugin::make(), TaskListPlugin::make()]);
+
+TextAlignPlugin::make()
+    ->alignments(['left', 'center', 'right', 'justify']) // the default
+    ->types(['paragraph', 'heading'])                    // the default
+    ->defaultAlignment('left');                          // the default; choosing it clears the alignment
 
 RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class]);
 ```
@@ -155,6 +161,7 @@ RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class
 | `CodePlugin` | Inline code (`Mod-e`). Code text can't have other marks. |
 | `SubscriptPlugin`, `SuperscriptPlugin` | Subscript (`Mod-,`) and superscript (`Mod-.`), in the more menu. Each replaces the other. |
 | `TaskListPlugin` | A checkbox list, in the list menu next to bulleted and numbered lists. Saved and rendered checkboxes are `disabled`; style them with `ul[data-type="taskList"]` and `li[data-checked="true"]`. |
+| `TextAlignPlugin` | An alignment menu on the block toolbar, for paragraphs and headings. It stores `style="text-align: …"`. Configure it with the alignments on offer, the node types it applies to, and the default alignment, which is never stored: choosing it clears the attribute. On a right-to-left site, use `defaultAlignment('right')`. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
 ## Global attributes
@@ -285,6 +292,30 @@ While the hot file exists in a local environment, `moduleUrl()` returns the dev 
 its HMR client; otherwise it returns the published asset. Override `assetsDistPath()`, `devServerEntry()` or
 `assetsMissingMessage()` to change the defaults. See `RichEditorPlusTableServiceProvider` in
 `hollyit/rich-editor-plus-table` for a complete example.
+
+### Tools with a menu
+
+A tool with `menu()` opens a list of items instead of running a command of its own. Its button shows the current
+item's label through `currentLabel()`:
+
+```php
+Tool::make('textAlign')
+    ->label('Text align')
+    ->icon('mdi-format-align-left')
+    ->currentLabel('Text align: :item')
+    ->menu([
+        ToolMenuItem::make('center')
+            ->label('Center')
+            ->icon('mdi-format-align-center')
+            ->command('setTextAlign', ['center'])
+            ->active(attributes: ['textAlign' => 'center']),
+    ])
+    ->block();
+```
+
+- A menu tool runs its items, not a command of its own.
+- `active()` without a name matches any node or mark with those attributes.
+- Menu tools can be inline or block tools, not in the more menu.
 
 ### JS side
 

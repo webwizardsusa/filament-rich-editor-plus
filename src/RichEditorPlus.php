@@ -20,6 +20,7 @@ use Hollyit\RichEditorPlus\Support\MentionProvider;
 use Hollyit\RichEditorPlus\Support\PluginExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\StateFormat;
+use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
 use Illuminate\Support\Js;
 use Livewire\Attributes\Renderless;
 
@@ -48,6 +49,17 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      * @var array<string | array<string>> | Closure | null
      */
     protected array|Closure|null $toolbarTools = null;
+
+    protected bool|Closure $hasFloatingToolbar = true;
+
+    protected bool|Closure $hasFixedToolbar = false;
+
+    protected bool|Closure $isFixedToolbarSticky = true;
+
+    /**
+     * @var array<string | array<string>> | Closure | null
+     */
+    protected array|Closure|null $fixedToolbarTools = null;
 
     /**
      * Replaces the default plugin set. Each entry is a plugin instance or class name.
@@ -112,10 +124,13 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     }
 
     /**
-     * Chooses which formatting tools the toolbar shows and in what order, by tool name. Each inner array is a group,
-     * with a divider between groups; a flat list is one group. Tools left out are hidden, though their keyboard
-     * shortcuts still work (remove the plugin with `withoutPlugins()` to drop those too), and names of tools the
-     * field doesn't have are skipped. `null` keeps the plugins' own order.
+     * Chooses what the floating toolbar shows and in what order, by name. Each inner array is a group, with a
+     * divider between groups; a flat list is one group. A list of tool names only arranges the formatting tools,
+     * and the controls stay where they are. Naming a control (`dragHandle`, `blockSwitcher`, `moveUp`, `moveDown`,
+     * `listOptions`, `more`) or the `blockTools` slot makes the list the whole toolbar, so only what it names is
+     * shown. Tools left out are hidden, though their keyboard shortcuts still work (remove the plugin with
+     * `withoutPlugins()` to drop those too), and names the field doesn't have are skipped. `null` keeps the default
+     * layout and the plugins' own order.
      *
      * @param  array<string | array<string>> | Closure | null  $tools
      */
@@ -131,8 +146,85 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      */
     public function getToolbarTools(): ?array
     {
-        $tools = $this->evaluate($this->toolbarTools);
+        return $this->normalizeToolbarGroups($this->evaluate($this->toolbarTools));
+    }
 
+    /**
+     * Shows the toolbar that floats above the selection. It is on by default.
+     */
+    public function floatingToolbar(bool|Closure $condition = true): static
+    {
+        $this->hasFloatingToolbar = $condition;
+
+        return $this;
+    }
+
+    public function hasFloatingToolbar(): bool
+    {
+        return (bool) $this->evaluate($this->hasFloatingToolbar);
+    }
+
+    /**
+     * Shows a toolbar above the editor, which stays in place and shows the active block's own tools in its block
+     * tools section. It can be used with the floating toolbar or instead of it.
+     */
+    public function fixedToolbar(bool|Closure $condition = true): static
+    {
+        $this->hasFixedToolbar = $condition;
+
+        return $this;
+    }
+
+    public function hasFixedToolbar(): bool
+    {
+        return (bool) $this->evaluate($this->hasFixedToolbar);
+    }
+
+    /**
+     * Keeps the fixed toolbar at the top of the screen while the editor scrolls past, below a Filament panel's
+     * topbar. It is on by default, and has no effect inside a container that scrolls on its own, such as a modal.
+     */
+    public function stickyFixedToolbar(bool|Closure $condition = true): static
+    {
+        $this->isFixedToolbarSticky = $condition;
+
+        return $this;
+    }
+
+    public function isFixedToolbarSticky(): bool
+    {
+        return (bool) $this->evaluate($this->isFixedToolbarSticky);
+    }
+
+    /**
+     * Chooses what the fixed toolbar shows, the same way `toolbarTools()` does for the floating one, which it falls
+     * back to when `null`. The drag handle is never shown in the fixed toolbar.
+     *
+     * @param  array<string | array<string>> | Closure | null  $tools
+     */
+    public function fixedToolbarTools(array|Closure|null $tools): static
+    {
+        $this->fixedToolbarTools = $tools;
+
+        return $this;
+    }
+
+    /**
+     * @return ?array<int, array<string>>
+     */
+    public function getFixedToolbarTools(): ?array
+    {
+        $tools = $this->evaluate($this->fixedToolbarTools);
+
+        return $tools === null ? $this->getToolbarTools() : $this->normalizeToolbarGroups($tools);
+    }
+
+    /**
+     * @param  ?array<string | array<string>>  $tools
+     * @return ?array<int, array<string>>
+     */
+    protected function normalizeToolbarGroups(?array $tools): ?array
+    {
         if ($tools === null) {
             return null;
         }
@@ -324,15 +416,18 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         $toolbarRenderer = new ToolbarRenderer;
         $menuRenderer = new BlockMenuRenderer;
 
-        $inlineTools = $registry->getInlineTools($this->getToolbarTools());
         $blockTypes = $registry->getBlockTypes();
 
         $listTypes = $registry->getListTypes();
 
         $html = '';
 
-        foreach (['*' => [], ...$registry->getBlockToolbars()] as $node => $tools) {
-            $html .= $toolbarRenderer->renderBlockToolbar($node, $tools, $inlineTools, $listTypes !== []);
+        if ($this->hasFloatingToolbar()) {
+            $layout = $registry->getToolbarLayout($this->getToolbarTools(), ToolbarPlacement::Floating);
+
+            foreach (['*' => [], ...$registry->getBlockToolbars()] as $node => $tools) {
+                $html .= $toolbarRenderer->renderBlockToolbar($node, $tools, [], $listTypes !== [], $layout);
+            }
         }
 
         $html .= $menuRenderer->renderSlashMenu($blockTypes, $idPrefix ?? $this->getName());
@@ -347,6 +442,28 @@ class RichEditorPlus extends Field implements HasEmbeddedView
             .$menuRenderer->renderListMenu($listTypes)
             .$menuRenderer->renderLiveRegion()
             .$registry->getEditorHtml();
+    }
+
+    /**
+     * The toolbar above the editor, or nothing when the field has none. A disabled field still shows it, with every
+     * button disabled, so the field keeps its shape. It hides with the editor when the editor cannot load.
+     */
+    public function getFixedToolbarHtml(): string
+    {
+        if (! $this->hasFixedToolbar()) {
+            return '';
+        }
+
+        $registry = $this->getPluginRegistry();
+
+        return (new ToolbarRenderer)->renderFixedToolbar(
+            $registry->getToolbarLayout($this->getFixedToolbarTools(), ToolbarPlacement::Fixed),
+            $registry->getBlockToolGroups(),
+            $registry->getListTypes() !== [],
+            $this->isFixedToolbarSticky(),
+            $this->isDisabled(),
+            'x-show="! error"',
+        );
     }
 
     public function toEmbeddedHtml(): string
@@ -384,6 +501,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
             class="rep-editor"
         >
             <p x-show="error" x-text="error" class="rep-error" role="alert" style="display: none"></p>
+            <?= $this->getFixedToolbarHtml() ?>
             <div x-ref="editor" x-show="! error"></div>
             <?= $isDisabled ? '' : $this->getToolbarsHtml($id) ?>
         </div>

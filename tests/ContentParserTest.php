@@ -151,3 +151,33 @@ it('survives broken HTML', function (): void {
 it('leaves bare text where it is, because parsing does not repair structure', function (): void {
     expect(parseContent('a'))->toBe([['type' => 'text', 'text' => 'a']]);
 });
+
+function excludingMarksParse(string $html): array
+{
+    $schema = new ContentSchema([NodeSpec::make('paragraph')->parseTags(['p'])->renderTag('p')], [
+        MarkSpec::make('bold')->parseTags(['strong'])->renderTag('strong'),
+        MarkSpec::make('link')->parseTags(['a'])->attribute('href')->renderTag('a'),
+        MarkSpec::make('code')->parseTags(['code'])->excludes('_')->renderTag('code'),
+        MarkSpec::make('subscript')->parseTags(['sub'])->excludes(['superscript'])->renderTag('sub'),
+        MarkSpec::make('superscript')->parseTags(['sup'])->excludes(['subscript'])->renderTag('sup'),
+    ]);
+
+    return (new HtmlParser($schema))->parse($html)['content'][0]['content'][0]['marks'];
+}
+
+it('drops marks inside a mark that excludes every other mark', function (string $html): void {
+    expect(excludingMarksParse($html))->toBe([['type' => 'code']]);
+})->with([
+    'bold inside code' => '<p><code><strong>x</strong></code></p>',
+    'code inside bold' => '<p><strong><code>x</code></strong></p>',
+    'link inside code' => '<p><code><a href="https://example.com">x</a></code></p>',
+]);
+
+it('keeps only the inner mark of two that exclude each other', function (): void {
+    expect(excludingMarksParse('<p><sup><sub>x</sub></sup></p>'))->toBe([['type' => 'subscript']])
+        ->and(excludingMarksParse('<p><sub><sup>x</sup></sub></p>'))->toBe([['type' => 'superscript']]);
+});
+
+it('keeps marks that do not exclude each other', function (): void {
+    expect(excludingMarksParse('<p><strong><sub>x</sub></strong></p>'))->toBe([['type' => 'bold'], ['type' => 'subscript']]);
+});

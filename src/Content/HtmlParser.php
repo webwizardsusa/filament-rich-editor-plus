@@ -158,14 +158,31 @@ class HtmlParser
         $byType = array_column($marks, null, 'type');
 
         foreach ($this->schema->matchMarks($element) as [$spec, $matched]) {
-            $mark = ['type' => $spec->getName()];
+            $name = $spec->getName();
+            $mark = ['type' => $name];
             $attributes = $spec->parseAttributes($element, $matched);
 
             if ($attributes !== []) {
                 $mark['attrs'] = $attributes;
             }
 
-            $byType[$spec->getName()] = $mark;
+            foreach (array_keys($byType) as $other) {
+                if ($other === $name) {
+                    continue;
+                }
+
+                if ($spec->excludesMark($other)) {
+                    unset($byType[$other]);
+
+                    continue;
+                }
+
+                if ($this->schema->mark($other)?->excludesMark($name)) {
+                    continue 2;
+                }
+            }
+
+            $byType[$name] = $mark;
         }
 
         $ordered = array_values($byType);

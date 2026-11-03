@@ -221,7 +221,7 @@ it('escapes the find panel text', function (): void {
 
 it('leaves the optional plugins out of the default set', function (): void {
     expect(collect(PluginRegistry::defaultPlugins())->map->getId()->all())
-        ->not->toContain('core/code', 'core/subscript', 'core/superscript');
+        ->not->toContain('core/code', 'core/subscript', 'core/superscript', 'core/text-align');
 });
 
 it('offers the task list as a list type with level tools', function (): void {

@@ -133,6 +133,30 @@ Tool::make('highlight')->shortcut('Mod-Shift-h');
 
 Alt+F10 moves focus into the floating toolbar, or into the fixed toolbar when there is no floating one.
 
+## Optional plugins
+
+These plugins ship with the package but aren't in the default set. Add them to a field, or to every field from a
+service provider:
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
+
+RichEditorPlus::make('body')->addPlugins([CodePlugin::make(), TaskListPlugin::make()]);
+
+RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class]);
+```
+
+| Plugin | Adds |
+|---|---|
+| `CodePlugin` | Inline code (`Mod-e`). Code text can't have other marks. |
+| `SubscriptPlugin`, `SuperscriptPlugin` | Subscript (`Mod-,`) and superscript (`Mod-.`), in the more menu. Each replaces the other. |
+| `TaskListPlugin` | A checkbox list, in the list menu next to bulleted and numbered lists. Saved and rendered checkboxes are `disabled`; style them with `ul[data-type="taskList"]` and `li[data-checked="true"]`. |
+| `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. Content that ends with a table or code block is saved with a trailing `<p></p>`. |
+
 ## Writing a plugin with JavaScript
 
 A plugin that adds editor behaviour ships an ES module. The editor imports it before it builds the editor, and calls

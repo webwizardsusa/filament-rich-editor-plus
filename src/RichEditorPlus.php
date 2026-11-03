@@ -9,13 +9,11 @@ use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Filament\Support\Components\Contracts\HasEmbeddedView;
-use Filament\Support\Facades\FilamentAsset;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\Rendering\BlockMenuRenderer;
 use Hollyit\RichEditorPlus\Rendering\ToolbarRenderer;
 use Hollyit\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
-use Hollyit\RichEditorPlus\Support\DevServer;
 use Hollyit\RichEditorPlus\Support\EditorCommand;
 use Hollyit\RichEditorPlus\Support\MentionItem;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
@@ -24,7 +22,6 @@ use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\StateFormat;
 use Illuminate\Support\Js;
 use Livewire\Attributes\Renderless;
-use LogicException;
 
 class RichEditorPlus extends Field implements HasEmbeddedView
 {
@@ -243,22 +240,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      */
     public function getAlpineComponentSrc(): string
     {
-        if ($devUrl = DevServer::forEditor()->entryUrl()) {
-            return $devUrl;
-        }
-
-        try {
-            return FilamentAsset::getAlpineComponentSrc(
-                RichEditorPlusServiceProvider::ALPINE_COMPONENT,
-                RichEditorPlusServiceProvider::PACKAGE,
-            );
-        } catch (LogicException $exception) {
-            throw new LogicException(
-                'The Rich Editor Plus assets are not available: the Vite dev server is not running (no public/rich-editor-plus.hot) '
-                .'and the package has not been built. Run `npm run dev:rep`, or `npm run build:rep` followed by `php artisan filament:assets`.',
-                previous: $exception,
-            );
-        }
+        return RichEditorPlusServiceProvider::moduleUrl();
     }
 
     /**

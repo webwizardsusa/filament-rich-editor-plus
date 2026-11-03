@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Blade;
 
 /**
  * Finds a package's running Vite dev server through the hot file its `vite.config.js` writes into `public/`.
- * Packages that ship JS for Rich Editor Plus can use it the same way the editor itself does.
+ * Packages that ship JS for Rich Editor Plus usually get one through the `RegistersPluginAssets` trait.
  */
 class DevServer
 {
@@ -20,11 +20,6 @@ class DevServer
         protected string $hotFileName,
         protected string $entry,
     ) {}
-
-    public static function forEditor(): static
-    {
-        return new static('rich-editor-plus.hot', 'packages/rich-editor-plus/resources/js/index.js');
-    }
 
     public function hotFilePath(): string
     {

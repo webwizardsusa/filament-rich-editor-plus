@@ -92,12 +92,42 @@ its default export with the shared editor API.
 
 ### PHP side
 
-Point the plugin's JS extension at your built module, and register that file with Filament so `filament:assets`
-publishes it:
+Use the `RegistersPluginAssets` trait in your package's service provider. It registers your built module and
+stylesheet with Filament so `filament:assets` publishes them, and `moduleUrl()` tells the editor where to load the
+module from:
 
 ```php
-use Filament\Support\Assets\AlpineComponent;
-use Filament\Support\Facades\FilamentAsset;
+use Hollyit\RichEditorPlus\Support\RegistersPluginAssets;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
+
+class HighlightServiceProvider extends PackageServiceProvider
+{
+    use RegistersPluginAssets;
+
+    public function configurePackage(Package $package): void
+    {
+        $package->name('acme-highlight');
+    }
+
+    public function packageBooted(): void
+    {
+        $this->registerPluginAssets();
+    }
+
+    public static function assetPackage(): string
+    {
+        return 'acme/highlight';
+    }
+
+    public static function assetId(): string
+    {
+        return 'acme-highlight';
+    }
+}
+```
+
+```php
 use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 
@@ -111,16 +141,23 @@ class HighlightPlugin extends Plugin
     public function getJsExtension(): JsExtension
     {
         return JsExtension::make($this->getId(), ['color' => 'yellow'])
-            ->module(FilamentAsset::getAlpineComponentSrc('acme-highlight', 'acme/highlight'));
+            ->module(HighlightServiceProvider::moduleUrl());
     }
 }
-
-// In your service provider's boot():
-FilamentAsset::register([AlpineComponent::make('acme-highlight', __DIR__.'/../dist/acme-highlight.js')], 'acme/highlight');
 ```
 
-For hot reloading while you develop, `Hollyit\RichEditorPlus\Support\DevServer` finds your Vite dev server through
-its hot file. See `RichEditorPlusTableServiceProvider` in `hollyit/rich-editor-plus-table` for a complete example.
+The trait expects the service provider in `src/` and, by default:
+
+| | |
+| --- | --- |
+| Built files | `dist/{assetId}.js` and, if you ship one, `dist/{assetId}.css` |
+| Dev server hot file | `public/{assetId}.hot` |
+| Dev server entry | `resources/js/index.js` |
+
+While the hot file exists in a local environment, `moduleUrl()` returns the dev server's entry and the panel loads
+its HMR client; otherwise it returns the published asset. Override `assetsDistPath()`, `devServerEntry()` or
+`assetsMissingMessage()` to change the defaults. See `RichEditorPlusTableServiceProvider` in
+`hollyit/rich-editor-plus-table` for a complete example.
 
 ### JS side
 

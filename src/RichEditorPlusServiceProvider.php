@@ -2,16 +2,15 @@
 
 namespace Hollyit\RichEditorPlus;
 
-use Filament\Support\Assets\AlpineComponent;
-use Filament\Support\Assets\Css;
-use Filament\Support\Facades\FilamentAsset;
 use Hollyit\RichEditorPlus\Benchmarks\Console\BenchmarkCommand;
-use Hollyit\RichEditorPlus\Support\DevServer;
+use Hollyit\RichEditorPlus\Support\RegistersPluginAssets;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class RichEditorPlusServiceProvider extends PackageServiceProvider
 {
+    use RegistersPluginAssets;
+
     public const string PACKAGE = 'hollyit/rich-editor-plus';
 
     public const string ALPINE_COMPONENT = 'rich-editor-plus';
@@ -30,24 +29,22 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        $this->registerAssets();
-        DevServer::forEditor()->registerClient();
+        $this->registerPluginAssets();
     }
 
-    protected function registerAssets(): void
+    public static function assetPackage(): string
     {
-        $distPath = __DIR__.'/../dist';
+        return self::PACKAGE;
+    }
 
-        $assets = [];
+    public static function assetId(): string
+    {
+        return self::ALPINE_COMPONENT;
+    }
 
-        if (is_file("{$distPath}/rich-editor-plus.js")) {
-            $assets[] = AlpineComponent::make(self::ALPINE_COMPONENT, "{$distPath}/rich-editor-plus.js");
-        }
-
-        if (is_file("{$distPath}/rich-editor-plus.css")) {
-            $assets[] = Css::make(self::ALPINE_COMPONENT.'-styles', "{$distPath}/rich-editor-plus.css");
-        }
-
-        FilamentAsset::register($assets, self::PACKAGE);
+    protected static function assetsMissingMessage(): string
+    {
+        return 'The Rich Editor Plus assets are not available: the Vite dev server is not running (no public/rich-editor-plus.hot) '
+            .'and the package has not been built. Run `npm run dev:rep`, or `npm run build:rep` followed by `php artisan filament:assets`.';
     }
 }

@@ -15766,8 +15766,8 @@ function _b({ name: e, attributes: t }) {
 	});
 }
 //#endregion
-//#region resources/js/extensions/core/palette-color.js
-function vb({ name: e, attribute: t, setCommand: n, unsetCommand: r, colors: i }) {
+//#region resources/js/extensions/core/palette-style.js
+function vb({ name: e, attribute: t, setCommand: n, unsetCommand: r, values: i }) {
 	return W.create({
 		name: e,
 		addCommands() {
@@ -17224,13 +17224,31 @@ K("core/document", () => [
 	attribute: "color",
 	setCommand: "setTextColor",
 	unsetCommand: "unsetTextColor",
-	colors: e
+	values: e
 })]), K("core/background-color", ({ colors: e }) => [Cb, vb({
 	name: "backgroundColorCommands",
 	attribute: "backgroundColor",
 	setCommand: "setBackgroundColor",
 	unsetCommand: "unsetBackgroundColor",
-	colors: e
+	values: e
+})]), K("core/font-family", ({ values: e }) => [Cb, vb({
+	name: "fontFamilyCommands",
+	attribute: "fontFamily",
+	setCommand: "setFontFamily",
+	unsetCommand: "unsetFontFamily",
+	values: e
+})]), K("core/font-size", ({ values: e }) => [Cb, vb({
+	name: "fontSizeCommands",
+	attribute: "fontSize",
+	setCommand: "setFontSize",
+	unsetCommand: "unsetFontSize",
+	values: e
+})]), K("core/line-height", ({ values: e }) => [Cb, vb({
+	name: "lineHeightCommands",
+	attribute: "lineHeight",
+	setCommand: "setLineHeight",
+	unsetCommand: "unsetLineHeight",
+	values: e
 })]), K("core/bold", () => Cg), K("core/italic", () => zg), K("core/underline", () => Pb), K("core/strikethrough", () => Ab), K("core/code", () => Eg), K("core/subscript", () => jb.extend({
 	excludes: "superscript",
 	addKeyboardShortcuts() {

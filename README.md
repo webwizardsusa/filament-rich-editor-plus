@@ -180,7 +180,7 @@ RichEditorPlus::make('body')->addPlugins([
 - Each plugin has a default eight-colour palette, and `colors()` replaces it.
 - Palette names are lower-case letters, digits and hyphens, and don't start with a hyphen. `default` is reserved for the
   menu's "Default" item. Every label must be non-empty.
-- A colour may not contain `;`, `{`, `}`, `<`, `>`, `"`, `'`, `\`, `/*` or `*/`.
+- A colour may not contain `;`, `{`, `}`, `<`, `>`, `"`, `'`, `\`, `/*`, `*/` or a control character such as a line break or tab.
 - `BackgroundColorPlugin` entries take an optional `'text'` colour, validated the same way, for the text inside the
   highlight. The default palette sets dark text (`#1f2937`) so highlights stay readable in dark mode. It is written as a
   zero-specificity `:where()` rule, so a text colour on the same span always wins. `TextColorPlugin` ignores `'text'`.
@@ -190,20 +190,68 @@ RichEditorPlus::make('body')->addPlugins([
   ```blade
   @php
       use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+      use Hollyit\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
+      use Hollyit\RichEditorPlus\Plugins\Core\FontSizePlugin;
+      use Hollyit\RichEditorPlus\Plugins\Core\LineHeightPlugin;
       use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
   @endphp
 
   <style>
       {!! TextColorPlugin::make()->getStylesheet() !!}
       {!! BackgroundColorPlugin::make()->getStylesheet() !!}
+      {!! FontFamilyPlugin::make()->getStylesheet() !!}
+      {!! FontSizePlugin::make()->getStylesheet() !!}
+      {!! LineHeightPlugin::make()->getStylesheet() !!}
   </style>
   ```
 
-  Or copy the rules into the site CSS. Content shown without them appears uncoloured.
+  Or copy the rules into the site CSS. Content shown without them appears unstyled. The same applies to the font,
+  size and line height plugins below.
 - A class means one colour site-wide: two fields that give the same class different colours clash on a page that shows both.
 - Removing an entry from a palette strips that colour from content the next time it is saved; until then the class stays in
   stored HTML.
 - The field prints its palette CSS in an inline `<style>`, so a Content-Security-Policy must allow inline styles.
+
+The font, size and line height plugins store their choice on the same `textStyle` span as the colours, so they combine
+with them and with each other. They take a palette of named values, and each has a default:
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\FontSizePlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\LineHeightPlugin;
+
+RichEditorPlus::make('body')->addPlugins([
+    FontFamilyPlugin::make()->fonts([
+        'brand' => ['label' => 'Brand', 'family' => '"Inter", sans-serif'],
+        'serif' => ['label' => 'Serif', 'family' => 'ui-serif, Georgia, serif'],
+    ]),
+    FontSizePlugin::make()->sizes([
+        'small' => ['label' => 'Small', 'size' => '0.875em'],
+        'large' => ['label' => 'Large', 'size' => 'clamp(1.125rem, 2vw, 1.5rem)'],
+    ]),
+    LineHeightPlugin::make(), // the default palette: tight, relaxed, loose
+]);
+```
+
+- Classes are `has-{name}-font-family`, `has-{name}-font-size` and `has-{name}-line-height` by default. Change them with
+  `classUsing()`, as for the colours.
+- The default palettes are fonts `sans`, `serif` and `mono`; sizes `small` (`0.875em`), `large` (`1.25em`), `x-large`
+  (`1.5em`) and `xx-large` (`2em`); and line heights `tight` (`1.25`), `relaxed` (`1.75`) and `loose` (`2`). `fonts()`,
+  `sizes()` and `heights()` replace them. Palette names follow the colour rules above.
+- A font is a comma-separated list of names, such as `ui-serif, Georgia, serif`. Quote a name that needs it, as in
+  `"Open Sans"`. A bare name may start with a hyphen, as in `-apple-system`. Quoted names may not contain quotes,
+  backslashes or line breaks.
+- A size is a length (`1.25rem`, `120%`), `0`, a size keyword (`large`), `var(--name)`, or one `clamp()`, `min()`,
+  `max()` or `calc()`. Those hold only numbers with units `px`, `rem`, `em`, `%`, `pt`, `vw` or `vh`, the operators
+  `+ - * /`, commas, spaces, `var(--name)` and nested math functions, with balanced parentheses.
+- A line height is a number (`1.5`), a length, `normal` or `var(--name)`.
+- No value may contain `;`, `{`, `}`, `<`, `>`, `\`, `/*`, `*/` or a control character. Only font names may contain
+  quotes.
+- The font menu shows each font's swatch in its own typeface. The size and line height menus are plain lists. Every menu
+  starts with a "Default" item that clears the value.
+- Line height applies to the selected text, so it can make lines taller but not tighter. To tighten whole paragraphs,
+  set it in the site's CSS.
+- The plugins name fonts only: web fonts must be loaded by the site, for example in its own stylesheet.
 
 | Plugin | Adds |
 |---|---|
@@ -213,6 +261,9 @@ RichEditorPlus::make('body')->addPlugins([
 | `TextAlignPlugin` | An alignment menu on the block toolbar, for paragraphs and headings. It stores `style="text-align: …"`. Configure it with the alignments on offer, the node types it applies to, and the default alignment, which is never stored: choosing it clears the attribute. On a right-to-left site, use `defaultAlignment('right')`. The menu appears in every block toolbar and is disabled where nothing can be aligned. Shortcuts: `Mod-Shift-l`, `Mod-Shift-e`, `Mod-Shift-r` and `Mod-Shift-j` for left, center, right and justify (Ctrl on Windows and Linux, Cmd on macOS), bound only for the configured alignments. |
 | `TextColorPlugin` | A text colour menu on the toolbar, from a palette of eight colours by default. It stores the colour as a class on a span. |
 | `BackgroundColorPlugin` | A highlight menu on the toolbar, from a palette of eight pale colours by default. It stores the highlight as a class on a span. |
+| `FontFamilyPlugin` | A font menu on the toolbar, from three font stacks by default (sans, serif and mono). It stores the font as a class on a span. |
+| `FontSizePlugin` | A size menu on the toolbar, from four sizes by default. It stores the size as a class on a span. |
+| `LineHeightPlugin` | A line height menu on the toolbar, from three values by default (tight, relaxed and loose). It stores the line height as a class on a span. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
 ## Global attributes
@@ -376,6 +427,9 @@ Tool::make('textAlign')
 - `fallback()` marks the item that is current when no other item is active, such as "Default" in a colour menu.
 - A plugin whose content needs CSS in the editor, such as palette classes, implements `ProvidesEditorStyles` and
   returns the CSS from `getEditorStyles()`. The field prints it in a `<style>` element, so return only validated CSS.
+- A palette plugin for another CSS property extends `PaletteStylePlugin`, which the colour and font plugins share. It
+  implements the hooks that differ, such as `attributeName()`, `cssProperty()`, `valueKey()`, `defaultPalette()` and
+  `assertValue()`, and gets the menu, classes, stylesheet and shared checks from the base.
 
 ### JS side
 

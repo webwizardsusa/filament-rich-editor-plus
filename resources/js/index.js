@@ -11,6 +11,7 @@ import { createSlashMenuPlugin, registerSlashMenu } from './slash/slash-menu'
 import { registerSuggestion } from './slash/suggestion-list'
 import { createBlockDrag } from './toolbar/block-drag'
 import { createBlockToolbarPlugin } from './toolbar/block-toolbar'
+import { createFixedToolbar, createFixedToolbarKeymap } from './toolbar/fixed-toolbar'
 import { bindToolbar, syncToolbar } from './toolbar/tools'
 import { createToolbarTooltip } from './toolbar/tooltip'
 import { tiptap } from './shared-modules'
@@ -45,6 +46,7 @@ export default function richEditorPlusComponent({
     let commitTimeout = null
     let blockControls = null
     let blockDrag = null
+    let fixedToolbar = null
     let mentionLabels = null
     let toolbarTooltip = null
 
@@ -200,49 +202,75 @@ export default function richEditorPlusComponent({
             chain.run()
         },
 
+        /**
+         * Binds whichever toolbars the field rendered: the floating ones, the fixed one, both or neither. The slash
+         * menu and block drag work either way. A disabled field has no menus, so nothing is bound.
+         */
         setUpToolbars() {
+            if (isDisabled) {
+                return
+            }
+
             const blockToolbars = new Map(
                 [...this.$el.querySelectorAll('[data-rep-block-toolbar]')].map((toolbar) => [
                     toolbar.dataset.repBlockToolbar,
                     toolbar,
                 ]),
             )
-
-            if (!blockToolbars.size) {
-                return
-            }
-
-            const toolbars = [...blockToolbars.values()]
+            const fixedElement = this.$el.querySelector('[data-rep-fixed-toolbar]')
             const mountAction = (action, args) => this.mountAction(action, args)
 
-            blockControls = createBlockControls({ editor, root: this.$el, blockTypes: blockTypeList })
-            toolbarTooltip = createToolbarTooltip({ root: this.$el, toolbars })
+            if (blockToolbars.size || fixedElement) {
+                const toolbars = [...blockToolbars.values()]
 
-            const sync = () =>
-                toolbars.forEach((toolbar) => {
-                    syncToolbar(editor, toolbar, tools)
-                    blockControls.sync(toolbar)
+                blockControls = createBlockControls({ editor, root: this.$el, blockTypes: blockTypeList })
+                toolbarTooltip = createToolbarTooltip({
+                    root: this.$el,
+                    toolbars: fixedElement ? [fixedElement, ...toolbars] : toolbars,
                 })
 
-            toolbars.forEach((toolbar) => {
-                bindToolbar(editor, toolbar, tools, mountAction)
-                blockControls.bind(toolbar)
-            })
+                if (fixedElement) {
+                    fixedToolbar = createFixedToolbar({
+                        editor,
+                        toolbar: fixedElement,
+                        tools,
+                        blockControls,
+                        mountAction,
+                    })
+                }
 
-            editor.on('transaction', sync)
+                if (blockToolbars.size) {
+                    const sync = () =>
+                        toolbars.forEach((toolbar) => {
+                            syncToolbar(editor, toolbar, tools)
+                            blockControls.sync(toolbar)
+                        })
 
-            editor.registerPlugin(
-                createBlockToolbarPlugin({
-                    toolbars: blockToolbars,
-                    root: this.$el,
-                    floatingElements: blockControls.floatingElements,
-                    onShow: sync,
-                    onHide: () => {
-                        toolbarTooltip.hide()
-                        blockControls.closeMenus()
-                    },
-                }),
-            )
+                    toolbars.forEach((toolbar) => {
+                        bindToolbar(editor, toolbar, tools, mountAction)
+                        blockControls.bind(toolbar)
+                    })
+
+                    editor.on('transaction', sync)
+
+                    editor.registerPlugin(
+                        createBlockToolbarPlugin({
+                            toolbars: blockToolbars,
+                            root: this.$el,
+                            floatingElements: blockControls.floatingElements,
+                            onShow: sync,
+                            onHide: () => {
+                                toolbarTooltip.hide()
+                                blockControls.closeMenus()
+                            },
+                        }),
+                    )
+
+                    sync()
+                } else {
+                    editor.registerPlugin(createFixedToolbarKeymap(fixedToolbar, this.$el))
+                }
+            }
 
             const slashMenu = this.$el.querySelector('[data-rep-slash-menu]')
 
@@ -260,8 +288,6 @@ export default function richEditorPlusComponent({
             }
 
             blockDrag = createBlockDrag({ editor, root: this.$el })
-
-            sync()
         },
 
         /**
@@ -313,6 +339,7 @@ export default function richEditorPlusComponent({
 
             mentionLabels?.destroy()
             blockDrag?.destroy()
+            fixedToolbar?.destroy()
             toolbarTooltip?.destroy()
             blockControls?.destroy()
             editor?.destroy()

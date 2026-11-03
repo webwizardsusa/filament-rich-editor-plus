@@ -65,8 +65,28 @@ expires. Keep the lifetime as short as that staleness allows.
 
 ## Toolbar
 
-Choose which formatting tools a field's toolbar shows, and in what order, by tool name. Each inner array is a group,
-with a divider between groups:
+A field has a floating toolbar by default, above the selection in the active block. It can have a fixed toolbar
+above the editor too, or instead:
+
+```php
+RichEditorPlus::make('body')->fixedToolbar();                          // both
+RichEditorPlus::make('body')->fixedToolbar()->floatingToolbar(false);  // fixed only
+RichEditorPlus::make('body')->floatingToolbar(false);                  // neither: slash menu and shortcuts only
+```
+
+The fixed toolbar stays in place. Tools that can't be used at the cursor are disabled rather than hidden, and its block
+tools section shows the active block's own tools, such as the table tools while the cursor is in a table. It sticks to
+the top of the screen while the editor scrolls past, below a Filament panel's topbar. Turn that off with
+`->stickyFixedToolbar(false)`, or move it with the `--rep-fixed-toolbar-offset` CSS variable. Sticky has no effect
+inside a container that scrolls on its own, such as a modal or slide-over.
+
+### Arranging a toolbar
+
+Choose what a toolbar shows, and in what order, by name. Each inner array is a group, with a divider between groups;
+a flat list is one group. `toolbarTools()` arranges the floating toolbar and `fixedToolbarTools()` the fixed one, which
+uses the floating arrangement when it has none of its own.
+
+A list of tool names only arranges the formatting tools, and the controls stay where they are:
 
 ```php
 RichEditorPlus::make('body')->toolbarTools([
@@ -75,8 +95,28 @@ RichEditorPlus::make('body')->toolbarTools([
 ]);
 ```
 
+Name a control, or the `blockTools` slot, and the list becomes the whole toolbar, so only what it names is shown:
+
+| Name | What it is |
+|---|---|
+| `dragHandle` | Drag to move the block (floating toolbar only) |
+| `blockSwitcher` | Change the block type |
+| `moveUp`, `moveDown` | Move the block |
+| `listOptions` | List type and level, inside a list |
+| `blockTools` | The active block's own tools |
+| `more` | The more menu |
+
+For example, structure in the fixed toolbar and formatting in a small floating one:
+
+```php
+RichEditorPlus::make('body')
+    ->fixedToolbar()
+    ->fixedToolbarTools([['blockSwitcher'], ['listOptions', 'blockTools'], ['more']])
+    ->toolbarTools([['bold', 'italic', 'link']]);
+```
+
 Tools you leave out are hidden, but their keyboard shortcuts still work. To drop a tool completely, remove its plugin
-with `withoutPlugins()`. A flat list is treated as one group.
+with `withoutPlugins()`. These names are reserved, so a plugin can't name a tool after one.
 
 Hovering over a button, or focusing it from the keyboard, shows its name and shortcut. A plugin labels its own tool's
 shortcut in TipTap's notation; `Mod` shows as ⌘ on a Mac and Ctrl elsewhere:
@@ -84,6 +124,8 @@ shortcut in TipTap's notation; `Mod` shows as ⌘ on a Mac and Ctrl elsewhere:
 ```php
 Tool::make('highlight')->shortcut('Mod-Shift-h');
 ```
+
+Alt+F10 moves focus into the floating toolbar, or into the fixed toolbar when there is no floating one.
 
 ## Writing a plugin with JavaScript
 

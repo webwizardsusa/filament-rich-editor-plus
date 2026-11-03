@@ -1,6 +1,7 @@
 import { TextSelection } from '@tiptap/pm/state'
 import { resolveActionArguments } from '../registry'
 import { countSelectedParagraphs, getActiveBlock, selectionSpansBlocks, selectsNestedBlock } from './active-block'
+import { sharedAttrs } from './convert-list'
 
 export const toBlockTypeList = (config) => Object.entries(config).map(([name, blockType]) => ({ name, ...blockType }))
 
@@ -38,7 +39,7 @@ function textRuns(block, schema) {
 
     const visit = (node, start) => {
         if (!node.type.spec.code) {
-            runs.push({ start, size: node.content.size, content: node.content })
+            runs.push({ start, size: node.content.size, content: node.content, attrs: node.attrs })
 
             return
         }
@@ -46,7 +47,7 @@ function textRuns(block, schema) {
         let lineStart = start
 
         node.textContent.split('\n').forEach((line) => {
-            runs.push({ start: lineStart, size: line.length, content: line === '' ? null : schema.text(line) })
+            runs.push({ start: lineStart, size: line.length, content: line === '' ? null : schema.text(line), attrs: node.attrs })
             lineStart += line.length + 1
         })
     }
@@ -65,13 +66,15 @@ function textRuns(block, schema) {
         })
     }
 
-    return runs.length ? runs : [{ start: block.pos + 1, size: 0, content: null }]
+    return runs.length ? runs : [{ start: block.pos + 1, size: 0, content: null, attrs: block.node.attrs }]
 }
 
 /**
  * Replaces a block with one paragraph per run of text, so any block type can then be applied to it. Returns the new
  * block's end, and a function that finds a position from the old block in the new one. TipTap's `clearNodes` is no use
- * here: it breaks on nested content, and on earlier steps in the same transaction.
+ * here: it breaks on nested content, and on earlier steps in the same transaction. Each paragraph keeps the attributes
+ * of the block it came from that a paragraph also has, such as a global `textAlign`, which `setNode` then copies onto
+ * the target type.
  */
 function flattenToParagraphs(tr, block) {
     const { schema } = tr.doc.type
@@ -80,7 +83,7 @@ function flattenToParagraphs(tr, block) {
     tr.replaceWith(
         block.pos,
         block.pos + block.node.nodeSize,
-        runs.map(({ content }) => schema.nodes.paragraph.create(null, content)),
+        runs.map(({ content, attrs }) => schema.nodes.paragraph.create(sharedAttrs(schema.nodes.paragraph, attrs), content)),
     )
 
     let contentStart = block.pos + 1

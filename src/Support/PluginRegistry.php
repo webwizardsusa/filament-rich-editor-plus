@@ -343,14 +343,15 @@ class PluginRegistry
     /**
      * What a toolbar shows, grouped and in order. With no arrangement, or one that only names tools, the placement's
      * default layout is used around the formatting tools, arranged as {@see getInlineTools()} does. Naming any
-     * {@see ToolbarControl} makes the arrangement the whole layout, so only what it names is shown. Each name is
+     * {@see ToolbarControl}, or passing `$onlyListed`, makes the arrangement the whole layout, so only what it names
+     * is shown (and a list that places nothing gives an empty layout). `$onlyListed` has no effect without groups. Each name is
      * placed once, unknown names are skipped, and the drag handle never goes in the fixed toolbar.
      *
      * @param  ?array<int, array<string>>  $groups
      */
-    public function getToolbarLayout(?array $groups, ToolbarPlacement $placement): ToolbarLayout
+    public function getToolbarLayout(?array $groups, ToolbarPlacement $placement, bool $onlyListed = false): ToolbarLayout
     {
-        if ($groups === null || ! $this->namesAControl($groups)) {
+        if ($groups === null || (! $onlyListed && ! $this->namesAControl($groups))) {
             return ToolbarLayout::default($placement, $this->getInlineTools($groups));
         }
 

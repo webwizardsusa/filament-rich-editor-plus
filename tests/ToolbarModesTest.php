@@ -53,6 +53,9 @@ class ToolbarModesTestForm extends Component implements HasActions, HasSchemas
             'static' => $field->fixedToolbar()->stickyFixedToolbar(false),
             'other' => $field->fixedToolbar()->stickyFixedToolbar(false)->toolbarTools(['italic']),
             'split' => $field->fixedToolbar()->toolbarTools(['bold'])->fixedToolbarTools([['blockSwitcher'], ['italic']]),
+            'bubble' => $field->toolbarTools([['bold', 'italic', 'link']], onlyListed: true),
+            'bubble-unflagged' => $field->toolbarTools([['bold', 'italic', 'link']]),
+            'empty-floating' => $field->toolbarTools([], onlyListed: true),
             default => null,
         };
 
@@ -151,5 +154,27 @@ it('keys the editor on its toolbar modes so a changed toolbar refreshes', functi
         ->and($key('floating'))->not->toBe($key('fixed'))
         ->and($key('static'))->not->toBe($key('fixed'))
         ->and($key('split'))->not->toBe($key('both'))
-        ->and($key('other'))->not->toBe($key('static'));
+        ->and($key('other'))->not->toBe($key('static'))
+        ->and($key('bubble'))->not->toBe($key('bubble-unflagged'));
+});
+
+it('can make a formatting-only list the whole floating toolbar', function (): void {
+    $floating = str(toolbarModesHtml('bubble'))->betweenFirst('data-rep-block-toolbar="*"', '</div>');
+
+    expect($floating->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold', 'italic', 'link'])
+        ->and($floating->contains('data-rep-drag-handle'))->toBeFalse()
+        ->and($floating->contains('data-rep-control="switcher"'))->toBeFalse()
+        ->and($floating->contains('data-rep-control="more"'))->toBeFalse();
+});
+
+it('renders no toolbar for a flagged list that shows nothing, but keeps the slash menu', function (): void {
+    expect(toolbarModesHtml('empty-floating'))
+        ->not->toContain('data-rep-block-toolbar')
+        ->toContain('data-rep-slash-menu');
+});
+
+it('lets the fixed toolbar inherit the floating flag only when it has no list of its own', function (): void {
+    expect(RichEditorPlus::make('body')->toolbarTools(['bold'], onlyListed: true)->isFixedToolbarOnlyListed())->toBeTrue()
+        ->and(RichEditorPlus::make('body')->toolbarTools(['bold'], onlyListed: true)->fixedToolbarTools(['italic'])->isFixedToolbarOnlyListed())->toBeFalse()
+        ->and(RichEditorPlus::make('body')->toolbarTools(['bold'])->isToolbarOnlyListed())->toBeFalse();
 });

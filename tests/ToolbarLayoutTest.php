@@ -116,3 +116,18 @@ it('leaves the plugins own tools untouched when building a full layout', functio
 
     expect($registry->getInlineTools()[0]->getGroup())->toBe('format');
 });
+
+it('gives exactly the listed tools when the list is flagged as the whole toolbar', function (): void {
+    expect(layoutNames(formattingRegistry()->getToolbarLayout([['bold', 'link']], ToolbarPlacement::Floating, onlyListed: true)))->toBe([['bold', 'link']]);
+});
+
+it('gives an empty layout for a flagged empty list', function (): void {
+    expect(formattingRegistry()->getToolbarLayout([[]], ToolbarPlacement::Floating, onlyListed: true)->isEmpty())->toBeTrue();
+});
+
+it('still gives the default layout for no arrangement when flagged', function (): void {
+    $registry = formattingRegistry();
+
+    expect(layoutNames($registry->getToolbarLayout(null, ToolbarPlacement::Floating, onlyListed: true)))
+        ->toBe(layoutNames($registry->getToolbarLayout(null, ToolbarPlacement::Floating)));
+});

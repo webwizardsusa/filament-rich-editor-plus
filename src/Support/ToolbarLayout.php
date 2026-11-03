@@ -42,6 +42,11 @@ class ToolbarLayout
         return $this->groups;
     }
 
+    public function isEmpty(): bool
+    {
+        return $this->groups === [];
+    }
+
     public function has(ToolbarControl $control): bool
     {
         foreach ($this->groups as $group) {

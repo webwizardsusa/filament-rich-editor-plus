@@ -106,17 +106,19 @@ Name a control, or the `blockTools` slot, and the list becomes the whole toolbar
 | `blockTools` | The active block's own tools |
 | `more` | The more menu |
 
-For example, structure in the fixed toolbar, and formatting plus the active block's own tools in a small floating one:
+For example, structure in the fixed toolbar, and formatting tools only in a small floating one:
 
 ```php
 RichEditorPlus::make('body')
     ->fixedToolbar()
     ->fixedToolbarTools([['blockSwitcher'], ['listOptions', 'blockTools'], ['more']])
-    ->toolbarTools([['bold', 'italic', 'link'], ['blockTools']]);
+    ->toolbarTools([['bold', 'italic', 'link']], onlyListed: true);
 ```
 
-A full layout needs at least one control name or `blockTools` to count as one; a list of tool names alone is an old-style
-list, and the toolbar keeps all its controls.
+A list becomes the whole toolbar when it names a control or `blockTools`, or when you pass `onlyListed: true` (to either
+method). Without one of those, a list of tool names alone is an old-style list, and the toolbar keeps all its controls.
+`onlyListed: true` is what makes a formatting-only floating toolbar possible. A fixed toolbar with no list of its own
+inherits the floating flag along with the list. A toolbar whose list shows nothing is not rendered.
 
 Tools you leave out are hidden, but their keyboard shortcuts still work. To drop a tool completely, remove its plugin
 with `withoutPlugins()`. These names are reserved, so a plugin can't name a tool after one.

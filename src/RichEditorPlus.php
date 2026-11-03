@@ -61,6 +61,10 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      */
     protected array|Closure|null $fixedToolbarTools = null;
 
+    protected bool|Closure $isToolbarOnlyListed = false;
+
+    protected bool|Closure $isFixedToolbarOnlyListed = false;
+
     /**
      * Replaces the default plugin set. Each entry is a plugin instance or class name.
      *
@@ -132,11 +136,15 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      * `withoutPlugins()` to drop those too), and names the field doesn't have are skipped. `null` keeps the default
      * layout and the plugins' own order.
      *
+     * Pass `onlyListed: true` to make the list the whole toolbar even when it names no control, for example a
+     * floating toolbar with formatting tools only. A list that shows nothing renders no toolbar.
+     *
      * @param  array<string | array<string>> | Closure | null  $tools
      */
-    public function toolbarTools(array|Closure|null $tools): static
+    public function toolbarTools(array|Closure|null $tools, bool|Closure $onlyListed = false): static
     {
         $this->toolbarTools = $tools;
+        $this->isToolbarOnlyListed = $onlyListed;
 
         return $this;
     }
@@ -147,6 +155,11 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     public function getToolbarTools(): ?array
     {
         return $this->normalizeToolbarGroups($this->evaluate($this->toolbarTools));
+    }
+
+    public function isToolbarOnlyListed(): bool
+    {
+        return (bool) $this->evaluate($this->isToolbarOnlyListed);
     }
 
     /**
@@ -198,13 +211,15 @@ class RichEditorPlus extends Field implements HasEmbeddedView
 
     /**
      * Chooses what the fixed toolbar shows, the same way `toolbarTools()` does for the floating one, which it falls
-     * back to when `null`. The drag handle is never shown in the fixed toolbar.
+     * back to when `null`, flag included. The drag handle is never shown in the fixed toolbar.
+     * `onlyListed: true` makes the list the whole toolbar even when it names no control.
      *
      * @param  array<string | array<string>> | Closure | null  $tools
      */
-    public function fixedToolbarTools(array|Closure|null $tools): static
+    public function fixedToolbarTools(array|Closure|null $tools, bool|Closure $onlyListed = false): static
     {
         $this->fixedToolbarTools = $tools;
+        $this->isFixedToolbarOnlyListed = $onlyListed;
 
         return $this;
     }
@@ -217,6 +232,15 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         $tools = $this->evaluate($this->fixedToolbarTools);
 
         return $tools === null ? $this->getToolbarTools() : $this->normalizeToolbarGroups($tools);
+    }
+
+    public function isFixedToolbarOnlyListed(): bool
+    {
+        if ($this->evaluate($this->fixedToolbarTools) === null) {
+            return $this->isToolbarOnlyListed();
+        }
+
+        return (bool) $this->evaluate($this->isFixedToolbarOnlyListed);
     }
 
     /**
@@ -423,10 +447,12 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         $html = '';
 
         if ($this->hasFloatingToolbar()) {
-            $layout = $registry->getToolbarLayout($this->getToolbarTools(), ToolbarPlacement::Floating);
+            $layout = $registry->getToolbarLayout($this->getToolbarTools(), ToolbarPlacement::Floating, $this->isToolbarOnlyListed());
 
-            foreach (['*' => [], ...$registry->getBlockToolbars()] as $node => $tools) {
-                $html .= $toolbarRenderer->renderBlockToolbar($node, $tools, [], $listTypes !== [], $layout);
+            if (! $layout->isEmpty()) {
+                foreach (['*' => [], ...$registry->getBlockToolbars()] as $node => $tools) {
+                    $html .= $toolbarRenderer->renderBlockToolbar($node, $tools, [], $listTypes !== [], $layout);
+                }
             }
         }
 
@@ -455,9 +481,14 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         }
 
         $registry = $this->getPluginRegistry();
+        $layout = $registry->getToolbarLayout($this->getFixedToolbarTools(), ToolbarPlacement::Fixed, $this->isFixedToolbarOnlyListed());
+
+        if ($layout->isEmpty()) {
+            return '';
+        }
 
         return (new ToolbarRenderer)->renderFixedToolbar(
-            $registry->getToolbarLayout($this->getFixedToolbarTools(), ToolbarPlacement::Fixed),
+            $layout,
             $registry->getBlockToolGroups(),
             $registry->getListTypes() !== [],
             $this->isFixedToolbarSticky(),
@@ -497,7 +528,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
                             state: $wire.<?= $this->applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) ?>,
                         })"
             wire:ignore
-            wire:key="<?= e($this->getLivewireKey()) ?>.<?= substr(md5(serialize([$isDisabled, $this->hasFloatingToolbar(), $this->hasFixedToolbar(), $this->isFixedToolbarSticky(), $this->getToolbarTools(), $this->getFixedToolbarTools()])), 0, 64) ?>"
+            wire:key="<?= e($this->getLivewireKey()) ?>.<?= substr(md5(serialize([$isDisabled, $this->hasFloatingToolbar(), $this->hasFixedToolbar(), $this->isFixedToolbarSticky(), $this->getToolbarTools(), $this->getFixedToolbarTools(), $this->isToolbarOnlyListed(), $this->isFixedToolbarOnlyListed()])), 0, 64) ?>"
             class="rep-editor"
         >
             <p x-show="error" x-text="error" class="rep-error" role="alert" style="display: none"></p>

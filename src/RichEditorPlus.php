@@ -45,7 +45,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      */
     protected array|Closure $additionalPlugins = [];
 
-    protected StateFormat|Closure $stateFormat = StateFormat::Json;
+    protected StateFormat|Closure $stateFormat = StateFormat::Html;
 
     /**
      * Replaces the default plugin set. Each entry is a plugin instance or class name.

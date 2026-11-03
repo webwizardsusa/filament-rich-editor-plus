@@ -82,7 +82,7 @@ function deeplyNestedDocument(int $levels = 12): array
 
 function jsonCast(): RichEditorPlusStateCast
 {
-    return new RichEditorPlusStateCast(RichEditorPlus::make('content'));
+    return new RichEditorPlusStateCast(RichEditorPlus::make('content')->storeAs(StateFormat::Json));
 }
 
 function htmlCast(): RichEditorPlusStateCast
@@ -190,3 +190,14 @@ it('does not throw on JSON that is not a document', function (string $state): vo
     expect(jsonCast()->get($state))->toBeArray()
         ->and(htmlCast()->get($state))->toBeString();
 })->with(['123', '{}', '"x"']);
+
+it('still stores documents when the field opts into JSON', function (): void {
+    expect(jsonCast()->get('<p>hi</p>'))->toBe(paragraphDocument());
+});
+
+it('saves a document stored as JSON as HTML once the field stores HTML', function (): void {
+    $cast = new RichEditorPlusStateCast(RichEditorPlus::make('content'));
+
+    expect($cast->get($cast->set(paragraphDocument())))->toBe('<p>hi</p>')
+        ->and($cast->get($cast->set(json_encode(paragraphDocument()))))->toBe('<p>hi</p>');
+});

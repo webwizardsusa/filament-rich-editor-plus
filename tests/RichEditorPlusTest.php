@@ -38,8 +38,9 @@ it('removes plugins by class or by id', function (): void {
         ->and($registry->has('core/italic'))->toBeTrue();
 });
 
-it('stores JSON by default', function (): void {
-    expect(RichEditorPlus::make('content')->getStateFormat())->toBe(StateFormat::Json);
+it('stores HTML by default', function (): void {
+    expect(RichEditorPlus::make('content')->getStateFormat())->toBe(StateFormat::Html)
+        ->and(RichEditorPlus::make('content')->storeAs(StateFormat::Json)->getStateFormat())->toBe(StateFormat::Json);
 });
 
 it('keeps plugins that are not excluded, in order', function (): void {

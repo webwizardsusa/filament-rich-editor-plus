@@ -102,7 +102,9 @@ export const BlockCommands = Extension.create({
 
             /**
              * TipTap's toggle removes the list when it is already that type, so that case is a no-op here. Between list
-             * types with different items, such as bullet and task lists, the list is rebuilt in place so nesting stays.
+             * types with different items, such as bullet and task lists, the list is rebuilt in place so nesting stays. That
+             * rebuild also converts nested lists of the same type, while bullet and numbered lists (TipTap's toggleList)
+             * convert only the list at the cursor.
              */
             setListType: (name) => ({ state, tr, dispatch, commands }) => {
                 const container = getLevelContainer(state.selection)

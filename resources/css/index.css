@@ -117,24 +117,25 @@
     padding-inline-start: 0.25rem;
 }
 
-.rep-editor .tiptap li[data-type='taskItem'] {
+.rep-editor .tiptap ul[data-type='taskList'] > li {
     display: flex;
     gap: 0.5rem;
     align-items: flex-start;
 }
 
-.rep-editor .tiptap li[data-type='taskItem'] > label {
+.rep-editor .tiptap ul[data-type='taskList'] > li > label {
     flex: none;
     margin-top: 0.3em;
     user-select: none;
 }
 
-.rep-editor .tiptap li[data-type='taskItem'] > div {
+.rep-editor .tiptap ul[data-type='taskList'] > li > div {
     flex: 1;
+    margin-top: 0;
     min-width: 0;
 }
 
-.rep-editor .tiptap li[data-type='taskItem'][data-checked='true'] > div > p {
+.rep-editor .tiptap ul[data-type='taskList'] > li[data-checked='true'] > div > p {
     text-decoration: line-through;
     opacity: 0.6;
 }

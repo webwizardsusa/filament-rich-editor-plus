@@ -17090,7 +17090,17 @@ K("core/document", () => [
 	sh,
 	ch,
 	kb
-]), K("core/bold", () => bg), K("core/italic", () => Ig), K("core/underline", () => yb), K("core/strikethrough", () => hb), K("core/code", () => Cg), K("core/subscript", () => gb.extend({ excludes: "superscript" })), K("core/superscript", () => _b.extend({ excludes: "subscript" })), K("core/blockquote", () => hg), K("core/heading", ({ levels: e }) => Ag.configure({ levels: e })), K("core/bullet-list", () => [
+]), K("core/bold", () => bg), K("core/italic", () => Ig), K("core/underline", () => yb), K("core/strikethrough", () => hb), K("core/code", () => Cg), K("core/subscript", () => gb.extend({
+	excludes: "superscript",
+	addKeyboardShortcuts() {
+		return { "Mod-,": () => this.editor.chain().unsetSuperscript().toggleSubscript().run() };
+	}
+})), K("core/superscript", () => _b.extend({
+	excludes: "subscript",
+	addKeyboardShortcuts() {
+		return { "Mod-.": () => this.editor.chain().unsetSubscript().toggleSuperscript().run() };
+	}
+})), K("core/blockquote", () => hg), K("core/heading", ({ levels: e }) => Ag.configure({ levels: e })), K("core/bullet-list", () => [
 	cy,
 	jy,
 	By

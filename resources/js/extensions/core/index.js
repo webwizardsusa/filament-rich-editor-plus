@@ -30,8 +30,32 @@ registerExtension('core/underline', () => Underline)
 registerExtension('core/strikethrough', () => Strike)
 registerExtension('core/code', () => Code)
 // Set here as well as in PHP, so the editor and the server agree whichever TipTap version is installed.
-registerExtension('core/subscript', () => Subscript.extend({ excludes: 'superscript' }))
-registerExtension('core/superscript', () => Superscript.extend({ excludes: 'subscript' }))
+/**
+ * TipTap's shortcut returns the result of `setMark`, which is false when the mark is swapped for the excluded one, so the
+ * browser would also handle the key. Chaining the removal first makes the swap report success and claim the key.
+ */
+registerExtension('core/subscript', () =>
+    Subscript.extend({
+        excludes: 'superscript',
+
+        addKeyboardShortcuts() {
+            return {
+                'Mod-,': () => this.editor.chain().unsetSuperscript().toggleSubscript().run(),
+            }
+        },
+    }),
+)
+registerExtension('core/superscript', () =>
+    Superscript.extend({
+        excludes: 'subscript',
+
+        addKeyboardShortcuts() {
+            return {
+                'Mod-.': () => this.editor.chain().unsetSubscript().toggleSuperscript().run(),
+            }
+        },
+    }),
+)
 registerExtension('core/blockquote', () => Blockquote)
 registerExtension('core/heading', ({ levels }) => Heading.configure({ levels }))
 registerExtension('core/bullet-list', () => [BulletList, ListItem, ListKeymap])

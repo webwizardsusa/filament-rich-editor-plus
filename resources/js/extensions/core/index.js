@@ -10,7 +10,9 @@ import Italic from '@tiptap/extension-italic'
 import Link from '@tiptap/extension-link'
 import { BulletList, ListItem, ListKeymap, OrderedList, TaskList } from '@tiptap/extension-list'
 import { globalAttributesExtension } from './global-attributes'
+import { paletteColorExtension } from './palette-color'
 import { textAlignExtension } from './text-align'
+import { TextStyle } from './text-style'
 import { ReadOnlyHtmlTaskItem } from './task-item'
 import Paragraph from '@tiptap/extension-paragraph'
 import Strike from '@tiptap/extension-strike'
@@ -27,6 +29,15 @@ import { registerActionArguments, registerExtension } from '../../registry'
 registerExtension('core/document', () => [Document, Paragraph, Text, HardBreak, UndoRedo, Dropcursor, Gapcursor, BlockCommands])
 registerExtension('core/global-attributes', (options) => globalAttributesExtension(options))
 registerExtension('core/text-align', (options) => textAlignExtension(options))
+
+registerExtension('core/text-color', ({ colors }) => [
+    TextStyle,
+    paletteColorExtension({ name: 'textColorCommands', attribute: 'color', setCommand: 'setTextColor', unsetCommand: 'unsetTextColor', colors }),
+])
+registerExtension('core/background-color', ({ colors }) => [
+    TextStyle,
+    paletteColorExtension({ name: 'backgroundColorCommands', attribute: 'backgroundColor', setCommand: 'setBackgroundColor', unsetCommand: 'unsetBackgroundColor', colors }),
+])
 
 registerExtension('core/bold', () => Bold)
 registerExtension('core/italic', () => Italic)

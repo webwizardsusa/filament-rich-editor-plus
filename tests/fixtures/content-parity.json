@@ -613,5 +613,25 @@
       ]
     },
     "html": "<ul data-type=\"taskList\"><li class=\"urgent\" data-checked=\"false\" data-type=\"taskItem\"><label><input type=\"checkbox\" disabled=\"disabled\"><span></span></label><div><p>a</p></div></li></ul>"
+  },
+  {
+    "name": "text colour",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "red", "backgroundColor": null } }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-red-color\">a</span></p>"
+  },
+  {
+    "name": "background colour",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": null, "backgroundColor": "yellow" } }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-yellow-background-color\">a</span></p>"
+  },
+  {
+    "name": "text and background colour on one span",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "red", "backgroundColor": "yellow" } }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-red-color has-yellow-background-color\">a</span></p>"
+  },
+  {
+    "name": "colour and bold",
+    "document": { "type": "doc", "content": [{ "type": "paragraph", "content": [{ "type": "text", "marks": [{ "type": "textStyle", "attrs": { "color": "blue", "backgroundColor": null } }, { "type": "bold" }], "text": "a" }] }] },
+    "html": "<p><span class=\"has-blue-color\"><strong>a</strong></span></p>"
   }
 ]

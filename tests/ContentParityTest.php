@@ -2,6 +2,7 @@
 
 use Hollyit\RichEditorPlus\Content\GlobalAttribute;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
@@ -17,6 +18,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
@@ -94,6 +96,8 @@ function parityPlugins(array $case = []): array
         CodePlugin::make(),
         SubscriptPlugin::make(),
         SuperscriptPlugin::make(),
+        TextColorPlugin::make(),
+        BackgroundColorPlugin::make(),
         TaskListPlugin::make(),
         LinkPlugin::make()->openInNewTab(false),
         BlockquotePlugin::make(),

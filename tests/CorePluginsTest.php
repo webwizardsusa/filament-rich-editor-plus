@@ -16,6 +16,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Hollyit\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
@@ -240,4 +241,14 @@ it('offers the task list as a list type with level tools', function (): void {
 
 it('leaves the task list out of the default set', function (): void {
     expect(collect(PluginRegistry::defaultPlugins())->map->getId()->all())->not->toContain('core/task-list');
+});
+
+it('describes the trailing node plugin as JS only', function (): void {
+    $plugin = TrailingNodePlugin::make();
+
+    expect($plugin->getId())->toBe('core/trailing-node')
+        ->and($plugin->getJsExtension()->getId())->toBe('core/trailing-node')
+        ->and($plugin->getNodes())->toBe([])
+        ->and($plugin->getTools())->toBe([])
+        ->and(collect(PluginRegistry::defaultPlugins())->map->getId()->all())->not->toContain('core/trailing-node');
 });

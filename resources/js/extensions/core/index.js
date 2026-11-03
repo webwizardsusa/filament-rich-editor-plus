@@ -16,7 +16,7 @@ import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import Text from '@tiptap/extension-text'
 import Underline from '@tiptap/extension-underline'
-import { Dropcursor, Gapcursor, UndoRedo } from '@tiptap/extensions'
+import { Dropcursor, Gapcursor, TrailingNode, UndoRedo } from '@tiptap/extensions'
 import { BlockCommands } from '../../blocks/block-commands'
 import { FindReplace } from '../../find-replace/plugin'
 import { createMentionNode } from '../../mentions/mention-node'
@@ -37,6 +37,7 @@ registerExtension('core/heading', ({ levels }) => Heading.configure({ levels }))
 registerExtension('core/bullet-list', () => [BulletList, ListItem, ListKeymap])
 registerExtension('core/ordered-list', () => [OrderedList, ListItem, ListKeymap])
 registerExtension('core/task-list', () => [TaskList, ReadOnlyHtmlTaskItem.configure({ nested: true }), ListKeymap])
+registerExtension('core/trailing-node', () => TrailingNode.configure({ node: 'paragraph' }))
 registerExtension('core/code-block', () => CodeBlock)
 registerExtension('core/divider', () => HorizontalRule)
 registerExtension('core/mention', ({ providers }) => createMentionNode(providers ?? []))

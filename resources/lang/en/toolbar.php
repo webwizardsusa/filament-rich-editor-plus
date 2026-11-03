@@ -2,6 +2,7 @@
 
 return [
     'block' => 'Block tools',
+    'fixed' => 'Editor toolbar',
     'drag' => 'Drag to move block',
     'switch' => 'Change block type',
     'move_up' => 'Move block up',

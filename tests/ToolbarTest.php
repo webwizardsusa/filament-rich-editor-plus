@@ -11,6 +11,8 @@ use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\Tool;
+use Hollyit\RichEditorPlus\Support\ToolbarLayout;
+use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -325,4 +327,91 @@ it('has no group for every block when every block tool belongs to a node', funct
     $groups = PluginRegistry::make([makeBlockToolPlugin('test/table', Tool::make('addRow')->block()->nodes(['table']))])->getBlockToolGroups();
 
     expect(array_keys($groups))->toBe(['table']);
+});
+
+it('renders the default floating layout in todays order', function (): void {
+    $html = (new ToolbarRenderer)->renderBlockToolbar('*', [Tool::make('quote')->block()], [Tool::make('bold')->icon('mdi-format-bold')], true);
+
+    expect($html)->toMatch('/data-rep-drag-handle.*data-rep-control="switcher".*data-rep-control="moveUp".*data-rep-control="moveDown".*data-rep-inline-tools.*data-rep-list-tools hidden.*data-rep-block-tools.*data-rep-control="more"/s');
+});
+
+it('renders a custom floating layout with only what it names', function (): void {
+    $layout = PluginRegistry::make([BoldPlugin::make()])->getToolbarLayout([['bold'], ['blockSwitcher']], ToolbarPlacement::Floating);
+
+    $html = (new ToolbarRenderer)->renderBlockToolbar('*', [Tool::make('quote')->block()], [], true, $layout);
+
+    expect($html)
+        ->toContain('data-rep-tool="bold"')
+        ->toContain('data-rep-control="switcher"')
+        ->not->toContain('data-rep-drag-handle')
+        ->not->toContain('data-rep-control="moveUp"')
+        ->not->toContain('data-rep-control="more"')
+        ->not->toContain('data-rep-list-tools')
+        ->not->toContain('data-rep-tool="quote"');
+});
+
+it('puts the divider that starts a group inside the section the browser can hide', function (): void {
+    $layout = PluginRegistry::make([BoldPlugin::make()])->getToolbarLayout([['blockSwitcher'], ['bold']], ToolbarPlacement::Floating);
+
+    $html = (new ToolbarRenderer)->renderBlockToolbar('*', [], [], layout: $layout);
+
+    expect($html)->toContain('data-rep-inline-tools><span class="rep-toolbar-divider"')
+        ->and(substr_count($html, 'rep-toolbar-divider'))->toBe(1);
+});
+
+it('renders the fixed toolbar with a group per node, showing only the one for every block', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(
+        ToolbarLayout::default(ToolbarPlacement::Fixed, []),
+        ['*' => [Tool::make('quote')->block()], 'table' => [Tool::make('addRow')->block()->nodes(['table'])]],
+        hasListTypes: false,
+    );
+
+    expect($html)
+        ->toContain('data-rep-fixed-toolbar')
+        ->toContain('role="toolbar"')
+        ->not->toContain('data-rep-block-toolbar')
+        ->not->toContain('data-rep-drag-handle')
+        ->toContain('<span data-rep-block-tools-for="*"><button')
+        ->toContain('<span data-rep-block-tools-for="table" hidden>')
+        ->not->toMatch('/<div[^>]*data-rep-fixed-toolbar[^>]*hidden/')
+        ->and(substr_count($html, 'data-rep-tool="quote"'))->toBe(1);
+});
+
+it('leaves the block tools section out of the fixed toolbar when no plugin has block tools', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(ToolbarLayout::default(ToolbarPlacement::Fixed, []), [], false);
+
+    expect($html)->not->toContain('data-rep-block-tools');
+});
+
+it('makes the fixed toolbar sticky unless told not to', function (bool $isSticky): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(ToolbarLayout::default(ToolbarPlacement::Fixed, []), [], false, isSticky: $isSticky);
+
+    expect(str_contains($html, 'rep-fixed-toolbar-sticky'))->toBe($isSticky);
+})->with([true, false]);
+
+it('shows the list button in the fixed toolbar, disabled until the cursor is in a list', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(ToolbarLayout::default(ToolbarPlacement::Fixed, []), [], true);
+
+    expect($html)
+        ->toContain('data-rep-list-tools>')
+        ->toMatch('/data-rep-control="list"[^>]*aria-label="List options"[^>]*aria-disabled="true"/')
+        ->toMatch('/data-rep-list-icon><svg/');
+});
+
+it('disables every button of a fixed toolbar on a disabled field', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(
+        ToolbarLayout::default(ToolbarPlacement::Fixed, [Tool::make('bold')->icon('mdi-format-bold')]),
+        [],
+        true,
+        isDisabled: true,
+    );
+
+    expect(substr_count($html, '<button '))->toBeGreaterThan(0)
+        ->and(substr_count($html, '<button disabled '))->toBe(substr_count($html, '<button '));
+});
+
+it('adds extra attributes to the fixed toolbar', function (): void {
+    $html = (new ToolbarRenderer)->renderFixedToolbar(ToolbarLayout::default(ToolbarPlacement::Fixed, []), [], false, attributes: 'x-show="! error"');
+
+    expect($html)->toMatch('/<div[^>]*data-rep-fixed-toolbar x-show="! error">/');
 });

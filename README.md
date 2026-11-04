@@ -456,6 +456,40 @@ export default function ({ registerExtension, extendExtension, registerActionArg
 `registerExtension()` takes the id your `JsExtension` uses and a factory that gets its options. To change one of the
 editor's own extensions, decorate it with `extendExtension()` instead of importing it again.
 
+### Asking the server from the editor
+
+A plugin whose JS needs data from the server while editing, such as the URLs of stored files, implements
+`AnswersEditorRequests`. The factory gets the editor's context as a third argument, and `callPlugin()` sends a request
+to the plugin's `answerEditorRequest()`:
+
+```js
+registerExtension('acme/files', (options, tiptap, { callPlugin }) => {
+    const answer = callPlugin('acme/files', 'urls', { paths: ['a.png'] }) // a promise of the PHP method's array
+})
+```
+
+```php
+public function answerEditorRequest(string $request, array $payload, RichEditorPlus $field): array
+{
+    return $request === 'urls' ? ['urls' => $this->urlsFor($payload['paths'] ?? [])] : [];
+}
+```
+
+- The payload comes from the browser. Validate it and cap its size; never trust a path or an id in it.
+- The method runs as a method of the field, under the page's own authorization, so a request is only answered for
+  someone who can use the page. A plugin that does not implement the interface answers `[]`.
+
+### Plugins that render markup
+
+A plugin that renders a node as an element with markup inside, such as a `<figure>` with an `<img>`, implements
+`PatchesRenderedMarkup` (on top of `PatchesRenderedHtml`) and returns those node names from
+`getRenderedMarkupNodes()`. Stored HTML is then patched without parsing every document. The patcher finds such an
+element from its opening tag, which carries `data-type="<node name>"`, to the first closing tag of the same name, so:
+
+- the element must never contain another element with its own tag name (a `<figure>` cannot hold a `<figure>`);
+- a document whose element does not parse back to exactly one node of that type, such as hand-edited markup, is rendered
+  by parsing the whole document. Other documents in the same batch are still patched.
+
 ### Bundling without a second copy of TipTap
 
 Never bundle `@tiptap/core` or `@tiptap/pm`. The editor already ships them, and ProseMirror breaks in subtle ways when

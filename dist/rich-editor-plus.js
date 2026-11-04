@@ -13108,21 +13108,21 @@ var Fh = /* @__PURE__ */ new Map();
 function Ih(e, t) {
 	Fh.set(e, [...Fh.get(e) ?? [], t]);
 }
-function Lh(e, t) {
-	let n = [], r = [];
-	return e.forEach(({ id: e, options: i }) => {
-		let a = Ph.get(e);
-		if (!a) {
-			console.error(`[rich-editor-plus] No JS extension is registered for [${e}].`), r.push(e);
+function Lh(e, t, n = {}) {
+	let r = [], i = [];
+	return e.forEach(({ id: e, options: a }) => {
+		let o = Ph.get(e);
+		if (!o) {
+			console.error(`[rich-editor-plus] No JS extension is registered for [${e}].`), i.push(e);
 			return;
 		}
-		n.push(...[].concat(a(i ?? {}, t)).map((n) => (Fh.get(e) ?? []).reduce((e, n) => n(e, {
-			options: i ?? {},
+		r.push(...[].concat(o(a ?? {}, t, n)).map((n) => (Fh.get(e) ?? []).reduce((e, n) => n(e, {
+			options: a ?? {},
 			tiptap: t
 		}) ?? e, n)));
 	}), {
-		extensions: [...new Map(n.map((e) => [e.name, e])).values()],
-		missing: r
+		extensions: [...new Map(r.map((e) => [e.name, e])).values()],
+		missing: i
 	};
 }
 var Rh = /* @__PURE__ */ new Map();
@@ -20565,7 +20565,11 @@ function ZE({ blockTypes: e, contentErrorMessage: t, extensions: n, format: r, i
 		error: null,
 		async init() {
 			if (await zh(n, window.RichEditorPlus), h) return;
-			let e = Lh(n, YE);
+			let e = Lh(n, YE, { callPlugin: (e, t, n = {}) => this.$wire.callSchemaComponentMethod(s, "answerPluginRequestForJs", {
+				plugin: e,
+				request: t,
+				payload: n
+			}) });
 			if (e.missing.length) {
 				this.error = u.replace(":plugins", e.missing.join(", "));
 				return;

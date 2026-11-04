@@ -59,6 +59,12 @@ class ContentFormatTestLines implements ContentFormat
 
     public function fromDocument(array $document, PluginRegistry $registry): string
     {
+        foreach ($document['content'] ?? [] as $block) {
+            if (($block['type'] ?? null) !== 'paragraph') {
+                throw new UnsupportedContentFormatException("Lines can't write [{$block['type']}] nodes.");
+            }
+        }
+
         return implode("\n", array_map(
             static fn (array $block): string => implode('', array_column($block['content'] ?? [], 'text')),
             $document['content'] ?? [],
@@ -129,6 +135,11 @@ class ContentFormatTestForm extends Component implements HasActions, HasSchemas
     public function mount(?string $content = null): void
     {
         $this->form->fill(['content' => $content]);
+    }
+
+    public function save(): void
+    {
+        $this->form->getState();
     }
 
     public function form(Schema $schema): Schema
@@ -227,6 +238,24 @@ it('round-trips through a Livewire form', function (): void {
     expect($component->get('data.content'))->toBeString()->toContain('"paragraph"')
         ->and($component->instance()->form->getState()['content'])->toBe("a\nb");
 });
+
+it('refuses to save content the format cannot write as a validation error', function (): void {
+    Livewire::test(ContentFormatTestForm::class, ['content' => 'a'])
+        ->set('data.content', '{"type":"doc","content":[{"type":"heading","content":[{"type":"text","text":"h"}]}]}')
+        ->call('save')
+        ->assertHasErrors(['data.content'])
+        ->assertSee(__('rich-editor-plus::errors.content_unsupported'), escape: true);
+});
+
+it('throws instead of loading an empty field when the document cannot be encoded', function (): void {
+    $document = ['type' => 'paragraph'];
+
+    for ($level = 0; $level < 300; $level++) {
+        $document = ['type' => 'blockquote', 'content' => [$document]];
+    }
+
+    (new RichEditorPlusStateCast(formatField()))->set(['type' => 'doc', 'content' => [$document]]);
+})->throws(UnexpectedValueException::class, "The content of the field [content] can't be loaded into the editor: Maximum stack depth exceeded.");
 
 it('reads strings with a format when rendering', function (): void {
     expect(RichContentPlusRenderer::make("one\ntwo")->format(new ContentFormatTestLines)->toHtml())->toBe('<p>one</p><p>two</p>')

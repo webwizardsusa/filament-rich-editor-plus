@@ -514,7 +514,9 @@ rejects as it does (the optional message is what the form says while it waits, i
 the form only while the file uploads, so wrap the whole job (upload, `store` request and inserting the result) in
 `processing()` to keep the form from saving before the file is in the document; calls may nest. A plugin that takes
 uploads implements `AcceptsEditorUploads` (without it the field refuses uploads) and answers
-`acceptsEditorUploads(): bool`, which lets it turn uploads off through its own settings. In its
+`acceptsEditorUploads(): bool`, which lets it turn uploads off through its own settings (upgrading: the interface
+used to be a marker with no methods, so an existing implementation must add `acceptsEditorUploads()`, returning
+`true` to keep accepting uploads). In its
 `answerEditorRequest()`, it takes the file with `$field->pullTemporaryUpload($key)`, which returns it once and then forgets it. Check the file's
 type from its contents and store it yourself; the browser chose nothing but the key.
 

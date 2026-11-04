@@ -151,6 +151,16 @@ abstract class ContentSpec
         return $this;
     }
 
+    /**
+     * The protocols a URL attribute allows, or null when the attribute isn't a URL attribute.
+     *
+     * @return array<string> | null
+     */
+    public function getUrlProtocols(string $name): ?array
+    {
+        return $this->attributes[$name]['protocols'] ?? null;
+    }
+
     public function declaresAttribute(string $name): bool
     {
         return array_key_exists($name, $this->attributes);

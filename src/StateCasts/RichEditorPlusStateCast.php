@@ -6,6 +6,8 @@ use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\StateFormat;
+use JsonException;
+use UnexpectedValueException;
 
 /**
  * Keeps the field's Livewire state a single string, and gives everything else the format the field stores.
@@ -57,13 +59,30 @@ class RichEditorPlusStateCast implements StateCast
         if ($format !== null) {
             $document = is_array($state) ? $state : $format->toDocument((string) $state, $this->richEditor->getPluginRegistry());
 
-            return json_encode($document, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            return $this->encode($document);
         }
 
         return match ($this->richEditor->getStateFormat()) {
-            StateFormat::Json => json_encode($this->toDocument($state), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            StateFormat::Json => $this->encode($this->toDocument($state)),
             StateFormat::Html => $this->toHtml($state),
         };
+    }
+
+    /**
+     * A document that can't be encoded (too deep, or with invalid UTF-8) would load as an empty field and be saved
+     * over the stored content, so it fails loudly instead.
+     *
+     * @param  array<string, mixed>  $document
+     *
+     * @throws UnexpectedValueException
+     */
+    protected function encode(array $document): string
+    {
+        try {
+            return json_encode($document, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new UnexpectedValueException("The content of the field [{$this->richEditor->getName()}] can't be loaded into the editor: {$exception->getMessage()}.", previous: $exception);
+        }
     }
 
     /**

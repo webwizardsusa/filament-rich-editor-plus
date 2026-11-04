@@ -11,6 +11,7 @@ use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Filament\Support\Components\Contracts\HasEmbeddedView;
 use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
+use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
@@ -76,6 +77,22 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     protected bool|Closure $isFixedToolbarOnlyListed = false;
 
     protected bool|Closure $inheritsToolbarTools = true;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->rule(
+            static fn (RichEditorPlus $component): Closure => static function (string $attribute, mixed $value, Closure $fail) use ($component): void {
+                try {
+                    app(RichEditorPlusStateCast::class, ['richEditor' => $component])->get($value);
+                } catch (UnsupportedContentFormatException) {
+                    $fail(__('rich-editor-plus::errors.content_unsupported'));
+                }
+            },
+            static fn (RichEditorPlus $component): bool => $component->getContentFormat() !== null,
+        );
+    }
 
     /**
      * Replaces the default plugin set. Each entry is a plugin instance or class name.

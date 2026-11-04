@@ -529,7 +529,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     public function hasFileAttachments(?bool $default = null): bool
     {
         foreach ($this->getPluginRegistry()->getPlugins() as $plugin) {
-            if ($plugin instanceof AcceptsEditorUploads) {
+            if ($plugin instanceof AcceptsEditorUploads && $plugin->acceptsEditorUploads()) {
                 return true;
             }
         }

@@ -35,6 +35,11 @@ beforeEach(function (): void {
 
 class UploadingTestPlugin extends Plugin implements AcceptsEditorUploads
 {
+    public function acceptsEditorUploads(): bool
+    {
+        return true;
+    }
+
     public function getId(): string
     {
         return 'test/uploading';

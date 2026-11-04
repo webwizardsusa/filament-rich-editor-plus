@@ -17649,18 +17649,19 @@ function CC({ wire: e, key: t, statePath: n, root: r, uploadingMessage: i, getEd
 		composed: !0,
 		cancelable: !0,
 		detail: t
-	}));
+	})), c = (e) => (s("form-processing-started", { message: i }), Promise.resolve(e).finally(() => s("form-processing-finished")));
 	return {
+		processing: c,
 		callPlugin: (n, r, i = {}) => e.callSchemaComponentMethod(t, "answerPluginRequestForJs", {
 			plugin: n,
 			request: r,
 			payload: i
 		}),
 		upload(t, { onProgress: r } = {}) {
-			let a = SC();
-			return s("form-processing-started", { message: i }), new Promise((i, o) => {
-				e.upload(`componentFileAttachments.${n}.${a}`, t, () => i(a), () => o(/* @__PURE__ */ Error(`[rich-editor-plus] The upload of [${t.name}] failed.`)), (e) => r?.(e?.detail?.progress ?? 0), () => o(/* @__PURE__ */ Error(`[rich-editor-plus] The upload of [${t.name}] was cancelled.`)));
-			}).finally(() => s("form-processing-finished"));
+			let i = SC();
+			return c(new Promise((a, o) => {
+				e.upload(`componentFileAttachments.${n}.${i}`, t, () => a(i), () => o(/* @__PURE__ */ Error(`[rich-editor-plus] The upload of [${t.name}] failed.`)), (e) => r?.(e?.detail?.progress ?? 0), () => o(/* @__PURE__ */ Error(`[rich-editor-plus] The upload of [${t.name}] was cancelled.`)));
+			}));
 		},
 		runAction(e) {
 			let t = a();

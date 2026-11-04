@@ -5,6 +5,7 @@ import { createCheckedEditor, setCheckedContent } from './content-check'
 import './extensions/core'
 import { extendExtension, loadModules, registerActionArguments, registerExtension, resolveExtensions } from './registry'
 import { createBlockControls } from './toolbar/block-controls'
+import { createPluginContext } from './plugin-context'
 import { createMentionLabels } from './mentions/mention-labels'
 import { createMentionMenuPlugin } from './mentions/mention-menu'
 import { createSlashMenuPlugin, registerSlashMenu } from './slash/slash-menu'
@@ -39,7 +40,9 @@ export default function richEditorPlusComponent({
     loadErrorMessage,
     placeholder,
     state,
+    statePath,
     tools,
+    uploadingMessage,
 }) {
     let editor
     let isDestroyed = false
@@ -104,10 +107,15 @@ export default function richEditorPlusComponent({
                 return
             }
 
-            const context = {
-                callPlugin: (plugin, request, payload = {}) =>
-                    this.$wire.callSchemaComponentMethod(key, 'answerPluginRequestForJs', { plugin, request, payload }),
-            }
+            const context = createPluginContext({
+                wire: this.$wire,
+                key,
+                statePath,
+                root: this.$el,
+                uploadingMessage,
+                getEditor: () => editor,
+                mountAction: (action, args) => this.mountAction(action, args),
+            })
 
             const resolved = resolveExtensions(extensions, tiptap, context)
 

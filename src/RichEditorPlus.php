@@ -4,11 +4,13 @@ namespace Hollyit\RichEditorPlus;
 
 use Closure;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Concerns\HasFileAttachments;
 use Filament\Forms\Components\Concerns\HasPlaceholder;
 use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Filament\Support\Components\Contracts\HasEmbeddedView;
+use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
@@ -22,11 +24,14 @@ use Hollyit\RichEditorPlus\Support\PluginExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\StateFormat;
 use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
 use Livewire\Attributes\Renderless;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class RichEditorPlus extends Field implements HasEmbeddedView
 {
+    use HasFileAttachments;
     use HasPlaceholder;
 
     /**
@@ -436,6 +441,68 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     }
 
     /**
+     * Filament only lets the page receive uploads under this field's `componentFileAttachments` entry when this is
+     * true, so it is true exactly when a plugin takes uploads from the editor.
+     */
+    public function hasFileAttachments(?bool $default = null): bool
+    {
+        foreach ($this->getPluginRegistry()->getPlugins() as $plugin) {
+            if ($plugin instanceof AcceptsEditorUploads) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Filament's own attachment storage (its default disk and rules) is not used: plugins store the files they take.
+     * Overridden without `#[ExposedLivewireMethod]` so the browser cannot call it.
+     */
+    public function getUploadedFileAttachmentTemporaryUrl(TemporaryUploadedFile|string|null $attachment = null): ?string
+    {
+        return null;
+    }
+
+    /**
+     * See {@see getUploadedFileAttachmentTemporaryUrl()}.
+     */
+    public function saveUploadedFileAttachmentAndGetUrl(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * The file the editor uploaded under `componentFileAttachments.{statePath}.{key}`, removed from there so it is
+     * taken at most once. Null for a malformed key, a disabled field, or an entry that is missing or not an upload.
+     */
+    public function pullTemporaryUpload(string $key): ?TemporaryUploadedFile
+    {
+        if (preg_match('/^[A-Za-z0-9-]{1,64}\z/', $key) !== 1) {
+            return null;
+        }
+
+        $livewire = $this->getLivewire();
+
+        if (! property_exists($livewire, 'componentFileAttachments') || ! is_array($livewire->componentFileAttachments)) {
+            return null;
+        }
+
+        $attachments = $livewire->componentFileAttachments;
+        $path = "{$this->getStatePath()}.{$key}";
+        $file = Arr::get($attachments, $path);
+
+        Arr::forget($attachments, $path);
+        $livewire->componentFileAttachments = $attachments;
+
+        if ($this->isDisabled() || ! $file instanceof TemporaryUploadedFile) {
+            return null;
+        }
+
+        return $file;
+    }
+
+    /**
      * Current labels for the mentions in a document, keyed by trigger then id, at most 100 ids per trigger.
      *
      * @param  array<string, array<string>>  $idsByTrigger
@@ -574,6 +641,8 @@ class RichEditorPlus extends Field implements HasEmbeddedView
                             livewireId: <?= Js::from($this->getLivewire()->getId()) ?>,
                             tools: <?= Js::from($this->getPluginRegistry()->getToolsConfig()) ?>,
                             placeholder: <?= Js::from($this->getEditorPlaceholder()) ?>,
+                            statePath: <?= Js::from($statePath) ?>,
+                            uploadingMessage: <?= Js::from(__('rich-editor-plus::uploads.uploading')) ?>,
                             state: $wire.<?= $this->applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) ?>,
                         })"
             wire:ignore

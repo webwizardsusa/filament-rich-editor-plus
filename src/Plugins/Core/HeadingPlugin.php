@@ -27,6 +27,14 @@ class HeadingPlugin extends Plugin
         return $this;
     }
 
+    /**
+     * @return array<int>
+     */
+    public function getLevels(): array
+    {
+        return $this->levels;
+    }
+
     public function getId(): string
     {
         return 'core/heading';

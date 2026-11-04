@@ -478,6 +478,7 @@ public function answerEditorRequest(string $request, array $payload, RichEditorP
 - The payload comes from the browser. Validate it and cap its size; never trust a path or an id in it.
 - The method runs as a method of the field, under the page's own authorization, so a request is only answered for
   someone who can use the page. A plugin that does not implement the interface answers `[]`.
+- A plugin that throws answers `[]` too, silently: the error is not reported, so log it yourself if you need it.
 
 ### Plugins that render markup
 
@@ -486,7 +487,8 @@ A plugin that renders a node as an element with markup inside, such as a `<figur
 `getRenderedMarkupNodes()`. Stored HTML is then patched without parsing every document. The patcher finds such an
 element from its opening tag, which carries `data-type="<node name>"`, to the first closing tag of the same name, so:
 
-- the element must never contain another element with its own tag name (a `<figure>` cannot hold a `<figure>`);
+- the element should never contain another element with its own tag name (a `<figure>` should not hold a `<figure>`).
+  A document where one does, or where an element is not closed, is rendered by parsing the whole document;
 - a document whose element does not parse back to exactly one node of that type, such as hand-edited markup, is rendered
   by parsing the whole document. Other documents in the same batch are still patched.
 

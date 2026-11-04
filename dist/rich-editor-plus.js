@@ -17466,6 +17466,7 @@ function fC({ root: e, toolbars: t, isMac: n = cC() }) {
 var pC = (e) => Array.isArray(e) ? {} : e ?? {};
 function mC(e, t) {
 	if (!t) return !1;
+	if (t.name && typeof e.storage?.[t.name]?.isActive == "boolean") return e.storage[t.name].isActive;
 	let n = pC(t.attributes);
 	return t.name ? e.isActive(t.name, n) : e.isActive(n);
 }
@@ -17503,7 +17504,7 @@ function _C({ editor: e, root: t, tools: n }) {
 		r.forEach((e, t) => {
 			let r = n.querySelector(`[data-rep-menu-item="${hC(e.name)}"]`);
 			r?.setAttribute("aria-checked", e === a ? "true" : "false"), r?.setAttribute("aria-disabled", o[t] ? "false" : "true");
-		}), t.setAttribute("aria-disabled", o.some(Boolean) ? "false" : "true");
+		}), t.setAttribute("aria-disabled", e.isEditable && o.some(Boolean) ? "false" : "true");
 		let s = a?.name ?? "";
 		if (t.dataset.repCurrent === s) return;
 		i.has(t) || i.set(t, t.innerHTML);
@@ -17649,7 +17650,7 @@ function CC({ wire: e, key: t, statePath: n, root: r, uploadingMessage: i, getEd
 		composed: !0,
 		cancelable: !0,
 		detail: t
-	})), c = (e) => (s("form-processing-started", { message: i }), Promise.resolve(e).finally(() => s("form-processing-finished")));
+	})), c = (e, t = i) => (s("form-processing-started", { message: t }), Promise.resolve(e).finally(() => s("form-processing-finished")));
 	return {
 		processing: c,
 		callPlugin: (n, r, i = {}) => e.callSchemaComponentMethod(t, "answerPluginRequestForJs", {
@@ -18473,15 +18474,18 @@ function fw(e, t, n) {
 function pw(e, t, n, { hideUnavailable: r = !0 } = {}) {
 	let i = !!Kh(e.state.selection), a = bC(e.state);
 	t.querySelectorAll("[data-rep-tool]").forEach((t) => {
-		let o = n[t.dataset.repTool];
-		if (o?.menu) return;
-		let s = mC(e, o?.active), c = !!o?.checksAvailability && !e.can()[o.command](...o.arguments ?? []);
-		if (t.setAttribute("aria-pressed", s ? "true" : "false"), t.classList.toggle("rep-tool-active", s), !r) {
-			let e = !!o?.hidesInListItem && i || !a && !!t.closest("[data-rep-inline-tools]");
-			t.setAttribute("aria-disabled", c || e ? "true" : "false");
+		let o = n[t.dataset.repTool], s = !e.isEditable && !o?.availableWhileReadOnly;
+		if (o?.menu) {
+			s && t.setAttribute("aria-disabled", "true");
 			return;
 		}
-		o?.checksAvailability && t.setAttribute("aria-disabled", c ? "true" : "false"), o?.hidesInListItem && (t.hidden = i);
+		let c = mC(e, o?.active), l = !!o?.checksAvailability && !e.can()[o.command](...o.arguments ?? []);
+		if (t.setAttribute("aria-pressed", c ? "true" : "false"), t.classList.toggle("rep-tool-active", c), !r) {
+			let e = !!o?.hidesInListItem && i || !a && !!t.closest("[data-rep-inline-tools]");
+			t.setAttribute("aria-disabled", l || e || s ? "true" : "false");
+			return;
+		}
+		(o?.checksAvailability || s || t.getAttribute("aria-disabled") === "true") && t.setAttribute("aria-disabled", l || s ? "true" : "false"), o?.hidesInListItem && (t.hidden = i);
 	}), r && t.querySelectorAll("[data-rep-block-tools]").forEach((e) => {
 		e.hidden = [...e.querySelectorAll("[data-rep-tool]")].every((e) => e.hidden);
 	});

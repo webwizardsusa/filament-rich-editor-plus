@@ -12,6 +12,11 @@ export function isToolActive(editor, active) {
         return false
     }
 
+    // An extension can report its own state, for tools that toggle a view rather than a mark or node.
+    if (active.name && typeof editor.storage?.[active.name]?.isActive === 'boolean') {
+        return editor.storage[active.name].isActive
+    }
+
     const attributes = normalizeAttributes(active.attributes)
 
     return active.name ? editor.isActive(active.name, attributes) : editor.isActive(attributes)
@@ -79,7 +84,7 @@ export function createToolMenus({ editor, root, tools }) {
             itemElement?.setAttribute('aria-disabled', runnable[index] ? 'false' : 'true')
         })
 
-        button.setAttribute('aria-disabled', runnable.some(Boolean) ? 'false' : 'true')
+        button.setAttribute('aria-disabled', editor.isEditable && runnable.some(Boolean) ? 'false' : 'true')
 
         const currentName = current?.name ?? ''
 

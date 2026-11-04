@@ -458,3 +458,9 @@ it('does not show a floating table toolbar with only a cursor when the layout ha
 
     expect($html)->not->toContain('data-rep-show-with-cursor');
 });
+
+it('marks tools that work while the editor is read-only', function (): void {
+    expect(Tool::make('x')->toArray()['availableWhileReadOnly'])->toBeFalse()
+        ->and(Tool::make('x')->availableWhileReadOnly()->toArray()['availableWhileReadOnly'])->toBeTrue()
+        ->and(Tool::make('x')->availableWhileReadOnly()->isAvailableWhileReadOnly())->toBeTrue();
+});

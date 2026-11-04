@@ -41,6 +41,8 @@ class Tool
 
     protected bool $hidesInListItem = false;
 
+    protected bool $isAvailableWhileReadOnly = false;
+
     protected bool $showsWithCursor = false;
 
     protected ?string $group = null;
@@ -339,13 +341,29 @@ class Tool
         return $this->showsWithCursor;
     }
 
+    /**
+     * Keeps the tool usable while the editor is read-only, for tools that change the view rather than the content,
+     * such as a source view. Other tools are disabled while the editor isn't editable.
+     */
+    public function availableWhileReadOnly(bool $condition = true): static
+    {
+        $this->isAvailableWhileReadOnly = $condition;
+
+        return $this;
+    }
+
+    public function isAvailableWhileReadOnly(): bool
+    {
+        return $this->isAvailableWhileReadOnly;
+    }
+
     public function getOrder(): int
     {
         return $this->order;
     }
 
     /**
-     * @return array{name: string, label: ?string, icon: ?string, shortcut: ?string, command: ?string, action: ?string, arguments: array<int, mixed>, active: ?array{name: ?string, attributes: array<string, mixed>}, menu: ?array<int, array<string, mixed>>, scope: string, nodes: array<string>, checksAvailability: bool, hidesInListItem: bool, group: ?string, order: int}
+     * @return array{name: string, label: ?string, icon: ?string, shortcut: ?string, command: ?string, action: ?string, arguments: array<int, mixed>, active: ?array{name: ?string, attributes: array<string, mixed>}, menu: ?array<int, array<string, mixed>>, scope: string, nodes: array<string>, checksAvailability: bool, hidesInListItem: bool, availableWhileReadOnly: bool, group: ?string, order: int}
      */
     public function toArray(): array
     {
@@ -366,6 +384,7 @@ class Tool
             'nodes' => $this->nodes,
             'checksAvailability' => $this->checksAvailability,
             'hidesInListItem' => $this->hidesInListItem,
+            'availableWhileReadOnly' => $this->isAvailableWhileReadOnly,
             'group' => $this->group,
             'order' => $this->order,
         ];

@@ -52,7 +52,14 @@ export function syncToolbar(editor, toolbar, tools, { hideUnavailable = true } =
     toolbar.querySelectorAll('[data-rep-tool]').forEach((button) => {
         const tool = tools[button.dataset.repTool]
 
+        const isLocked = !editor.isEditable && !tool?.availableWhileReadOnly
+
         if (tool?.menu) {
+            // Menu buttons get their own availability from the menus; this only adds the read-only lock.
+            if (isLocked) {
+                button.setAttribute('aria-disabled', 'true')
+            }
+
             return
         }
 
@@ -68,13 +75,13 @@ export function syncToolbar(editor, toolbar, tools, { hideUnavailable = true } =
                 (Boolean(tool?.hidesInListItem) && isInList) ||
                 (!canFormat && Boolean(button.closest('[data-rep-inline-tools]')))
 
-            button.setAttribute('aria-disabled', isUnavailable || isOutOfPlace ? 'true' : 'false')
+            button.setAttribute('aria-disabled', isUnavailable || isOutOfPlace || isLocked ? 'true' : 'false')
 
             return
         }
 
-        if (tool?.checksAvailability) {
-            button.setAttribute('aria-disabled', isUnavailable ? 'true' : 'false')
+        if (tool?.checksAvailability || isLocked || button.getAttribute('aria-disabled') === 'true') {
+            button.setAttribute('aria-disabled', isUnavailable || isLocked ? 'true' : 'false')
         }
 
         if (tool?.hidesInListItem) {

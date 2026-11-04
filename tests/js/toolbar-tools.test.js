@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { isToolActive } from '../../resources/js/toolbar/tool-menus'
 import { bindToolbar, ensureTabStop, focusToolbar, syncToolbar } from '../../resources/js/toolbar/tools'
 import { doc, makeEditor, p } from './support/make-editor'
 
@@ -123,4 +124,30 @@ it('keeps disabling instead of hiding after a click when told not to hide', () =
     expect(button('levelUp').hidden).toBe(false)
     expect(button('levelUp').getAttribute('aria-disabled')).toBe('true')
     expect(toolbar.querySelector('[data-rep-block-tools]').hidden).toBe(false)
+})
+
+it.each([false, true])('disables tools while the editor is read-only, except those marked available (hideUnavailable: %s)', (hideUnavailable) => {
+    const lockTools = {
+        bold: { command: 'toggleBold', arguments: [], active: null, checksAvailability: false, hidesInListItem: false },
+        source: { command: 'focus', arguments: [], active: null, checksAvailability: false, hidesInListItem: false, availableWhileReadOnly: true },
+    }
+    toolbar.insertAdjacentHTML('beforeend', '<button data-rep-tool="source" tabindex="-1"></button>')
+    editor = makeEditor(doc(p('abc')))
+    editor.setEditable(false)
+    syncToolbar(editor, toolbar, lockTools, { hideUnavailable })
+
+    expect(button('bold').getAttribute('aria-disabled')).toBe('true')
+    expect(button('source').getAttribute('aria-disabled')).not.toBe('true')
+
+    editor.setEditable(true)
+    syncToolbar(editor, toolbar, lockTools, { hideUnavailable })
+
+    expect(button('bold').getAttribute('aria-disabled')).toBe('false')
+})
+
+it('reads a tool active state from extension storage', () => {
+    editor = makeEditor(doc(p('abc')))
+    editor.storage.demo = { isActive: true }
+
+    expect(isToolActive(editor, { name: 'demo', attributes: {} })).toBe(true)
 })

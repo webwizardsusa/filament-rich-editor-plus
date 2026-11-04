@@ -72,6 +72,29 @@ describe('the plugin context', () => {
         await expect(context.upload(new File(['x'], 'a.png'))).rejects.toThrow()
     })
 
+    it('holds the form until a promise settles, and gives back its result', async () => {
+        const { context, events } = setUp()
+        let resolve
+        const work = new Promise((done) => { resolve = done })
+
+        const held = context.processing(work)
+        await Promise.resolve()
+
+        expect(events).toEqual([['form-processing-started', { message: 'Uploading file…' }]])
+
+        resolve('done')
+
+        await expect(held).resolves.toBe('done')
+        expect(events.map(([name]) => name)).toEqual(['form-processing-started', 'form-processing-finished'])
+    })
+
+    it('finishes processing when the held promise rejects', async () => {
+        const { context, events } = setUp()
+
+        await expect(context.processing(Promise.reject(new Error('nope')))).rejects.toThrow('nope')
+        expect(events.map(([name]) => name)).toEqual(['form-processing-started', 'form-processing-finished'])
+    })
+
     it('runs an action with the arguments registered for it', () => {
         registerActionArguments('test-context-action', (editor) => ({ from: editor.id }))
         const { context, mountAction } = setUp()

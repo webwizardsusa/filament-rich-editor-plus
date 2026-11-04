@@ -481,10 +481,13 @@ public function answerEditorRequest(string $request, array $payload, RichEditorP
 - A plugin that throws answers `[]` too, silently: the error is not reported, so log it yourself if you need it.
 
 The context also has `upload(file, { onProgress })`, which sends a file to the field's Livewire temporary uploads and
-resolves with a key, and `runAction(action)`, which opens a field action with its registered arguments. A plugin that
-takes uploads implements `AcceptsEditorUploads` (without it the field refuses uploads) and, in its
-`answerEditorRequest()`, takes the file with `$field->pullTemporaryUpload($key)`, which returns it once and then
-forgets it. Check the file's type from its contents and store it yourself; the browser chose nothing but the key.
+resolves with a key, `processing(promise)`, which keeps the form from saving until the promise settles and resolves or
+rejects as it does, and `runAction(action)`, which opens a field action with its registered arguments. `upload()` holds
+the form only while the file uploads, so wrap the whole job (upload, `store` request and inserting the result) in
+`processing()` to keep the form from saving before the file is in the document; calls may nest. A plugin that takes
+uploads implements `AcceptsEditorUploads` (without it the field refuses uploads) and, in its `answerEditorRequest()`,
+takes the file with `$field->pullTemporaryUpload($key)`, which returns it once and then forgets it. Check the file's
+type from its contents and store it yourself; the browser chose nothing but the key.
 
 ### Plugins that render markup
 

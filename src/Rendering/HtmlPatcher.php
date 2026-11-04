@@ -17,8 +17,9 @@ use RuntimeException;
  * passing every other byte through. Plugins still make each lookup once for the whole batch.
  *
  * Rendered nodes are elements with only text inside, or, when a plugin declares them as markup nodes, elements that
- * contain markup (such as an image's `<figure>`). A document with a markup element that does not parse back to one node
- * of its type is parsed whole instead, so a batch costs at most two calls to the plugins.
+ * contain markup (such as an image's `<figure>`). A document whose markup elements cannot all be matched safely (one
+ * contains an element of its own tag, one is not closed, or the pattern fails on the document) or do not parse back to
+ * one node of their type is parsed whole instead, so a batch costs at most two calls to the plugins.
  *
  * Stored HTML is trusted: it must have been written by the field or by `toStorableHtml()`.
  */
@@ -105,7 +106,7 @@ class HtmlPatcher
             return $htmlDocuments;
         }
 
-        $nodes = $this->parseElements($found);
+        $nodes = $this->parseElements(array_filter($found, static fn (?array $elements): bool => $elements !== null));
         $serializer = new HtmlSerializer($this->schema);
         $patched = array_filter($nodes, static fn (?array $documentNodes): bool => $documentNodes !== null);
 
@@ -118,7 +119,7 @@ class HtmlPatcher
             }
         }
 
-        $fallbacks = array_diff_key($nodes, $patched);
+        $fallbacks = array_diff_key($found, $patched);
 
         if ($fallbacks !== []) {
             $parser = new HtmlParser($this->schema);
@@ -133,11 +134,12 @@ class HtmlPatcher
     }
 
     /**
-     * The rendered elements of each document that has any, in document order. A text element inside a markup element
-     * is part of that element, so it is not matched on its own.
+     * The rendered elements of each document that has any, in document order, or null for a document that must be
+     * parsed whole (see {@see findMarkupElements()}). A text element inside a markup element is part of that element,
+     * so it is not matched on its own.
      *
      * @param  array<array-key, string>  $htmlDocuments
-     * @return array<array-key, array<int, array<int | string, array{0: string, 1: int}>>>
+     * @return array<array-key, array<int, array<int | string, array{0: string, 1: int}>> | null>
      */
     protected function find(array $htmlDocuments): array
     {
@@ -147,8 +149,15 @@ class HtmlPatcher
         $found = [];
 
         foreach ($htmlDocuments as $key => $html) {
-            $elements = $pattern === null ? [] : $this->match($pattern, $html);
-            $markupElements = $markupPattern !== null && $this->containsAny($html, $markupMarkers) ? $this->match($markupPattern, $html) : [];
+            $markupElements = $markupPattern !== null && $this->containsAny($html, $markupMarkers) ? $this->findMarkupElements($markupPattern, $markupMarkers, $html) : [];
+
+            if ($markupElements === null) {
+                $found[$key] = null;
+
+                continue;
+            }
+
+            $elements = $pattern === null ? [] : ($this->match($pattern, $html) ?? throw new RuntimeException('Stored rich content could not be patched: '.preg_last_error_msg().'.'));
 
             if ($markupElements !== []) {
                 $elements = array_filter($elements, static function (array $element) use ($markupElements): bool {
@@ -190,14 +199,71 @@ class HtmlPatcher
     }
 
     /**
-     * @return array<int, array<int | string, array{0: string, 1: int}>>
+     * The markup elements of a document, or null when they cannot all be matched safely and the document must be
+     * parsed whole: the pattern fails, an element contains an opening tag of its own name (the match would stop at the
+     * inner closing tag), or the document has more markers than matched elements (an element is not closed).
+     *
+     * @param  array<int, string>  $markers
+     * @return array<int, array<int | string, array{0: string, 1: int}>> | null
      */
-    protected function match(string $pattern, string $html): array
+    protected function findMarkupElements(string $pattern, array $markers, string $html): ?array
+    {
+        $elements = $this->match($pattern, $html);
+
+        if ($elements === null) {
+            return null;
+        }
+
+        $markerCount = 0;
+
+        foreach ($markers as $marker) {
+            $markerCount += substr_count($html, $marker);
+        }
+
+        if ($markerCount !== count($elements)) {
+            return null;
+        }
+
+        foreach ($elements as $element) {
+            if ($this->containsOpeningTag($element[0][0], $element['tag'][0])) {
+                return null;
+            }
+        }
+
+        return $elements;
+    }
+
+    /**
+     * Whether an element's HTML contains, after its own opening tag, another opening tag of the same name.
+     */
+    protected function containsOpeningTag(string $elementHtml, string $tag): bool
+    {
+        $needle = '<'.$tag;
+        $position = 0;
+
+        while (($position = stripos($elementHtml, $needle, $position + 1)) !== false) {
+            $next = $elementHtml[$position + strlen($needle)] ?? '';
+
+            if ($next === '/' || $next === '>' || ctype_space($next)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Every match of the pattern in the HTML, or null when the pattern fails on it (such as when it exhausts
+     * `pcre.backtrack_limit`).
+     *
+     * @return array<int, array<int | string, array{0: string, 1: int}>> | null
+     */
+    protected function match(string $pattern, string $html): ?array
     {
         $count = preg_match_all($pattern, $html, $elements, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
 
         if ($count === false) {
-            throw new RuntimeException('Stored rich content could not be patched: '.preg_last_error_msg().'.');
+            return null;
         }
 
         return $count > 0 ? $elements : [];
@@ -218,8 +284,8 @@ class HtmlPatcher
     /**
      * An element marked as a rendered markup node, up to the first closing tag of its own name. Attributes are stepped
      * over as in {@see pattern()}. The body is stepped over possessively, a run of text or one tag at a time, so a
-     * large body or an unclosed element costs steps in proportion to its length and never backtracks. The element must
-     * not contain one of its own tag.
+     * large body or an unclosed element costs steps in proportion to its length and never backtracks. A match that
+     * contains one of its own tag is cut short, so {@see findMarkupElements()} sends that document to the full parse.
      */
     protected function markupPattern(): string
     {

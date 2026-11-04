@@ -87,6 +87,11 @@ class PhotoTestPlugin extends Plugin implements PatchesRenderedMarkup
     }
 }
 
+function fullPhotoRender(string $html): string
+{
+    return RichContentPlusRenderer::make($html)->parseHtml()->plugins([new PhotoTestPlugin])->toHtml();
+}
+
 function photoRenderer(PhotoTestPlugin $plugin, array $documents): array
 {
     return (new HtmlPatcher(PluginRegistry::make([$plugin])))->patch($documents);
@@ -156,12 +161,12 @@ it('patches mentions and markup nodes together, leaving a mention inside a marku
         ->and($plugin->calls)->toBe(1);
 });
 
-it('leaves an unclosed markup element before a large body as stored instead of hitting the backtrack limit', function (): void {
+it('renders an unclosed markup element before a large body through the full parse path instead of hitting the backtrack limit', function (): void {
     $plugin = new PhotoTestPlugin;
     $stored = '<figure data-type="photo" data-key="a.jpg"><img alt="">'.str_repeat('<p>Lorem ipsum dolor sit amet.</p>', 60_000);
 
-    expect(photoRenderer($plugin, [$stored])[0])->toBe($stored)
-        ->and($plugin->calls)->toBe(0);
+    expect(photoRenderer($plugin, [$stored])[0])->toBe(fullPhotoRender($stored))
+        ->and($plugin->calls)->toBe(1);
 });
 
 it('patches a markup element whose body is very large without hitting the backtrack limit', function (): void {
@@ -171,4 +176,53 @@ it('patches a markup element whose body is very large without hitting the backtr
     $patched = photoRenderer($plugin, ['<figure data-type="photo" data-key="a.jpg"><img alt=""><figcaption>'.$caption.'</figcaption></figure>'])[0];
 
     expect($patched)->toBe('<figure data-type="photo" data-key="a.jpg"><img src="https://cdn.test/a.jpg" alt=""><figcaption>'.$caption.'</figcaption></figure>');
+});
+
+it('renders a document whose markup element contains another element of its tag through the full parse path', function (string $stored): void {
+    $plugin = new PhotoTestPlugin;
+    $fine = '<figure data-type="photo" data-key="b.jpg"><img alt=""></figure>';
+
+    $patched = photoRenderer($plugin, ['nested' => $stored, 'fine' => $fine]);
+
+    expect($patched['nested'])->toBe(fullPhotoRender($stored))
+        ->and($patched['fine'])->toBe('<figure data-type="photo" data-key="b.jpg"><img src="https://cdn.test/b.jpg" alt=""></figure>')
+        ->and($plugin->calls)->toBe(2);
+})->with([
+    'a nested photo figure' => ['<p>before</p><figure data-type="photo" data-key="outer.jpg"><figure data-type="photo" data-key="inner.jpg"><img alt="inner"></figure><img alt="outer"></figure><p>after</p>'],
+    'a nested plain figure' => ['<figure data-type="photo" data-key="a.jpg"><figure><img alt="x"></figure><figcaption>cap</figcaption></figure><p>after</p>'],
+]);
+
+it('renders a document with an unclosed markup element through the full parse path, still patching the rest of the batch', function (): void {
+    $plugin = new PhotoTestPlugin;
+    $unclosed = '<figure data-type="photo" data-key="a.jpg"><img alt="">'
+        .'<figure data-type="photo" data-key="b.jpg"><img alt=""></figure>';
+    $fine = '<figure data-type="photo" data-key="c.jpg"><img alt=""></figure>';
+
+    $patched = photoRenderer($plugin, ['unclosed' => $unclosed, 'fine' => $fine]);
+
+    expect($patched['unclosed'])->toBe(fullPhotoRender($unclosed))
+        ->and($patched['fine'])->toBe('<figure data-type="photo" data-key="c.jpg"><img src="https://cdn.test/c.jpg" alt=""></figure>')
+        ->and($plugin->calls)->toBe(2);
+});
+
+it('renders a document the markup pattern fails on through the full parse path, still patching the rest of the batch', function (): void {
+    $plugin = new PhotoTestPlugin;
+    $failing = '<figure data-type="photo" data-key="a.jpg"><img alt="">'.str_repeat('<b>x</b>', 2_000);
+    $fine = '<figure data-type="photo" data-key="b.jpg"><img alt=""></figure>';
+    $backtrackLimit = ini_get('pcre.backtrack_limit');
+    $jit = ini_get('pcre.jit');
+
+    try {
+        ini_set('pcre.jit', '0');
+        ini_set('pcre.backtrack_limit', '100');
+
+        $patched = photoRenderer($plugin, ['failing' => $failing, 'fine' => $fine]);
+    } finally {
+        ini_set('pcre.backtrack_limit', $backtrackLimit);
+        ini_set('pcre.jit', $jit);
+    }
+
+    expect($patched['fine'])->toBe('<figure data-type="photo" data-key="b.jpg"><img src="https://cdn.test/b.jpg" alt=""></figure>')
+        ->and($patched['failing'])->toBe(fullPhotoRender($failing))
+        ->and($plugin->calls)->toBe(2);
 });

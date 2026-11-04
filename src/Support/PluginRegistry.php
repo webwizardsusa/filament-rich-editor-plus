@@ -57,6 +57,11 @@ class PluginRegistry
     protected array $extensions = [];
 
     /**
+     * @var array<string>
+     */
+    protected array $hiddenTools = [];
+
+    /**
      * @param  array<EditorPlugin | class-string<EditorPlugin>>  $plugins
      */
     public function __construct(array $plugins)
@@ -361,10 +366,29 @@ class PluginRegistry
      */
     public function getTools(): array
     {
-        return $this->gather(
+        $tools = $this->gather(
             static fn (EditorPlugin $plugin): array => $plugin->getTools(),
             static fn (PluginExtension $extension): array => $extension->getTools(),
         );
+
+        if ($this->hiddenTools === []) {
+            return $tools;
+        }
+
+        return array_values(array_filter($tools, fn (Tool $tool): bool => ! in_array($tool->getName(), $this->hiddenTools, true)));
+    }
+
+    /**
+     * Removes tools by name from every toolbar, menu and the tools sent to the editor, for example the tools a stored
+     * format can't keep.
+     *
+     * @param  array<string>  $names
+     */
+    public function withoutTools(array $names): static
+    {
+        $this->hiddenTools = array_values($names);
+
+        return $this;
     }
 
     /**

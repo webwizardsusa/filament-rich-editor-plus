@@ -10,9 +10,12 @@ use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Filament\Support\Components\Contracts\HasEmbeddedView;
+use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Hollyit\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\Rendering\BlockMenuRenderer;
 use Hollyit\RichEditorPlus\Rendering\ToolbarRenderer;
@@ -26,6 +29,7 @@ use Hollyit\RichEditorPlus\Support\StateFormat;
 use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
+use InvalidArgumentException;
 use Livewire\Attributes\Renderless;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -49,7 +53,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      */
     protected array|Closure $additionalPlugins = [];
 
-    protected StateFormat|Closure $stateFormat = StateFormat::Html;
+    protected StateFormat|ContentFormat|Closure $stateFormat = StateFormat::Html;
 
     /**
      * @var array<string | array<string>> | Closure | null
@@ -285,16 +289,71 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         );
     }
 
-    public function storeAs(StateFormat|Closure $format): static
+    /**
+     * How the field's value is stored: as a JSON document, as HTML, or in a {@see ContentFormat} such as Markdown. With
+     * a content format the editor still works on JSON, and the state cast converts.
+     */
+    public function storeAs(StateFormat|ContentFormat|Closure $format): static
     {
         $this->stateFormat = $format;
 
         return $this;
     }
 
+    /**
+     * The format of the Livewire state: always JSON when a content format is set.
+     */
     public function getStateFormat(): StateFormat
     {
-        return $this->evaluate($this->stateFormat);
+        $format = $this->evaluate($this->stateFormat);
+
+        if ($format instanceof ContentFormat || $this->getContentFormat() !== null) {
+            return StateFormat::Json;
+        }
+
+        return $format;
+    }
+
+    /**
+     * The content format from `storeAs()`, else from the first explicitly added plugin that provides one.
+     *
+     * @throws InvalidArgumentException When `storeAs()` and a plugin choose different formats.
+     */
+    public function getContentFormat(): ?ContentFormat
+    {
+        $chosen = $this->evaluate($this->stateFormat);
+        $fromPlugins = null;
+
+        foreach ($this->getExplicitPlugins() as $plugin) {
+            if ($plugin instanceof ProvidesContentFormat && ($format = $plugin->getContentFormat()) !== null) {
+                $fromPlugins = $format;
+
+                break;
+            }
+        }
+
+        if (! $chosen instanceof ContentFormat) {
+            return $fromPlugins;
+        }
+
+        if ($fromPlugins !== null && $fromPlugins->getId() !== $chosen->getId()) {
+            throw new InvalidArgumentException("The field [{$this->getName()}] stores [{$chosen->getId()}] but a plugin chooses [{$fromPlugins->getId()}].");
+        }
+
+        return $chosen;
+    }
+
+    /**
+     * The plugins given with `plugins()` and `addPlugins()`, without the defaults.
+     *
+     * @return array<EditorPlugin>
+     */
+    protected function getExplicitPlugins(): array
+    {
+        return array_map(
+            PluginRegistry::resolvePlugin(...),
+            [...($this->evaluate($this->plugins) ?? []), ...($this->evaluate($this->additionalPlugins) ?? [])],
+        );
     }
 
     /**
@@ -302,8 +361,20 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      */
     public function getPlugins(): array
     {
+        $defaults = null;
+
+        if ($this->evaluate($this->plugins) === null) {
+            $defaults = PluginRegistry::defaultPlugins();
+            $format = $this->getContentFormat();
+
+            if ($format !== null) {
+                $unsupported = $format->unsupportedPlugins($defaults);
+                $defaults = array_values(array_filter($defaults, static fn (EditorPlugin $plugin): bool => ! in_array($plugin, $unsupported, true)));
+            }
+        }
+
         $plugins = PluginRegistry::mergePlugins(
-            $this->evaluate($this->plugins) ?? PluginRegistry::defaultPlugins(),
+            $this->evaluate($this->plugins) ?? $defaults,
             $this->evaluate($this->additionalPlugins),
         );
 
@@ -325,7 +396,18 @@ class RichEditorPlus extends Field implements HasEmbeddedView
 
     public function getPluginRegistry(): PluginRegistry
     {
-        return PluginRegistry::make($this->getPlugins());
+        $plugins = $this->getPlugins();
+        $format = $this->getContentFormat();
+
+        $format?->assertSupports($plugins);
+
+        foreach ($plugins as $plugin) {
+            if ($plugin instanceof ChecksFieldPlugins) {
+                $plugin->checkFieldPlugins($plugins);
+            }
+        }
+
+        return PluginRegistry::make($plugins)->withoutTools($format?->getHiddenTools() ?? []);
     }
 
     /**

@@ -20,7 +20,8 @@ class RichEditorPlusStateCast implements StateCast
     public function __construct(protected RichEditorPlus $richEditor) {}
 
     /**
-     * From the Livewire state to the value the form, model and hooks work with.
+     * From the Livewire state to the value the form, model and hooks work with. With a content format, the format's
+     * string.
      *
      * @return string | array<string, mixed> | null
      */
@@ -30,6 +31,12 @@ class RichEditorPlusStateCast implements StateCast
             return null;
         }
 
+        $format = $this->richEditor->getContentFormat();
+
+        if ($format !== null) {
+            return $format->fromDocument($this->toDocument($state), $this->richEditor->getPluginRegistry());
+        }
+
         return match ($this->richEditor->getStateFormat()) {
             StateFormat::Json => $this->toDocument($state),
             StateFormat::Html => $this->toHtml($state),
@@ -37,12 +44,20 @@ class RichEditorPlusStateCast implements StateCast
     }
 
     /**
-     * From a stored value (an array, JSON or HTML) to the Livewire state.
+     * From a stored value (an array, JSON or HTML, or the content format's string) to the Livewire state.
      */
     public function set(mixed $state): ?string
     {
         if (blank($state)) {
             return null;
+        }
+
+        $format = $this->richEditor->getContentFormat();
+
+        if ($format !== null) {
+            $document = is_array($state) ? $state : $format->toDocument((string) $state, $this->richEditor->getPluginRegistry());
+
+            return json_encode($document, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         return match ($this->richEditor->getStateFormat()) {

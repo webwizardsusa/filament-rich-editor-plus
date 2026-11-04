@@ -51,7 +51,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
 
             const blockType = blockTypes.find(({ name }) => name === item.dataset.repBlockType)
 
-            if (blockType) {
+            if (blockType && editor.isEditable) {
                 switchBlock(editor, blockType, blockTypes)
             }
         },
@@ -62,7 +62,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
         onSelect: (item) => {
             editor.view.focus()
 
-            if (!isDisabled(item)) {
+            if (!isDisabled(item) && (editor.isEditable || item.hasAttribute('data-rep-read-only-ok'))) {
                 editor.chain().focus()[item.dataset.repMoreAction]().run()
             }
         },
@@ -74,7 +74,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
               onSelect: (item) => {
                   editor.view.focus()
 
-                  if (isDisabled(item)) {
+                  if (isDisabled(item) || !editor.isEditable) {
                       return
                   }
 
@@ -135,7 +135,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
         const name = list.type.name
         const type = listElement.querySelector(`[data-rep-list-type="${name}"]`)
 
-        setDisabled(button, spans)
+        setDisabled(button, spans || !editor.isEditable)
 
         listElement.querySelectorAll('[data-rep-list-type]').forEach((item) => {
             item.setAttribute('aria-checked', item.dataset.repListType === name ? 'true' : 'false')
@@ -220,7 +220,8 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
             }
 
             const spans = selectionSpansBlocks(state)
-            const locked = spans || selectsNestedBlock(state)
+            const readOnly = !editor.isEditable
+            const locked = spans || selectsNestedBlock(state) || readOnly
             const paragraphs = countSelectedParagraphs(state)
             const switcher = toolbar.querySelector('[data-rep-control="switcher"]')
 
@@ -235,14 +236,14 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
             syncSwitcher(toolbar, current, paragraphs)
             syncListMenu(toolbar, spans, hideUnavailable)
 
-            setDisabled(switcher, (locked && !paragraphs) || !current?.switchable)
+            setDisabled(switcher, (locked && !paragraphs) || readOnly || !current?.switchable)
             setDisabled(toolbar.querySelector('[data-rep-control="moveUp"]'), locked || !editor.can().moveBlockUp())
             setDisabled(toolbar.querySelector('[data-rep-control="moveDown"]'), locked || !editor.can().moveBlockDown())
             setDisabled(toolbar.querySelector('[data-rep-drag-handle]'), locked)
 
             const moreItems = [...moreElement.querySelectorAll('[data-rep-more-action]')]
 
-            moreItems.forEach((item) => setDisabled(item, !editor.can()[item.dataset.repMoreAction]?.()))
+            moreItems.forEach((item) => setDisabled(item, (readOnly && !item.hasAttribute('data-rep-read-only-ok')) || !editor.can()[item.dataset.repMoreAction]?.()))
             setDisabled(toolbar.querySelector('[data-rep-control="more"]'), moreItems.every(isDisabled))
             toolMenus.sync(toolbar)
 

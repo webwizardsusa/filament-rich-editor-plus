@@ -82,7 +82,7 @@ class BlockMenuRenderer
             .$this->renderMoreItem('selectParentBlock', 'mdi-arrow-top-left', __('rich-editor-plus::toolbar.select_parent'));
 
         foreach ($tools as $tool) {
-            $html .= $this->renderMoreItem($tool->getCommand(), $tool->getIcon(), $tool->getLabel() ?? $tool->getName());
+            $html .= $this->renderMoreItem($tool->getCommand(), $tool->getIcon(), $tool->getLabel() ?? $tool->getName(), $tool->isAvailableWhileReadOnly());
         }
 
         return $html
@@ -166,9 +166,9 @@ class BlockMenuRenderer
             .' data-rep-moved-down="'.e(__('rich-editor-plus::toolbar.moved_down')).'"></span>';
     }
 
-    protected function renderMoreItem(string $command, ?string $icon, string $label): string
+    protected function renderMoreItem(string $command, ?string $icon, string $label, bool $isAvailableWhileReadOnly = false): string
     {
-        return '<button type="button" class="rep-menu-item" role="menuitem" tabindex="-1" data-rep-more-action="'.e($command).'">'
+        return '<button type="button" class="rep-menu-item" role="menuitem" tabindex="-1" data-rep-more-action="'.e($command).'"'.($isAvailableWhileReadOnly ? ' data-rep-read-only-ok' : '').'>'
             .(generate_icon_html($icon)?->toHtml() ?? '')
             .'<span class="rep-menu-item-label">'.e($label).'</span>'
             .'</button>';

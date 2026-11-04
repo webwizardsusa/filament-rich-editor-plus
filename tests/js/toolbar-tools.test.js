@@ -137,7 +137,7 @@ it.each([false, true])('disables tools while the editor is read-only, except tho
     syncToolbar(editor, toolbar, lockTools, { hideUnavailable })
 
     expect(button('bold').getAttribute('aria-disabled')).toBe('true')
-    expect(button('source').getAttribute('aria-disabled')).not.toBe('true')
+    expect(button('source').getAttribute('aria-disabled')).toBe(hideUnavailable ? null : 'false')
 
     editor.setEditable(true)
     syncToolbar(editor, toolbar, lockTools, { hideUnavailable })

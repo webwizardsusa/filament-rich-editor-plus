@@ -328,3 +328,22 @@ it('hides every formatting section in a code block by default', () => {
 
     expect([...toolbar.querySelectorAll('[data-rep-inline-tools]')].map((section) => section.hidden)).toEqual([true, true])
 })
+
+it('locks the block controls and more items while read-only, except those marked available', () => {
+    root.querySelector('[data-rep-more-menu]').insertAdjacentHTML('beforeend', '<button data-rep-more-action="focus" data-rep-read-only-ok></button>')
+    setUp(doc(p('abc'), p('def')))
+    editor.commands.setTextSelection(2)
+    editor.setEditable(false)
+
+    controls.sync(toolbar)
+
+    expect(control('switcher').getAttribute('aria-disabled')).toBe('true')
+    expect(control('moveDown').getAttribute('aria-disabled')).toBe('true')
+    expect(root.querySelector('[data-rep-more-action="deleteBlock"]').getAttribute('aria-disabled')).toBe('true')
+    expect(root.querySelector('[data-rep-more-action="focus"]').getAttribute('aria-disabled')).toBe('false')
+
+    control('more').click()
+    root.querySelector('[data-rep-more-action="deleteBlock"]').click()
+
+    expect(editor.getText()).toContain('abc')
+})

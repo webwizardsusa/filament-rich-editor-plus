@@ -17546,17 +17546,17 @@ function xC({ editor: e, root: t, blockTypes: n, tools: r = {} }) {
 		onSelect: (t) => {
 			e.view.focus();
 			let r = n.find(({ name: e }) => e === t.dataset.repBlockType);
-			r && ig(e, r, n);
+			r && e.isEditable && ig(e, r, n);
 		}
 	}), u = new nC(a, {
 		itemSelector: "[data-rep-more-action]",
 		onSelect: (t) => {
-			e.view.focus(), yC(t) || e.chain().focus()[t.dataset.repMoreAction]().run();
+			e.view.focus(), !yC(t) && (e.isEditable || t.hasAttribute("data-rep-read-only-ok")) && e.chain().focus()[t.dataset.repMoreAction]().run();
 		}
 	}), d = o ? new nC(o, {
 		itemSelector: "[data-rep-list-action], [data-rep-list-type]",
 		onSelect: (t) => {
-			e.view.focus(), !yC(t) && (t.dataset.repListType ? e.chain().focus().setListType(t.dataset.repListType).run() : e.chain().focus()[t.dataset.repListAction]().run());
+			e.view.focus(), !yC(t) && e.isEditable && (t.dataset.repListType ? e.chain().focus().setListType(t.dataset.repListType).run() : e.chain().focus()[t.dataset.repListAction]().run());
 		}
 	}) : null, f = _C({
 		editor: e,
@@ -17581,7 +17581,7 @@ function xC({ editor: e, root: t, blockTypes: n, tools: r = {} }) {
 			return;
 		}
 		let l = a.type.name, u = o.querySelector(`[data-rep-list-type="${l}"]`);
-		if (vC(s, n), o.querySelectorAll("[data-rep-list-type]").forEach((e) => {
+		if (vC(s, n || !e.isEditable), o.querySelectorAll("[data-rep-list-type]").forEach((e) => {
 			e.setAttribute("aria-checked", e.dataset.repListType === l ? "true" : "false");
 		}), o.querySelectorAll("[data-rep-list-action]").forEach((t) => {
 			vC(t, !e.can()[t.dataset.repListAction]());
@@ -17623,14 +17623,14 @@ function xC({ editor: e, root: t, blockTypes: n, tools: r = {} }) {
 		sync(t, { hideUnavailable: r = !0 } = {}) {
 			let { state: i } = e, o = Uh(i);
 			if (!o) return;
-			let s = Yh(i), c = s || qh(i), l = Jh(i), u = t.querySelector("[data-rep-control=\"switcher\"]"), d = l ? {
-				name: `blocks:${l}`,
-				label: u?.dataset.repMultipleLabel.replace(":count", l),
+			let s = Yh(i), c = !e.isEditable, l = s || qh(i) || c, u = Jh(i), d = t.querySelector("[data-rep-control=\"switcher\"]"), p = u ? {
+				name: `blocks:${u}`,
+				label: d?.dataset.repMultipleLabel.replace(":count", u),
 				switchable: _
 			} : eg(n, o.node);
-			v(t, d, l), g(t, s, r), vC(u, c && !l || !d?.switchable), vC(t.querySelector("[data-rep-control=\"moveUp\"]"), c || !e.can().moveBlockUp()), vC(t.querySelector("[data-rep-control=\"moveDown\"]"), c || !e.can().moveBlockDown()), vC(t.querySelector("[data-rep-drag-handle]"), c);
-			let p = [...a.querySelectorAll("[data-rep-more-action]")];
-			p.forEach((t) => vC(t, !e.can()[t.dataset.repMoreAction]?.())), vC(t.querySelector("[data-rep-control=\"more\"]"), p.every(yC)), f.sync(t), r && t.querySelectorAll("[data-rep-inline-tools]").forEach((e) => {
+			v(t, p, u), g(t, s, r), vC(d, l && !u || c || !p?.switchable), vC(t.querySelector("[data-rep-control=\"moveUp\"]"), l || !e.can().moveBlockUp()), vC(t.querySelector("[data-rep-control=\"moveDown\"]"), l || !e.can().moveBlockDown()), vC(t.querySelector("[data-rep-drag-handle]"), l);
+			let m = [...a.querySelectorAll("[data-rep-more-action]")];
+			m.forEach((t) => vC(t, c && !t.hasAttribute("data-rep-read-only-ok") || !e.can()[t.dataset.repMoreAction]?.())), vC(t.querySelector("[data-rep-control=\"more\"]"), m.every(yC)), f.sync(t), r && t.querySelectorAll("[data-rep-inline-tools]").forEach((e) => {
 				e.hidden = !bC(i);
 			});
 		},

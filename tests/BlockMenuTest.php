@@ -127,3 +127,10 @@ it('hides the list type section when there is only one type to choose', function
 it('has no list menu without list types', function (): void {
     expect((new BlockMenuRenderer)->renderListMenu([]))->toBe('');
 });
+
+it('marks more menu tools that stay usable while the editor is read-only', function (): void {
+    $html = (new BlockMenuRenderer)->renderMoreMenu([Tool::make('src')->command('toggleSrc')->availableWhileReadOnly()->overflow(), Tool::make('other')->command('doOther')->overflow()]);
+
+    expect($html)->toContain('data-rep-more-action="toggleSrc" data-rep-read-only-ok')
+        ->and($html)->not->toContain('data-rep-more-action="doOther" data-rep-read-only-ok');
+});

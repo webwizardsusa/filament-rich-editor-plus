@@ -9,6 +9,7 @@ use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Filament\Support\Components\Contracts\HasEmbeddedView;
+use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\Rendering\BlockMenuRenderer;
@@ -412,6 +413,25 @@ class RichEditorPlus extends Field implements HasEmbeddedView
             ),
             [],
         );
+    }
+
+    /**
+     * Passes a request from the editor's JS to the plugin with that id, when it answers editor requests. An unknown
+     * plugin, one without the contract, or a failure answers nothing.
+     *
+     * @param  array<array-key, mixed>  $payload
+     * @return array<array-key, mixed>
+     */
+    #[ExposedLivewireMethod]
+    public function answerPluginRequestForJs(string $plugin, string $request, array $payload = []): array
+    {
+        $instance = $this->getPluginRegistry()->getPlugins()[$plugin] ?? null;
+
+        if (! $instance instanceof AnswersEditorRequests) {
+            return [];
+        }
+
+        return rescue(fn (): array => $instance->answerEditorRequest($request, $payload, $this), [], report: false);
     }
 
     /**

@@ -104,7 +104,12 @@ export default function richEditorPlusComponent({
                 return
             }
 
-            const resolved = resolveExtensions(extensions, tiptap)
+            const context = {
+                callPlugin: (plugin, request, payload = {}) =>
+                    this.$wire.callSchemaComponentMethod(key, 'answerPluginRequestForJs', { plugin, request, payload }),
+            }
+
+            const resolved = resolveExtensions(extensions, tiptap, context)
 
             if (resolved.missing.length) {
                 // Starting without a plugin's schema would make ProseMirror drop its content, which a save

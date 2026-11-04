@@ -12,3 +12,30 @@ it('dedupes extensions that two plugins share', () => {
 
     expect(extensions.map(({ name }) => name)).toEqual(['shared'])
 })
+
+it('passes the editor context to factories', () => {
+    const seen = []
+    registerExtension('test/context', (options, tiptap, context) => {
+        seen.push(context)
+
+        return []
+    })
+
+    const context = { callPlugin: () => Promise.resolve({}) }
+    resolveExtensions([{ id: 'test/context', options: {} }], {}, context)
+
+    expect(seen).toEqual([context])
+})
+
+it('gives factories an empty context by default', () => {
+    let received
+    registerExtension('test/no-context', (options, tiptap, context) => {
+        received = context
+
+        return []
+    })
+
+    resolveExtensions([{ id: 'test/no-context', options: {} }], {})
+
+    expect(received).toEqual({})
+})

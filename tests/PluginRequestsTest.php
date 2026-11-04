@@ -1,10 +1,12 @@
 <?php
 
+use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Livewire\Attributes\Renderless;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -62,3 +64,12 @@ it('answers nothing for unknown plugins, plugins without the contract, and failu
     'no contract' => ['test/silent', 'ping'],
     'exception' => ['test/echo', 'explode'],
 ]);
+
+it('exposes the plugin request method to the editor without re-rendering the component', function (): void {
+    $attributes = array_map(
+        static fn (ReflectionAttribute $attribute): string => $attribute->getName(),
+        (new ReflectionMethod(RichEditorPlus::class, 'answerPluginRequestForJs'))->getAttributes(),
+    );
+
+    expect($attributes)->toContain(ExposedLivewireMethod::class)->toContain(Renderless::class);
+});

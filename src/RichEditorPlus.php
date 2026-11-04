@@ -423,6 +423,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
      * @return array<array-key, mixed>
      */
     #[ExposedLivewireMethod]
+    #[Renderless]
     public function answerPluginRequestForJs(string $plugin, string $request, array $payload = []): array
     {
         $instance = $this->getPluginRegistry()->getPlugins()[$plugin] ?? null;

@@ -15,6 +15,7 @@ use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
 use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
+use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
 use Hollyit\RichEditorPlus\Support\JsExtension;
@@ -225,4 +226,29 @@ it('round-trips through a Livewire form', function (): void {
 
     expect($component->get('data.content'))->toBeString()->toContain('"paragraph"')
         ->and($component->instance()->form->getState()['content'])->toBe("a\nb");
+});
+
+it('reads strings with a format when rendering', function (): void {
+    expect(RichContentPlusRenderer::make("one\ntwo")->format(new ContentFormatTestLines)->toHtml())->toBe('<p>one</p><p>two</p>')
+        ->and(RichContentPlusRenderer::make("one\ntwo")->format(new ContentFormatTestLines)->toArray()['content'])->toHaveCount(2);
+});
+
+it('renders many strings with a format', function (): void {
+    expect(RichContentPlusRenderer::many(['a', "b\nc"])->format(new ContentFormatTestLines)->toHtml())
+        ->toBe(['<p>a</p>', '<p>b</p><p>c</p>']);
+});
+
+it('writes any content in a format', function (): void {
+    expect(RichContentPlusRenderer::make('<p>one</p><p>two</p>')->toFormat(new ContentFormatTestLines))->toBe("one\ntwo");
+});
+
+it('takes macros', function (): void {
+    RichContentPlusRenderer::macro('shout', function (): string {
+        /** @var RichContentPlusRenderer $this */
+        return strtoupper($this->toText());
+    });
+
+    expect(RichContentPlusRenderer::make('<p>hi</p>')->shout())->toBe('HI');
+
+    RichContentPlusRenderer::flushMacros();
 });

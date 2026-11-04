@@ -104,3 +104,14 @@ describe('the plugin context', () => {
         expect(mountAction).toHaveBeenCalledWith('test-context-action', { from: 'editor' })
     })
 })
+
+it('sends its own message when given one', async () => {
+    const { context, events } = setUp()
+
+    await context.processing(Promise.resolve(), 'Converting Markdown…')
+
+    expect(events).toEqual([
+        ['form-processing-started', { message: 'Converting Markdown…' }],
+        ['form-processing-finished', null],
+    ])
+})

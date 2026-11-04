@@ -8,7 +8,7 @@ const randomKey = () =>
  * What extension factories get as their third argument. `callPlugin` asks a plugin on the field (see
  * `AnswersEditorRequests`); `upload` sends a file to the field's Livewire temporary uploads and resolves with the key
  * a plugin's `store` request takes (see `RichEditorPlus::pullTemporaryUpload()`); `processing` keeps the form from
- * saving until a promise settles; `runAction` opens a field action with the arguments registered for it, as a toolbar
+ * saving until a promise settles, showing an optional message (default: the uploading message); `runAction` opens a field action with the arguments registered for it, as a toolbar
  * tool does.
  */
 export function createPluginContext({ wire, key, statePath, root, uploadingMessage, getEditor, mountAction }) {
@@ -17,8 +17,8 @@ export function createPluginContext({ wire, key, statePath, root, uploadingMessa
         root?.closest('form')?.dispatchEvent(new CustomEvent(name, { composed: true, cancelable: true, detail }))
 
     // Filament's form buttons count started and finished events, so these may nest.
-    const processing = (promise) => {
-        dispatchFormEvent('form-processing-started', { message: uploadingMessage })
+    const processing = (promise, message = uploadingMessage) => {
+        dispatchFormEvent('form-processing-started', { message })
 
         return Promise.resolve(promise).finally(() => dispatchFormEvent('form-processing-finished'))
     }

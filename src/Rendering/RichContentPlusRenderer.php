@@ -3,11 +3,13 @@
 namespace Hollyit\RichEditorPlus\Rendering;
 
 use Hollyit\RichEditorPlus\Content\ContentSchema;
+use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
 use Hollyit\RichEditorPlus\Content\HtmlParser;
 use Hollyit\RichEditorPlus\Content\HtmlSerializer;
 use Hollyit\RichEditorPlus\Content\TextSerializer;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Illuminate\Support\Traits\Macroable;
 
 /**
  * Converts stored editor content (TipTap JSON as an array or string, or HTML) on the server, using the nodes and marks
@@ -15,7 +17,11 @@ use Hollyit\RichEditorPlus\Support\PluginRegistry;
  */
 class RichContentPlusRenderer
 {
+    use Macroable;
+
     protected ?PluginRegistry $registry = null;
+
+    protected ?ContentFormat $format = null;
 
     protected bool $parsesHtml = false;
 
@@ -100,6 +106,16 @@ class RichContentPlusRenderer
     }
 
     /**
+     * Reads string content in this format (such as Markdown) instead of as HTML or JSON. Arrays are still documents.
+     */
+    public function format(?ContentFormat $format): static
+    {
+        $this->format = $format;
+
+        return $this;
+    }
+
+    /**
      * @param  array<EditorPlugin | class-string<EditorPlugin>>  $plugins
      */
     public function plugins(array $plugins): static
@@ -143,6 +159,14 @@ class RichContentPlusRenderer
         return $this->getDocument();
     }
 
+    /**
+     * The content written in another format, from the document as plugins prepare it for rendering.
+     */
+    public function toFormat(ContentFormat $format): string
+    {
+        return $format->fromDocument($this->getPreparedDocument(), $this->getRegistry());
+    }
+
     public function toText(): string
     {
         return (new TextSerializer($this->getSchema()))->serialize($this->getPreparedDocument());
@@ -153,6 +177,10 @@ class RichContentPlusRenderer
      */
     protected function getDocument(): array
     {
+        if ($this->format !== null && is_string($this->content) && ! blank($this->content)) {
+            return $this->format->toDocument($this->content, $this->getRegistry());
+        }
+
         return static::toDocument($this->content, $this->getSchema());
     }
 
@@ -168,7 +196,7 @@ class RichContentPlusRenderer
 
     protected function patchesHtml(): bool
     {
-        return ! $this->parsesHtml && static::isHtml($this->content) && HtmlPatcher::supports($this->getRegistry());
+        return $this->format === null && ! $this->parsesHtml && static::isHtml($this->content) && HtmlPatcher::supports($this->getRegistry());
     }
 
     protected function getSchema(): ContentSchema

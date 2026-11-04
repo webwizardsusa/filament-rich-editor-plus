@@ -3,6 +3,7 @@
 namespace Hollyit\RichEditorPlus\Rendering;
 
 use Hollyit\RichEditorPlus\Content\ContentSchema;
+use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
 use Hollyit\RichEditorPlus\Content\HtmlSerializer;
 use Hollyit\RichEditorPlus\Content\TextSerializer;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
@@ -20,6 +21,8 @@ class RichContentPlusBatchRenderer
     protected ?ContentSchema $schema = null;
 
     protected bool $parsesHtml = false;
+
+    protected ?ContentFormat $format = null;
 
     /**
      * @var array<array-key, string | array<string, mixed> | null>
@@ -54,6 +57,16 @@ class RichContentPlusBatchRenderer
     }
 
     /**
+     * Reads string content in this format (such as Markdown) instead of as HTML or JSON. Arrays are still documents.
+     */
+    public function format(?ContentFormat $format): static
+    {
+        $this->format = $format;
+
+        return $this;
+    }
+
+    /**
      * Parses stored HTML into documents before rendering, instead of patching it. Use this for HTML that was not
      * written by the field or by `toStorableHtml()`.
      */
@@ -72,7 +85,7 @@ class RichContentPlusBatchRenderer
      */
     public function toHtml(): array
     {
-        $patchable = $this->parsesHtml || ! HtmlPatcher::supports($this->getRegistry())
+        $patchable = $this->format !== null || $this->parsesHtml || ! HtmlPatcher::supports($this->getRegistry())
             ? []
             : array_filter($this->contents, RichContentPlusRenderer::isHtml(...));
 
@@ -110,7 +123,9 @@ class RichContentPlusBatchRenderer
         $schema = $this->getSchema();
 
         $documents = array_map(
-            static fn (string|array|null $content): array => RichContentPlusRenderer::toDocument($content, $schema),
+            fn (string|array|null $content): array => $this->format !== null && is_string($content) && ! blank($content)
+                ? $this->format->toDocument($content, $this->getRegistry())
+                : RichContentPlusRenderer::toDocument($content, $schema),
             $contents,
         );
 

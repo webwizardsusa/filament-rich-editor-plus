@@ -32,20 +32,24 @@ const optionsFor = {
     },
 }
 
-export function editorOptions(content, pluginIds = defaultPluginIds) {
+/**
+ * `context` is what factories get as their third argument, such as `{ callPlugin }`.
+ */
+export function editorOptions(content, pluginIds = defaultPluginIds, context = {}) {
     const element = document.createElement('div')
     document.body.append(element)
 
     const { extensions } = resolveExtensions(
         pluginIds.map((id) => (typeof id === 'string' ? { id, options: optionsFor[id] ?? {} } : id)),
         {},
+        context,
     )
 
     return { element, extensions, content }
 }
 
-export function makeEditor(content, pluginIds = defaultPluginIds) {
-    return new Editor(editorOptions(content, pluginIds))
+export function makeEditor(content, pluginIds = defaultPluginIds, context = {}) {
+    return new Editor(editorOptions(content, pluginIds, context))
 }
 
 export const p = (text) => ({ type: 'paragraph', content: [{ type: 'text', text }] })

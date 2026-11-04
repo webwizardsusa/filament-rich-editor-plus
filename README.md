@@ -19,6 +19,34 @@ RichEditorPlus::make('body')->storeAs(StateFormat::Json);
 Rows already stored as JSON keep working in an HTML field: they load, render, and are saved as HTML the next time
 they are edited.
 
+### Content formats
+
+HTML and JSON are the built-in storage formats. A `ContentFormat` stores the field's content as something else, such as
+Markdown (see [Rich Editor Plus: Markdown](../rich-editor-plus-markdown/README.md)). The editor still edits a document;
+the format converts it on the way in and out of the model.
+
+```php
+RichEditorPlus::make('body')->storeAs(MarkdownFormat::make());
+
+$field->getContentFormat(); // the ContentFormat, or null
+```
+
+- `storeAs()` takes a `StateFormat`, a `ContentFormat` or a closure returning either. With a `ContentFormat`,
+  `getStateFormat()` still answers `StateFormat::Json`, because the browser keeps editing a document.
+- A plugin can choose the format by implementing `ProvidesContentFormat`; the field uses the first format from its
+  explicit plugins (never the defaults). A plugin format that differs from the one given to `storeAs()` throws at boot.
+- A format's `assertSupports()` throws an `UnsupportedContentFormatException` naming every plugin it can't keep. Default
+  plugins the format can't keep are dropped quietly; plugins you add throw. `getHiddenTools()` names tools the field
+  removes from every toolbar and the slash menu.
+- A plugin that implements `ChecksFieldPlugins` is asked to check the field's final plugin list when the field builds
+  its registry, so it can throw when the combination doesn't suit it. `PluginRegistry::withoutTools()` builds a
+  registry with some tools removed.
+- `RichContentPlusRenderer` reads string content with a format through `->format($format)`, and writes with
+  `->toFormat($format)`. The renderer is `Macroable`, so a package can add methods such as `toMarkdown()`.
+- A tool marked `Tool::availableWhileReadOnly()` stays enabled while the editor is read-only; the toolbar, the More menu
+  and the block controls disable every other tool. A tool's active state can also come from an extension's
+  `editor.storage[name].isActive` boolean.
+
 ### Rendering
 
 ```php
@@ -481,12 +509,13 @@ public function answerEditorRequest(string $request, array $payload, RichEditorP
 - A plugin that throws answers `[]` too, silently: the error is not reported, so log it yourself if you need it.
 
 The context also has `upload(file, { onProgress })`, which sends a file to the field's Livewire temporary uploads and
-resolves with a key, `processing(promise)`, which keeps the form from saving until the promise settles and resolves or
-rejects as it does, and `runAction(action)`, which opens a field action with its registered arguments. `upload()` holds
+resolves with a key, `processing(promise, message)`, which keeps the form from saving until the promise settles and resolves or
+rejects as it does (the optional message is what the form says while it waits, instead of the upload wording), and `runAction(action)`, which opens a field action with its registered arguments. `upload()` holds
 the form only while the file uploads, so wrap the whole job (upload, `store` request and inserting the result) in
 `processing()` to keep the form from saving before the file is in the document; calls may nest. A plugin that takes
-uploads implements `AcceptsEditorUploads` (without it the field refuses uploads) and, in its `answerEditorRequest()`,
-takes the file with `$field->pullTemporaryUpload($key)`, which returns it once and then forgets it. Check the file's
+uploads implements `AcceptsEditorUploads` (without it the field refuses uploads) and answers
+`acceptsEditorUploads(): bool`, which lets it turn uploads off through its own settings. In its
+`answerEditorRequest()`, it takes the file with `$field->pullTemporaryUpload($key)`, which returns it once and then forgets it. Check the file's
 type from its contents and store it yourself; the browser chose nothing but the key.
 
 ### Plugins that render markup

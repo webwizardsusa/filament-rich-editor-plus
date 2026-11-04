@@ -155,3 +155,20 @@ it('patches mentions and markup nodes together, leaving a mention inside a marku
         .'<figure data-type="photo" data-key="a.jpg"><img src="https://cdn.test/a.jpg" alt=""><figcaption>@Old</figcaption></figure>')
         ->and($plugin->calls)->toBe(1);
 });
+
+it('leaves an unclosed markup element before a large body as stored instead of hitting the backtrack limit', function (): void {
+    $plugin = new PhotoTestPlugin;
+    $stored = '<figure data-type="photo" data-key="a.jpg"><img alt="">'.str_repeat('<p>Lorem ipsum dolor sit amet.</p>', 60_000);
+
+    expect(photoRenderer($plugin, [$stored])[0])->toBe($stored)
+        ->and($plugin->calls)->toBe(0);
+});
+
+it('patches a markup element whose body is very large without hitting the backtrack limit', function (): void {
+    $plugin = new PhotoTestPlugin;
+    $caption = str_repeat('Long caption text. ', 60_000);
+
+    $patched = photoRenderer($plugin, ['<figure data-type="photo" data-key="a.jpg"><img alt=""><figcaption>'.$caption.'</figcaption></figure>'])[0];
+
+    expect($patched)->toBe('<figure data-type="photo" data-key="a.jpg"><img src="https://cdn.test/a.jpg" alt=""><figcaption>'.$caption.'</figcaption></figure>');
+});

@@ -143,11 +143,12 @@ class HtmlPatcher
     {
         $pattern = $this->renderedNodes === [] ? null : $this->pattern();
         $markupPattern = $this->markupNodes === [] ? null : $this->markupPattern();
+        $markupMarkers = array_map(static fn (string $name): string => 'data-type="'.$name.'"', array_keys($this->markupNodes));
         $found = [];
 
         foreach ($htmlDocuments as $key => $html) {
             $elements = $pattern === null ? [] : $this->match($pattern, $html);
-            $markupElements = $markupPattern === null ? [] : $this->match($markupPattern, $html);
+            $markupElements = $markupPattern !== null && $this->containsAny($html, $markupMarkers) ? $this->match($markupPattern, $html) : [];
 
             if ($markupElements !== []) {
                 $elements = array_filter($elements, static function (array $element) use ($markupElements): bool {
@@ -170,6 +171,22 @@ class HtmlPatcher
         }
 
         return $found;
+    }
+
+    /**
+     * Whether the HTML contains any of the strings, a cheap check before running a pattern over the whole document.
+     *
+     * @param  array<int, string>  $needles
+     */
+    protected function containsAny(string $html, array $needles): bool
+    {
+        foreach ($needles as $needle) {
+            if (str_contains($html, $needle)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -200,26 +217,41 @@ class HtmlPatcher
 
     /**
      * An element marked as a rendered markup node, up to the first closing tag of its own name. Attributes are stepped
-     * over as in {@see pattern()}; the body is matched lazily, so the element must not contain one of its own tag.
+     * over as in {@see pattern()}. The body is stepped over possessively, a run of text or one tag at a time, so a
+     * large body or an unclosed element costs steps in proportion to its length and never backtracks. The element must
+     * not contain one of its own tag.
      */
     protected function markupPattern(): string
     {
         $types = implode('|', array_map(static fn (string $name): string => preg_quote($name, '/'), array_keys($this->markupNodes)));
 
-        return '/<(?<tag>[a-zA-Z][a-zA-Z0-9-]*+)(?:\s[^\s=>"]++(?:="[^"]*+")?)*?\sdata-type="(?<type>'.$types.')"[^>]*+>.*?<\/(?P=tag)>/su';
+        return '/<(?<tag>[a-zA-Z][a-zA-Z0-9-]*+)(?:\s[^\s=>"]++(?:="[^"]*+")?)*?\sdata-type="(?<type>'.$types.')"[^>]*+>(?:[^<]++|<(?!\/(?P=tag)>))*+<\/(?P=tag)>/u';
     }
 
     /**
      * The node of every rendered element, per document and in element order, or null for a document with a markup
-     * element that does not parse back to one node of its type. Markup elements are parsed first, so text elements are
-     * only parsed for documents that are patched.
+     * element that does not parse back to one node of its type. Without markup elements, every text element is parsed
+     * in one call as before; otherwise markup elements are parsed first, so text elements are only parsed for documents
+     * that are patched.
      *
      * @param  array<array-key, array<int, array<int | string, array{0: string, 1: int}>>>  $found
      * @return array<array-key, array<int, array<string, mixed>> | null>
      */
     protected function parseElements(array $found): array
     {
-        if ($this->markupNodes === []) {
+        $markupElements = [];
+
+        if ($this->markupNodes !== []) {
+            foreach ($found as $elements) {
+                foreach ($elements as $element) {
+                    if (isset($this->markupNodes[$element['type'][0]])) {
+                        $markupElements[] = $element;
+                    }
+                }
+            }
+        }
+
+        if ($markupElements === []) {
             $textNodes = $this->parseTextElements(array_merge(...array_values($found)));
             $offset = 0;
 
@@ -229,16 +261,6 @@ class HtmlPatcher
             }
 
             return $found;
-        }
-
-        $markupElements = [];
-
-        foreach ($found as $elements) {
-            foreach ($elements as $element) {
-                if (isset($this->markupNodes[$element['type'][0]])) {
-                    $markupElements[] = $element;
-                }
-            }
         }
 
         $markupNodes = $this->parseMarkupElements($markupElements);

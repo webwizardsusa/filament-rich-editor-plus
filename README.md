@@ -1,6 +1,7 @@
 # Rich Editor Plus
 
 [![Latest version on Packagist](https://img.shields.io/packagist/v/webwizardsusa/filament-rich-editor-plus.svg)](https://packagist.org/packages/webwizardsusa/filament-rich-editor-plus)
+[![Tests](https://github.com/webwizardsusa/filament-rich-editor-plus/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/webwizardsusa/filament-rich-editor-plus/actions/workflows/tests.yml)
 
 A rich editor field for Filament, built on TipTap. Each block gets its own toolbar, Gutenberg style. Type `/` to insert
 blocks from the slash menu. Everything the editor can do comes from a plugin, so you can turn features off one by one

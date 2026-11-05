@@ -4,6 +4,14 @@ A rich editor field for Filament, built on TipTap. Each block gets its own toolb
 blocks from the slash menu. Everything the editor can do comes from a plugin, so you can turn features off one by one
 or write your own. Optional plugins add tables, images, file attachments, mentions and Markdown storage.
 
+![The floating block toolbar above a selection in a paragraph](art/hero.png)
+
+Type `/` on an empty line to pick a block from the slash menu:
+
+![The slash menu open on an empty line, listing paragraph, headings and lists](art/slash-menu.png)
+
+It works on phones too (see [On mobile](#on-mobile)) and follows Filament's dark mode (see [Dark mode](#dark-mode)).
+
 ## Requirements
 
 - PHP 8.3 or later
@@ -181,6 +189,10 @@ RichEditorPlus::make('body')->fixedToolbar()->floatingToolbar(false);  // fixed 
 RichEditorPlus::make('body')->floatingToolbar(false);                  // neither: slash menu and shortcuts only
 ```
 
+| Floating (the default) | Fixed | Both |
+|---|---|---|
+| ![A floating toolbar above the selected text](art/toolbar-floating.png) | ![A fixed toolbar above the editor](art/toolbar-fixed.png) | ![A full fixed toolbar plus a small floating bubble with bold, italic, underline, strikethrough and link](art/toolbar-both.png) |
+
 The fixed toolbar stays in place. Tools that can't be used at the cursor are disabled rather than hidden, and its block
 tools section shows the active block's own tools, such as the table tools while the cursor is in a table. It sticks to
 the top of the screen while the editor scrolls past, below a Filament panel's topbar. Turn that off with
@@ -239,6 +251,42 @@ Tool::make('highlight')->shortcut('Mod-Shift-h');
 ```
 
 Alt+F10 moves focus into the floating toolbar, or into the fixed toolbar when there is no floating one.
+
+### Find and replace
+
+Find and replace is on by default, from the toolbar's More menu or the slash menu ("Find and replace"). It highlights
+every match, and has options for matching case and whole words.
+
+![The find and replace panel over the editor, with every match of "item" highlighted](art/find-replace.png)
+
+## On mobile
+
+The editor works with touch screens without any setup:
+
+- The floating toolbar sits below the selection instead of above it, clear of the browser's own selection menu.
+- It stays inside the visible part of the page, above the on-screen keyboard.
+- Tools that don't fit the screen move into the More menu.
+- The slash and mention menus fit a phone-width screen.
+
+<p>
+  <img src="art/mobile-toolbar.png" width="300" alt="On a phone, the block toolbar below the selected text, with the tools that don't fit moved into the More menu">
+  &nbsp;
+  <img src="art/mobile-slash.png" width="300" alt="On a phone, the slash menu open in the editor">
+</p>
+
+## Dark mode
+
+The editor follows the panel's theme. When Filament switches to dark mode, the editor, its toolbars and its menus
+switch with it, with no setup. The default highlight palette keeps text readable in dark mode (see the colour plugins
+under [Optional plugins](#optional-plugins)).
+
+![The editor in dark mode with the floating toolbar above a selection](art/dark-editor.png)
+
+<p>
+  <img src="art/dark-menus.png" width="560" alt="The text colour menu open in dark mode">
+  &nbsp;
+  <img src="art/dark-mobile-toolbar.png" width="220" alt="The editor in dark mode on a phone">
+</p>
 
 ## Links
 
@@ -307,6 +355,8 @@ RichEditorPlus::make('body')->addPlugins([
 ]);
 ```
 
+![The text colour menu open on a selected word, with Red checked](art/colors.png)
+
 - Colours are stored as classes: `has-brand-color` and `has-yellow-background-color` by default. Change the names with
   `classUsing(fn (string $name) => …)`.
 - Each plugin has a default eight-colour palette, and `colors()` replaces it.
@@ -365,6 +415,8 @@ RichEditorPlus::make('body')->addPlugins([
 ]);
 ```
 
+![The font menu open on a selected phrase, with Serif checked](art/fonts.png)
+
 - Classes are `has-{name}-font-family`, `has-{name}-font-size` and `has-{name}-line-height` by default. Change them with
   `classUsing()`, as for the colours.
 - The default palettes are fonts `sans`, `serif` and `mono`; sizes `small` (`0.875em`), `large` (`1.25em`), `x-large`
@@ -402,10 +454,17 @@ RichEditorPlus::make('body')->addPlugins([
 | `LineHeightPlugin` | A line height menu on the toolbar, from three values by default (tight, relaxed and loose). It stores the line height as a class on a span. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
+A task list from `TaskListPlugin`:
+
+![A task list with one checked item and a nested item](art/task-list.png)
+
 ## Mentions
 
 `MentionPlugin` lets editors mention records by typing a trigger, such as `@` for people or `#` for tags. Each trigger
 has a `MentionProvider` that finds and labels its records. The plugin is opt-in, since it does nothing without one:
+
+![Mention suggestions open after typing @a, listing users with their email addresses](art/mentions.png)
+
 
 ```php
 use App\Models\User;
@@ -478,6 +537,8 @@ RichContentPlusRenderer::make($post->body)->plugins([MentionPlugin::make()->prov
 size and whether there is a header row. While the cursor is in a table, the toolbar shows its tools: add or delete
 columns and rows, merge or split cells, toggle the header row and delete the table.
 
+![A table with the cursor in a header cell and the table tools open in the More menu](art/table.png)
+
 ```php
 use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 
@@ -496,6 +557,8 @@ Markdown has no column widths (see [Markdown](#markdown)).
 `ImagePlugin` adds images: upload a file to a Laravel disk or link to a web image,
 then give it alt text, a caption, an alignment and a width. Images are blocks, added from the slash menu ("Image") or
 the block menu, and edited from the block toolbar.
+
+![An image with a caption, its block toolbar, and the width menu open](art/image.png)
 
 ```php
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
@@ -627,6 +690,8 @@ and in the content.
   `livewire.temporary_file_upload.rules` (for example `['required', 'file', 'max:51200']`).
 
 ### Attachments
+
+![An attached PDF shown as a file card, with its block toolbar](art/attachment.png)
 
 ```php
 use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
@@ -786,6 +851,8 @@ Turn it off with `MarkdownPlugin::make()->pasteMarkdown(false)`.
 A "Markdown source" item in the toolbar's More menu swaps the editor for a Markdown textarea. It is on
 by default when the field stores Markdown. On other fields call `->sourceToggle()`; the field's plugins must all have
 a Markdown form, or it throws at boot with the same message as above.
+
+![The Markdown source view: the field's content as Markdown text, with a Done button](art/markdown-source.png)
 
 - Edits convert back to the document after a short pause, so the form's state stays current, and the form waits for a
   conversion in flight before saving.

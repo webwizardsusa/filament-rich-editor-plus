@@ -20,7 +20,7 @@ It works on phones too (see [On mobile](#on-mobile)) and follows Filament's dark
 ## Installation
 
 ```bash
-composer require webwizardsusa/rich-editor-plus
+composer require webwizardsusa/filament-rich-editor-plus
 php artisan filament:assets
 ```
 
@@ -1213,7 +1213,7 @@ npm i -D vite @tiptap/core@^3 @tiptap/pm@^3
 ```js
 // vite.config.js
 import { defineConfig } from 'vite'
-import { sharedTiptap } from './vendor/webwizardsusa/rich-editor-plus/vite/shared-tiptap.js'
+import { sharedTiptap } from './vendor/webwizardsusa/filament-rich-editor-plus/vite/shared-tiptap.js'
 
 export default defineConfig({
     // List packages you import that import TipTap themselves (such as `@tiptap/extension-*`), so dev mode doesn't
@@ -1242,7 +1242,7 @@ trait looks for. Set `root` to the app root, give the entry relative to it, and 
 // vite.dev.config.js
 import { defineConfig } from 'vite'
 import laravel from 'laravel-vite-plugin'
-import { sharedTiptap } from './vendor/webwizardsusa/rich-editor-plus/vite/shared-tiptap.js'
+import { sharedTiptap } from './vendor/webwizardsusa/filament-rich-editor-plus/vite/shared-tiptap.js'
 
 const appRoot = '../..' // the host app, relative to your package
 
@@ -1347,7 +1347,7 @@ To try a change in the browser, put the package in a Laravel app with a Filament
     { "type": "path", "url": "./packages/*" }
 ],
 "require": {
-    "webwizardsusa/rich-editor-plus": "@dev"
+    "webwizardsusa/filament-rich-editor-plus": "@dev"
 }
 ```
 

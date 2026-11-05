@@ -47,6 +47,6 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
     protected static function assetsMissingMessage(): string
     {
         return 'The Rich Editor Plus assets are not available: the package\'s dist/ directory is missing and no Vite dev server '
-            .'is running. Reinstall webwizardsusa/rich-editor-plus; when working on the package itself, run its `npm run dev` or `npm run build`.';
+            .'is running. Reinstall webwizardsusa/filament-rich-editor-plus; when working on the package itself, run its `npm run dev` or `npm run build`.';
     }
 }

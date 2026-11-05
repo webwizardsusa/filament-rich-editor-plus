@@ -83,7 +83,8 @@ registerExtension('core/superscript', () =>
         },
     }),
 )
-registerExtension('core/blockquote', () => Blockquote)
+// The `container` group is what the editor's block tools look for (see `isContainerNode()`).
+registerExtension('core/blockquote', () => Blockquote.extend({ group: 'block container' }))
 registerExtension('core/heading', ({ levels }) => Heading.configure({ levels }))
 registerExtension('core/bullet-list', () => [BulletList, ListItem, ListKeymap])
 registerExtension('core/ordered-list', () => [OrderedList, ListItem, ListKeymap])

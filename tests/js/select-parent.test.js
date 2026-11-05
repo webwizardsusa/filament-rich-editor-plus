@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, it } from 'vitest'
 import { switchBlock } from '../../resources/js/blocks/block-types'
 import { createBlockControls } from '../../resources/js/toolbar/block-controls'
 import { blockTypes, named } from './support/block-types'
+import { note, pluginIdsWithNote } from './support/container-node'
 import { doc, makeEditor, p } from './support/make-editor'
 import { makeToolbarRoot } from './support/toolbar-markup'
 
@@ -29,8 +30,8 @@ const placeCursor = (text) => {
     })
 }
 
-const open = (content, text) => {
-    editor = makeEditor(content)
+const open = (content, text, pluginIds = undefined) => {
+    editor = makeEditor(content, pluginIds)
     placeCursor(text)
     controls = createBlockControls({ editor, root, blockTypes })
     controls.bind(toolbar)
@@ -91,6 +92,14 @@ it('selects the quote from a paragraph inside it', () => {
     editor.commands.selectParentBlock()
 
     expect(selectedNode()).toBe('blockquote')
+})
+
+it('selects any container from a paragraph inside it', () => {
+    open(doc(note('info', p('a'), p('b'))), 'b', pluginIdsWithNote)
+
+    editor.commands.selectParentBlock()
+
+    expect(selectedNode()).toBe('note')
 })
 
 it('selects what contains the whole selection, not just its start', () => {

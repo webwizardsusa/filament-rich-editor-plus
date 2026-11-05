@@ -1,7 +1,14 @@
 import { Extension } from '@tiptap/core'
 import { NodeSelection } from '@tiptap/pm/state'
 import { Mapping } from '@tiptap/pm/transform'
-import { getActiveBlock, getLevelContainer, isListNode, selectionSpansBlocks, selectsNestedBlock } from './active-block'
+import {
+    getActiveBlock,
+    getLevelContainer,
+    isContainerNode,
+    isListNode,
+    selectionSpansBlocks,
+    selectsNestedBlock,
+} from './active-block'
 import { convertList, itemTypeOf } from './convert-list'
 import { deleteBlockAt, duplicateBlockAt, moveBlock } from './move-block'
 
@@ -15,7 +22,7 @@ const singleBlock = (tr) => (selectionSpansBlocks(tr) || selectsNestedBlock(tr) 
  * Whether "select parent" stops at a node. Paragraphs and list items are skipped: there is nothing useful to do with
  * them once selected, and they would mean extra clicks to reach the list.
  */
-const isParentBlock = (nodeType) => isListNode(nodeType) || nodeType.name === 'blockquote'
+const isParentBlock = (nodeType) => isListNode(nodeType) || isContainerNode(nodeType)
 
 const moveByOne = (direction) => ({ tr, dispatch }) => {
     const block = singleBlock(tr)
@@ -161,7 +168,8 @@ export const BlockCommands = Extension.create({
                     return commands.sinkListItem(container.name)
                 }
 
-                return container?.name === 'blockquote' && commands.wrapIn('blockquote')
+                // A nested container starts with the same attributes, such as a callout's style.
+                return Boolean(container) && commands.wrapIn(container.name, state.selection.$from.node(container.depth).attrs)
             },
 
             decreaseBlockLevel: () => ({ state, commands }) => {
@@ -171,7 +179,7 @@ export const BlockCommands = Extension.create({
                     return commands.liftListItem(container.name)
                 }
 
-                return container?.name === 'blockquote' && commands.lift('blockquote')
+                return Boolean(container) && commands.lift(container.name)
             },
         }
     },

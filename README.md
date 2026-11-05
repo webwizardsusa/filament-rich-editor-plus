@@ -1052,6 +1052,13 @@ export default function ({ registerExtension, extendExtension, registerActionArg
 `registerExtension()` takes the id your `JsExtension` uses and a factory that gets its options. To change one of the
 editor's own extensions, decorate it with `extendExtension()` instead of importing it again.
 
+A node that holds other blocks the way a quote does, such as a callout box with `content: 'block+'`, joins the
+`container` group: `group: 'block container'`. The editor then treats it like a quote: the slash menu opens in
+paragraphs inside it, "select parent" stops at it, and the decrease and increase level commands lift blocks out of it
+and nest it (with the same attributes). Give its block type `multiBlock()` and a wrapping command, such as one that
+runs `wrapIn()`, so several selected paragraphs become one block. The level buttons only show if the plugin adds them,
+so a container that shouldn't nest can leave them out.
+
 ### Asking the server from the editor
 
 A plugin whose JS needs data from the server while editing, such as the URLs of stored files, implements

@@ -8,6 +8,7 @@ import {
 } from '../../resources/js/slash/slash-menu'
 import { setCheckedContent } from '../../resources/js/content-check'
 import { blockTypes, named } from './support/block-types'
+import { note, pluginIdsWithNote } from './support/container-node'
 import { blockSummary, doc, makeEditor, p } from './support/make-editor'
 import { makeToolbarRoot } from './support/toolbar-markup'
 
@@ -24,9 +25,9 @@ const isActive = () => slashMenuKey.getState(editor.state).active
 
 const menu = () => root.querySelector('[data-rep-slash-menu]')
 
-function setUp(content, mountAction = vi.fn()) {
+function setUp(content, mountAction = vi.fn(), pluginIds = undefined) {
     root = makeToolbarRoot()
-    editor = makeEditor(content)
+    editor = makeEditor(content, pluginIds)
 
     registerSlashMenu(
         editor,
@@ -382,6 +383,21 @@ describe('inside a quote', () => {
         typeInEmptyParagraph('/')
 
         expect(isActive()).toBe(true)
+    })
+
+    it('opens in any container, not only a quote', () => {
+        setUp(doc(note('info', empty)), vi.fn(), pluginIdsWithNote)
+        typeInEmptyParagraph('/')
+
+        expect(isActive()).toBe(true)
+    })
+
+    it('makes a heading inside a container', () => {
+        setUp(doc(note('info', p('a'), empty)), vi.fn(), pluginIdsWithNote)
+        const range = typeInEmptyParagraph('/heading2')
+
+        expect(runSlashItem(editor, range, named('heading2'), blockTypes, vi.fn())).toBe(true)
+        expect(editor.getJSON()).toEqual(doc(note('info', p('a'), { type: 'heading', attrs: { level: 2 } })))
     })
 
     it('stays closed after other text in a quote', () => {

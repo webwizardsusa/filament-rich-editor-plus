@@ -17,22 +17,34 @@ export function getActiveBlock({ selection, doc }) {
     return { node: selection.$from.node(1), pos: selection.$from.before(1) }
 }
 
+const isInGroup = (nodeType, group) => (nodeType.spec.group ?? '').split(' ').includes(group)
+
 /**
  * Whether a node type is a list, such as a bullet, numbered or task list. TipTap puts every list in the `list` group.
  */
 export function isListNode(nodeType) {
-    return (nodeType.spec.group ?? '').split(' ').includes('list')
+    return isInGroup(nodeType, 'list')
 }
 
 /**
- * The nearest list item or quote around the cursor, with its depth. Lists and quotes can nest inside each other, and
- * this is the one the cursor is really in. A list item is any node directly inside a list, so task items count too.
+ * Whether a node type holds other blocks the way a quote does. A plugin's node opts in by joining the `container` group
+ * (`group: 'block container'`), as lists join `list`: the slash menu then opens in paragraphs inside it, "select parent"
+ * stops at it, and the level commands nest and lift it.
+ */
+export function isContainerNode(nodeType) {
+    return isInGroup(nodeType, 'container')
+}
+
+/**
+ * The nearest list item or container, such as a quote, around the cursor, with its depth. Lists and containers can
+ * nest inside each other, and this is the one the cursor is really in. A list item is any node directly inside a list,
+ * so task items count too.
  */
 export function getLevelContainer({ $from }) {
     for (let depth = $from.depth; depth > 0; depth--) {
         const { name } = $from.node(depth).type
 
-        if (name === 'blockquote') {
+        if (isContainerNode($from.node(depth).type)) {
             return { name, depth, isListItem: false }
         }
 

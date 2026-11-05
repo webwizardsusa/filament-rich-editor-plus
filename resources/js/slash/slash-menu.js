@@ -1,5 +1,6 @@
 import { PluginKey } from '@tiptap/pm/state'
 import { exitSuggestion, Suggestion } from '@tiptap/suggestion'
+import { isContainerNode } from '../blocks/active-block'
 import { canRunBlockType, runBlockType } from '../blocks/block-types'
 import { createSuggestionList, registerSuggestion } from './suggestion-list'
 
@@ -20,9 +21,9 @@ export function filterBlockTypes(blockTypes, query) {
     return blockTypes.filter(({ label, keywords }) => needle === '' || [label, ...(keywords ?? [])].some(matches))
 }
 
-const isTopLevelOrQuoted = ($position) => {
+const isTopLevelOrInContainer = ($position) => {
     for (let depth = 1; depth < $position.depth; depth++) {
-        if ($position.node(depth).type.name !== 'blockquote') {
+        if (!isContainerNode($position.node(depth).type)) {
             return false
         }
     }
@@ -32,14 +33,14 @@ const isTopLevelOrQuoted = ($position) => {
 
 /**
  * The menu only opens when the slash and its query are all a paragraph holds, with the cursor after them, and the
- * paragraph is at the top level or only inside quotes. The cursor check matters because the match runs on past it: a slash typed before the word "hello" would otherwise
+ * paragraph is at the top level or only inside containers such as quotes. The cursor check matters because the match runs on past it: a slash typed before the word "hello" would otherwise
  * count as the query `/hello`. Anywhere else `/` is a plain character, which keeps URLs and file paths out of its way.
  */
 export function isSlashAllowed({ state, range }) {
     const $from = state.doc.resolve(range.from)
 
     return (
-        isTopLevelOrQuoted($from) &&
+        isTopLevelOrInContainer($from) &&
         $from.parent.type.name === 'paragraph' &&
         range.from === $from.start() &&
         range.to === $from.end() &&

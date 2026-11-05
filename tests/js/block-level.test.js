@@ -1,5 +1,6 @@
 import { afterEach, expect, it } from 'vitest'
 import { syncToolbar } from '../../resources/js/toolbar/tools'
+import { note, pluginIdsWithNote } from './support/container-node'
 import { doc, makeEditor, p } from './support/make-editor'
 
 let editor
@@ -21,8 +22,8 @@ const placeCursor = (text) => {
     })
 }
 
-const open = (content, text) => {
-    editor = makeEditor(content)
+const open = (content, text, pluginIds = undefined) => {
+    editor = makeEditor(content, pluginIds)
     placeCursor(text)
 }
 
@@ -86,6 +87,20 @@ it('acts on the quote when it sits inside a list', () => {
 
     expect(editor.commands.decreaseBlockLevel()).toBe(true)
     expect(editor.getJSON()).toEqual(doc(bullets(item(p('a')))))
+})
+
+it('nests the current block of any container, keeping its attributes', () => {
+    open(doc(note('warning', p('a'), p('b'))), 'b', pluginIdsWithNote)
+
+    expect(editor.commands.increaseBlockLevel()).toBe(true)
+    expect(editor.getJSON()).toEqual(doc(note('warning', p('a'), note('warning', p('b')))))
+})
+
+it('lifts a block out of any container', () => {
+    open(doc(note('warning', p('a'), p('b'))), 'b', pluginIdsWithNote)
+
+    expect(editor.commands.decreaseBlockLevel()).toBe(true)
+    expect(editor.getJSON()).toEqual(doc(note('warning', p('a')), p('b')))
 })
 
 it('does nothing outside a list or quote', () => {

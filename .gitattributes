@@ -10,6 +10,8 @@
 /package.json       export-ignore
 /package-lock.json  export-ignore
 /phpunit.xml        export-ignore
+/release-please-config.json   export-ignore
+/.release-please-manifest.json export-ignore
 /vite.config.js     export-ignore
 /vite.modules.config.js export-ignore
 /vitest.config.js   export-ignore

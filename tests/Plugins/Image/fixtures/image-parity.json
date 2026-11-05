@@ -1,0 +1,146 @@
+[
+    {
+        "name": "uploaded image",
+        "document": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "image",
+                    "attrs": {
+                        "disk": "media",
+                        "path": "editor-images/a.jpg",
+                        "url": null,
+                        "alt": "A cat",
+                        "caption": "",
+                        "align": "center",
+                        "width": "100"
+                    }
+                }
+            ]
+        },
+        "html": "<figure class=\"rep-image\" data-type=\"image\" data-disk=\"media\" data-path=\"editor-images/a.jpg\" data-align=\"center\" data-width=\"100\"><img alt=\"A cat\"></figure>"
+    },
+    {
+        "name": "external image",
+        "document": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "image",
+                    "attrs": {
+                        "disk": null,
+                        "path": null,
+                        "url": "https://example.test/b.png",
+                        "alt": "B",
+                        "caption": "",
+                        "align": "center",
+                        "width": "100"
+                    }
+                }
+            ]
+        },
+        "html": "<figure class=\"rep-image\" data-type=\"image\" data-url=\"https://example.test/b.png\" data-align=\"center\" data-width=\"100\"><img src=\"https://example.test/b.png\" alt=\"B\"></figure>"
+    },
+    {
+        "name": "caption",
+        "document": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "image",
+                    "attrs": {
+                        "disk": "media",
+                        "path": "editor-images/a.jpg",
+                        "url": null,
+                        "alt": "A cat",
+                        "caption": "Our cat",
+                        "align": "center",
+                        "width": "100"
+                    }
+                }
+            ]
+        },
+        "html": "<figure class=\"rep-image\" data-type=\"image\" data-disk=\"media\" data-path=\"editor-images/a.jpg\" data-align=\"center\" data-width=\"100\"><img alt=\"A cat\"><figcaption>Our cat</figcaption></figure>"
+    },
+    {
+        "name": "alignment and width",
+        "document": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "image",
+                    "attrs": {
+                        "disk": "media",
+                        "path": "editor-images/a.jpg",
+                        "url": null,
+                        "alt": "A cat",
+                        "caption": "",
+                        "align": "right",
+                        "width": "50"
+                    }
+                }
+            ]
+        },
+        "html": "<figure class=\"rep-image\" data-type=\"image\" data-disk=\"media\" data-path=\"editor-images/a.jpg\" data-align=\"right\" data-width=\"50\"><img alt=\"A cat\"></figure>"
+    },
+    {
+        "name": "decorative image",
+        "document": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "image",
+                    "attrs": {
+                        "disk": null,
+                        "path": null,
+                        "url": "https://example.test/b.png",
+                        "alt": "",
+                        "caption": "",
+                        "align": "center",
+                        "width": "100"
+                    }
+                }
+            ]
+        },
+        "html": "<figure class=\"rep-image\" data-type=\"image\" data-url=\"https://example.test/b.png\" data-align=\"center\" data-width=\"100\"><img src=\"https://example.test/b.png\" alt=\"\"></figure>"
+    },
+    {
+        "name": "image between paragraphs",
+        "document": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "a"
+                        }
+                    ]
+                },
+                {
+                    "type": "image",
+                    "attrs": {
+                        "disk": "media",
+                        "path": "editor-images/a.jpg",
+                        "url": null,
+                        "alt": "A cat",
+                        "caption": "",
+                        "align": "center",
+                        "width": "100"
+                    }
+                },
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "b"
+                        }
+                    ]
+                }
+            ]
+        },
+        "html": "<p>a</p><figure class=\"rep-image\" data-type=\"image\" data-disk=\"media\" data-path=\"editor-images/a.jpg\" data-align=\"center\" data-width=\"100\"><img alt=\"A cat\"></figure><p>b</p>"
+    }
+]

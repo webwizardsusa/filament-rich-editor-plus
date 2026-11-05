@@ -1,0 +1,47 @@
+[
+    {
+        "name": "pdf attachment",
+        "document": {"type": "doc", "content": [
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/a.pdf", "name": "Q3 report.pdf", "size": 482133, "mime": "application/pdf"}}
+        ]},
+        "html": "<div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/a.pdf\" data-size=\"482133\" data-mime=\"application/pdf\"><a download=\"Q3 report.pdf\">Q3 report.pdf</a><span class=\"rep-attachment-size\">471 KB</span></div>"
+    },
+    {
+        "name": "name needing escaping",
+        "document": {"type": "doc", "content": [
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/b.pdf", "name": "Tom & Jerry.pdf", "size": 1024, "mime": "application/pdf"}}
+        ]},
+        "html": "<div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/b.pdf\" data-size=\"1024\" data-mime=\"application/pdf\"><a download=\"Tom &amp; Jerry.pdf\">Tom &amp; Jerry.pdf</a><span class=\"rep-attachment-size\">1 KB</span></div>"
+    },
+    {
+        "name": "sizes on unit boundaries",
+        "document": {"type": "doc", "content": [
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/c.txt", "name": "c.txt", "size": 1023, "mime": "text/plain"}},
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/d.txt", "name": "d.txt", "size": 10137, "mime": "text/plain"}},
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/e.txt", "name": "e.txt", "size": 1048576, "mime": "text/plain"}}
+        ]},
+        "html": "<div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/c.txt\" data-size=\"1023\" data-mime=\"text/plain\"><a download=\"c.txt\">c.txt</a><span class=\"rep-attachment-size\">1023 B</span></div><div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/d.txt\" data-size=\"10137\" data-mime=\"text/plain\"><a download=\"d.txt\">d.txt</a><span class=\"rep-attachment-size\">9.9 KB</span></div><div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/e.txt\" data-size=\"1048576\" data-mime=\"text/plain\"><a download=\"e.txt\">e.txt</a><span class=\"rep-attachment-size\">1 MB</span></div>"
+    },
+    {
+        "name": "attachment without size or type",
+        "document": {"type": "doc", "content": [
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/f.zip", "name": "f.zip", "size": null, "mime": null}}
+        ]},
+        "html": "<div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/f.zip\"><a download=\"f.zip\">f.zip</a></div>"
+    },
+    {
+        "name": "attachment next to an image",
+        "document": {"type": "doc", "content": [
+            {"type": "image", "attrs": {"disk": "media", "path": "editor-images/a.jpg", "url": null, "alt": "A cat", "caption": "", "align": "center", "width": "100"}},
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/a.pdf", "name": "a.pdf", "size": 2048, "mime": "application/pdf"}}
+        ]},
+        "html": "<figure class=\"rep-image\" data-type=\"image\" data-disk=\"media\" data-path=\"editor-images/a.jpg\" data-align=\"center\" data-width=\"100\"><img alt=\"A cat\"></figure><div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/a.pdf\" data-size=\"2048\" data-mime=\"application/pdf\"><a download=\"a.pdf\">a.pdf</a><span class=\"rep-attachment-size\">2 KB</span></div>"
+    },
+    {
+        "name": "name with surrounding ideographic spaces and an emoji",
+        "document": {"type": "doc", "content": [
+            {"type": "attachment", "attrs": {"disk": "media", "path": "editor-attachments/g.pdf", "name": "\u3000r\ud83d\ude42.pdf\u3000", "size": 2048, "mime": "application/pdf"}}
+        ]},
+        "html": "<div class=\"rep-attachment\" data-type=\"attachment\" data-disk=\"media\" data-path=\"editor-attachments/g.pdf\" data-size=\"2048\" data-mime=\"application/pdf\"><a download=\"\u3000r\ud83d\ude42.pdf\u3000\">\u3000r\ud83d\ude42.pdf\u3000</a><span class=\"rep-attachment-size\">2 KB</span></div>"
+    }
+]

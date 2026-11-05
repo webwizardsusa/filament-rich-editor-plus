@@ -6,4 +6,12 @@ return [
     'content_invalid' => 'This content uses blocks this editor does not have. It has not been changed.',
     'content_unsupported' => "This content has formatting this field can't save. Remove it and try again.",
     'bundled_assets_missing' => 'The Rich Editor Plus :name assets are not available: the Vite dev server is not running (no public/:hot) and the package has not been built. Run `npm run dev::name`, or `npm run build:rep` followed by `php artisan filament:assets`.',
+
+    'image' => [
+        'upload_missing' => 'The upload has expired or was already used. Try again.',
+        'type_not_accepted' => 'This type of file can\'t be added here.',
+        'too_large' => 'The file is larger than :size.',
+        'uploads_disabled' => 'Uploads are turned off for images.',
+        'store_failed' => 'The file couldn\'t be saved. Try again.',
+    ],
 ];

@@ -138,7 +138,7 @@ class LinkPlugin extends Plugin
 
     public function getActions(): array
     {
-        return [LinkAction::make($this->shouldOpenInNewTab)];
+        return [LinkAction::make($this->shouldOpenInNewTab, $this->protocols)];
     }
 
     public function getTools(): array

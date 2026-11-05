@@ -566,7 +566,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
 
     /**
      * Passes a request from the editor's JS to the plugin with that id, when it answers editor requests. An unknown
-     * plugin, one without the contract, or a failure answers nothing.
+     * plugin, one without the contract, or a failure answers nothing; a failure is reported.
      *
      * @param  array<array-key, mixed>  $payload
      * @return array<array-key, mixed>
@@ -581,7 +581,7 @@ class RichEditorPlus extends Field implements HasEmbeddedView
             return [];
         }
 
-        return rescue(fn (): array => $instance->answerEditorRequest($request, $payload, $this), [], report: false);
+        return rescue(fn (): array => $instance->answerEditorRequest($request, $payload, $this), []);
     }
 
     /**

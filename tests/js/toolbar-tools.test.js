@@ -100,6 +100,25 @@ it('leaves buttons in hidden groups out of keyboard navigation', () => {
     expect(document.activeElement).toBe(toolbar.querySelector('[data-rep-control="more"]'))
 })
 
+it('swaps the arrow keys in a right-to-left layout', () => {
+    editor = makeEditor(doc(p('abc')))
+    bindToolbar(editor, toolbar, tools, vi.fn())
+    toolbar.setAttribute('dir', 'rtl')
+    toolbar.style.direction = 'rtl'
+
+    focusToolbar(toolbar)
+    const first = document.activeElement
+    toolbar.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+
+    // Left is forward in RTL: the next button, not a wrap round to the last one (the more control).
+    expect(document.activeElement).not.toBe(toolbar.querySelector('[data-rep-control="more"]'))
+    expect(first.compareDocumentPosition(document.activeElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+
+    toolbar.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+
+    expect(document.activeElement).toBe(first)
+})
+
 it('gives a toolbar one tab stop on its first visible button, and moves it off a hidden one', () => {
     editor = makeEditor(doc(p('abc')))
 

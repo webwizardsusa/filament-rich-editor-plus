@@ -475,6 +475,25 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
         }
 
         $this->assertStorageConfigured();
+
+        if ($this->servesSvgFromOwnDomain()) {
+            throw new InvalidArgumentException(
+                "ImagePlugin accepts [image/svg+xml] on the local, public disk [{$this->getDisk()}], so an uploaded SVG's script would run on your own domain. "
+                .'Use a private visibility, a disk on another domain (such as S3), or ->urlUsing() to serve them from a domain without your cookies.',
+            );
+        }
+    }
+
+    /**
+     * Whether uploaded SVGs, which can carry script, would be served as plain public files from the app's own domain.
+     */
+    protected function servesSvgFromOwnDomain(): bool
+    {
+        return in_array('image/svg+xml', array_map('strtolower', $this->getAcceptedFileTypes()), true)
+            && $this->allowsUploads
+            && $this->getVisibility() === 'public'
+            && $this->urlCallback === null
+            && config("filesystems.disks.{$this->getDisk()}.driver") === 'local';
     }
 
     /**

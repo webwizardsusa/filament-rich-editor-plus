@@ -38,18 +38,18 @@ trait StoresEditorFiles
         'text/javascript',
     ];
 
-    protected ?string $disk = null;
+    protected string|Closure|null $disk = null;
 
-    protected ?string $directory = null;
+    protected string|Closure|null $directory = null;
 
-    protected ?string $visibility = null;
+    protected string|Closure|null $visibility = null;
 
-    protected ?int $maxSize = null;
+    protected int|Closure|null $maxSize = null;
 
     /**
-     * @var array<string> | null
+     * @var array<string> | Closure | null
      */
-    protected ?array $acceptedFileTypes = null;
+    protected array|Closure|null $acceptedFileTypes = null;
 
     protected int $temporaryUrlMinutes = 30;
 
@@ -68,7 +68,7 @@ trait StoresEditorFiles
      * The disk uploads go to. Defaults to Filament's default disk (`filament.default_filesystem_disk`), using `public`
      * in place of `local` while the visibility is `public`, as Filament's own uploads do.
      */
-    public function disk(?string $disk): static
+    public function disk(string|Closure|null $disk): static
     {
         $this->disk = $disk;
 
@@ -77,9 +77,10 @@ trait StoresEditorFiles
 
     /**
      * The directory on the disk uploads go to, and the only one the plugin signs or renders paths from. Empty allows
-     * the whole disk.
+     * the whole disk. A closure is called each time the directory is needed, for example to give each tenant its own:
+     * `->directory(fn (): string => 'editor-images/'.Filament::getTenant()->getKey())`.
      */
-    public function directory(string $directory): static
+    public function directory(string|Closure $directory): static
     {
         $this->directory = $directory;
 
@@ -90,7 +91,7 @@ trait StoresEditorFiles
      * `public` (the default) renders plain disk URLs, anything else renders temporary URLs. A `public` upload is also
      * made public on the disk when the disk allows it; a bucket that refuses ACLs keeps it as its policy says.
      */
-    public function visibility(string $visibility): static
+    public function visibility(string|Closure $visibility): static
     {
         $this->visibility = $visibility;
 
@@ -100,7 +101,7 @@ trait StoresEditorFiles
     /**
      * The largest upload, in kilobytes.
      */
-    public function maxSize(int $kilobytes): static
+    public function maxSize(int|Closure $kilobytes): static
     {
         $this->maxSize = $kilobytes;
 
@@ -108,11 +109,11 @@ trait StoresEditorFiles
     }
 
     /**
-     * @param  array<string>  $types
+     * @param  array<string> | Closure(): array<string>  $types
      */
-    public function acceptedFileTypes(array $types): static
+    public function acceptedFileTypes(array|Closure $types): static
     {
-        $this->acceptedFileTypes = array_values($types);
+        $this->acceptedFileTypes = $types instanceof Closure ? $types : array_values($types);
 
         return $this;
     }
@@ -138,8 +139,10 @@ trait StoresEditorFiles
 
     public function getDisk(): string
     {
-        if ($this->disk !== null) {
-            return $this->disk;
+        $configured = value($this->disk);
+
+        if ($configured !== null) {
+            return (string) $configured;
         }
 
         $disk = (string) (config('filament.default_filesystem_disk') ?? config('filesystems.default'));
@@ -149,12 +152,12 @@ trait StoresEditorFiles
 
     public function getDirectory(): string
     {
-        return $this->directory ?? $this->defaultDirectory();
+        return (string) (value($this->directory) ?? $this->defaultDirectory());
     }
 
     public function getVisibility(): string
     {
-        return $this->visibility ?? 'public';
+        return (string) (value($this->visibility) ?? 'public');
     }
 
     /**
@@ -176,7 +179,7 @@ trait StoresEditorFiles
 
     public function getMaxSize(): int
     {
-        return $this->maxSize ?? $this->defaultMaxSize();
+        return (int) (value($this->maxSize) ?? $this->defaultMaxSize());
     }
 
     /**
@@ -184,7 +187,9 @@ trait StoresEditorFiles
      */
     public function getAcceptedFileTypes(): array
     {
-        return $this->acceptedFileTypes ?? $this->defaultAcceptedFileTypes();
+        $types = value($this->acceptedFileTypes);
+
+        return is_array($types) ? array_values($types) : $this->defaultAcceptedFileTypes();
     }
 
     /**

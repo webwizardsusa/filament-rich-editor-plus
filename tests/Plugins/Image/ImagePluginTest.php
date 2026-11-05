@@ -151,6 +151,18 @@ it('refuses bad configuration', function (Closure $configure): void {
     'non-image type' => [fn (ImagePlugin $plugin): ImagePlugin => $plugin->acceptedFileTypes(['application/pdf'])],
 ]);
 
+it('refuses SVG uploads served as public files from the app\'s own domain', function (): void {
+    ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/png', 'image/svg+xml'])->getNodes();
+})->throws(InvalidArgumentException::class, 'ImagePlugin accepts [image/svg+xml] on the local, public disk [media]');
+
+it('takes SVG uploads when they are private, served elsewhere, or not uploaded at all', function (ImagePlugin $plugin): void {
+    expect($plugin->getNodes())->not->toBeEmpty();
+})->with([
+    'private' => fn (): ImagePlugin => ImagePlugin::make()->disk('vault')->visibility('private')->acceptedFileTypes(['image/svg+xml']),
+    'urlUsing' => fn (): ImagePlugin => ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/svg+xml'])->urlUsing(fn (string $disk, string $path): string => "https://cdn.example/{$path}"),
+    'URLs only' => fn (): ImagePlugin => ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/svg+xml'])->allowUploads(false)->allowUrls(),
+]);
+
 it('gives its caption, or else its alt, as plain text', function (): void {
     expect(RichContentPlusRenderer::make(UPLOAD)->plugins([imagePlugin()])->toText())->toContain('Our cat')
         ->and(RichContentPlusRenderer::make(str_replace('<figcaption>Our cat</figcaption>', '', UPLOAD))->plugins([imagePlugin()])->toText())->toContain('A cat');
@@ -213,5 +225,5 @@ it('never lets a type/* wildcard match a type that can run script', function ():
         ->and($wildcards->acceptsFileType('text/html'))->toBeFalse()
         ->and($wildcards->acceptsFileType('text/xml'))->toBeFalse()
         ->and($wildcards->acceptsFileType('text/javascript'))->toBeFalse()
-        ->and(ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/svg+xml'])->acceptsFileType('image/svg+xml'))->toBeTrue();
+        ->and(ImagePlugin::make()->disk('vault')->visibility('private')->acceptedFileTypes(['image/svg+xml'])->acceptsFileType('image/svg+xml'))->toBeTrue();
 });

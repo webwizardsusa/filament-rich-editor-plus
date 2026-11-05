@@ -239,7 +239,7 @@ it('never lets a wildcard take an SVG image, even renamed', function (string $na
 })->with(['logo.svg', 'logo.png']);
 
 it('takes an SVG image when image/svg+xml is accepted by name', function (): void {
-    StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/*', 'image/svg+xml'])];
+    StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/*', 'image/svg+xml'])->urlUsing(fn (string $disk, string $path): string => "https://files.example/{$path}")];
 
     $answer = storeUpload('hollyit/image', UploadedFile::fake()->createWithContent('logo.svg', SVG_WITH_SCRIPT));
 

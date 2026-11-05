@@ -85,13 +85,13 @@ class FindReplacePlugin extends Plugin
     protected function renderOption(string $option, string $text, string $label): string
     {
         return '<button type="button" class="rep-tool rep-find-option" aria-pressed="false" data-rep-find-option="'.e($option).'"'
-            .' aria-label="'.e($label).'" title="'.e($label).'">'.e($text).'</button>';
+            .' aria-label="'.e($label).'">'.e($text).'</button>';
     }
 
     protected function renderIconAction(string $command, string $icon, string $label): string
     {
         return '<button type="button" class="rep-tool" data-rep-find-action="'.e($command).'"'
-            .' aria-label="'.e($label).'" title="'.e($label).'">'.generate_icon_html($icon)->toHtml().'</button>';
+            .' aria-label="'.e($label).'">'.generate_icon_html($icon)->toHtml().'</button>';
     }
 
     protected function renderTextAction(string $command, string $label): string

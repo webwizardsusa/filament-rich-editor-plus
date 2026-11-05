@@ -22,6 +22,8 @@ use RuntimeException;
  * one node of their type is parsed whole instead, so a batch costs at most two calls to the plugins.
  *
  * Stored HTML is trusted: it must have been written by the field or by `toStorableHtml()`.
+ *
+ * @internal The field's own rendering; it may change in any release.
  */
 class HtmlPatcher
 {

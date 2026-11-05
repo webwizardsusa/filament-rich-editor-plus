@@ -127,9 +127,14 @@ export function bindToolbar(editor, toolbar, tools, mountAction, { hideUnavailab
             return
         }
 
+        // In a right-to-left layout the next button is drawn to the left, so the arrows swap.
+        const next = buttons[(index + 1) % buttons.length]
+        const previous = buttons[(index - 1 + buttons.length) % buttons.length]
+        const isRtl = getComputedStyle(toolbar).direction === 'rtl'
+
         const target = {
-            ArrowRight: buttons[(index + 1) % buttons.length],
-            ArrowLeft: buttons[(index - 1 + buttons.length) % buttons.length],
+            ArrowRight: isRtl ? previous : next,
+            ArrowLeft: isRtl ? next : previous,
             Home: buttons[0],
             End: buttons[buttons.length - 1],
         }[event.key]

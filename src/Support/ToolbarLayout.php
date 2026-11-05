@@ -5,6 +5,8 @@ namespace Hollyit\RichEditorPlus\Support;
 /**
  * What a toolbar shows, in order: groups of formatting tools and controls, with a divider between groups. Build one
  * with {@see PluginRegistry::getToolbarLayout()}.
+ *
+ * @internal The field's own rendering; it may change in any release.
  */
 class ToolbarLayout
 {

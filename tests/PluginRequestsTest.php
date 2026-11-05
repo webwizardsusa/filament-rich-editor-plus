@@ -7,6 +7,7 @@ use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Tests\TestCase;
+use Illuminate\Support\Facades\Exceptions;
 use Livewire\Attributes\Renderless;
 
 uses(TestCase::class);
@@ -64,6 +65,14 @@ it('answers nothing for unknown plugins, plugins without the contract, and failu
     'no contract' => ['test/silent', 'ping'],
     'exception' => ['test/echo', 'explode'],
 ]);
+
+it('reports a plugin that throws', function (): void {
+    Exceptions::fake();
+
+    RichEditorPlus::make('body')->addPlugins([EchoRequestPlugin::make()])->answerPluginRequestForJs('test/echo', 'explode');
+
+    Exceptions::assertReported(fn (RuntimeException $exception): bool => $exception->getMessage() === 'boom');
+});
 
 it('exposes the plugin request method to the editor without re-rendering the component', function (): void {
     $attributes = array_map(

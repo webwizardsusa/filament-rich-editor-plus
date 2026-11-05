@@ -96,6 +96,25 @@ it('does not change the plugin instance it was given', function (): void {
         ->and($plugin->getDirectory())->toBe('editor-images');
 });
 
+it('takes closures for its storage settings, called when they are needed', function (): void {
+    $tenant = 'acme';
+    $plugin = ImagePlugin::make()
+        ->disk(fn (): string => 'vault')
+        ->directory(function () use (&$tenant): string {
+            return "editor-images/{$tenant}";
+        })
+        ->visibility(fn (): string => 'private')
+        ->maxSize(fn (): int => 64)
+        ->acceptedFileTypes(fn (): array => ['image/png']);
+
+    $tenant = 'globex';
+
+    expect([$plugin->getDisk(), $plugin->getDirectory(), $plugin->getVisibility(), $plugin->getMaxSize(), $plugin->getAcceptedFileTypes()])
+        ->toBe(['vault', 'editor-images/globex', 'private', 64, ['image/png']])
+        ->and($plugin->isSafePath('vault', 'editor-images/globex/a.png'))->toBeTrue()
+        ->and($plugin->isSafePath('vault', 'editor-images/acme/a.png'))->toBeFalse();
+});
+
 it('turns image uploads off with fileAttachments(false)', function (): void {
     $field = RichEditorPlus::make('content')->fileAttachments(false)->addPlugins([ImagePlugin::make()->disk('media')]);
 

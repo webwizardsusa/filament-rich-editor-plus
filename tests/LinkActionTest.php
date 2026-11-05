@@ -92,6 +92,26 @@ it('does not treat a select-all as a cursor', function (): void {
         ->assertDispatched('run-rich-editor-plus-commands', fn (string $event, array $params): bool => count($params['commands']) === 1 && $params['commands'][0]['name'] === 'setLink');
 });
 
+it('refuses a URL with a scheme the link plugin does not keep', function (string $url): void {
+    Livewire::test(LinkActionTestForm::class)
+        ->callAction(linkAction(), data: ['url' => $url, 'shouldOpenInNewTab' => false], arguments: ['editorSelection' => ['type' => 'text', 'anchor' => 1, 'head' => 6]])
+        ->assertHasActionErrors(['url'])
+        ->assertNotDispatched('run-rich-editor-plus-commands');
+})->with(['javascript' => 'javascript:alert(1)', 'data' => 'data:text/html,x', 'disguised' => " java\tscript:alert(1)"]);
+
+it('accepts relative URLs and the configured schemes', function (string $url): void {
+    Livewire::test(LinkActionTestForm::class)
+        ->callAction(linkAction(), data: ['url' => $url, 'shouldOpenInNewTab' => false], arguments: ['editorSelection' => ['type' => 'text', 'anchor' => 1, 'head' => 6]])
+        ->assertHasNoActionErrors();
+})->with(['https' => 'https://example.com', 'mailto' => 'mailto:a@example.com', 'relative' => '/about', 'no scheme' => 'example.com']);
+
+it('treats a selection without positions as a range, not a cursor', function (): void {
+    Livewire::test(LinkActionTestForm::class)
+        ->callAction(linkAction(), data: ['url' => 'https://example.com', 'shouldOpenInNewTab' => false], arguments: ['editorSelection' => ['type' => 'text']])
+        ->assertHasNoActionErrors()
+        ->assertDispatched('run-rich-editor-plus-commands', fn (string $event, array $params): bool => count($params['commands']) === 1);
+});
+
 it('prefills the modal from the existing link', function (): void {
     Livewire::test(LinkActionTestForm::class)
         ->mountAction(linkAction(), arguments: ['editorSelection' => ['type' => 'text', 'anchor' => 1, 'head' => 6], 'url' => 'https://old.test', 'shouldOpenInNewTab' => true])

@@ -239,16 +239,18 @@ export default function richEditorPlusComponent({
                 ]),
             )
             const fixedElement = this.$el.querySelector('[data-rep-fixed-toolbar]')
+            const findPanel = this.$el.querySelector('[data-rep-find]')
             const mountAction = (action, args) => this.mountAction(action, args)
+            const tooltipTargets = [fixedElement, ...blockToolbars.values(), findPanel].filter(Boolean)
+
+            if (tooltipTargets.length) {
+                toolbarTooltip = createToolbarTooltip({ root: this.$el, toolbars: tooltipTargets })
+            }
 
             if (blockToolbars.size || fixedElement) {
                 const toolbars = [...blockToolbars.values()]
 
                 blockControls = createBlockControls({ editor, root: this.$el, blockTypes: blockTypeList, tools })
-                toolbarTooltip = createToolbarTooltip({
-                    root: this.$el,
-                    toolbars: fixedElement ? [fixedElement, ...toolbars] : toolbars,
-                })
 
                 if (fixedElement) {
                     fixedToolbar = createFixedToolbar({

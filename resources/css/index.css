@@ -489,6 +489,21 @@
     font-weight: 600;
 }
 
+/* A check mark as well as the weight, so the current choice doesn't depend on telling bold from regular. */
+.rep-menu-item[aria-checked='true']::after {
+    content: '';
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin-inline-start: auto;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.rep-menu-item[aria-checked='true']:has(.rep-menu-item-shortcut)::after {
+    margin-inline-start: 0.5rem;
+}
+
 .rep-menu-item-shortcut {
     margin-inline-start: auto;
     padding-inline-start: 1rem;

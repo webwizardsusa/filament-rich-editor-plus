@@ -569,7 +569,9 @@ reloading the page fixes it.
 
 On a private disk, anyone who can open the field can get a temporary URL for any file in the plugin's directory, not
 only the images in the record they are editing. Give private images a directory per tenant (or per record), such as
-`->directory('editor-images/'.$tenant->getKey())`, so one tenant cannot reach another's files.
+`->directory(fn (): string => 'editor-images/'.Filament::getTenant()->getKey())`, so one tenant cannot reach another's
+files. `disk()`, `directory()`, `visibility()`, `maxSize()` and `acceptedFileTypes()` all take a closure, which is
+called whenever the setting is needed.
 
 ### External images
 
@@ -1075,7 +1077,7 @@ public function answerEditorRequest(string $request, array $payload, RichEditorP
 - Requests are answered for a disabled (read-only) field too, because a read-only editor still loads what it shows.
   A request that changes anything, such as storing a file, must return early when `$field->isDisabled()`.
   `$field->pullTemporaryUpload()` already returns `null` for a disabled field.
-- A plugin that throws answers `[]` too, silently: the error is not reported, so log it yourself if you need it.
+- A plugin that throws answers `[]` too, and the exception is reported through Laravel's exception handler.
 
 The context also has `upload(file, { onProgress })`, which sends a file to the field's Livewire temporary uploads and
 resolves with a key, `processing(promise, message)`, which keeps the form from saving until the promise settles and resolves or

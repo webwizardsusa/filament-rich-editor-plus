@@ -2,10 +2,12 @@
 
 namespace Hollyit\RichEditorPlus\Actions;
 
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\Width;
+use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\EditorCommand;
 
@@ -15,7 +17,10 @@ use Hollyit\RichEditorPlus\Support\EditorCommand;
  */
 class LinkAction
 {
-    public static function make(bool $opensInNewTabByDefault = false): Action
+    /**
+     * @param  array<string>  $protocols  the link schemes the field keeps; a URL with any other scheme is refused
+     */
+    public static function make(bool $opensInNewTabByDefault = false, array $protocols = ['http', 'https', 'mailto', 'tel']): Action
     {
         return Action::make('link')
             ->label(__('rich-editor-plus::actions.link.label'))
@@ -28,13 +33,18 @@ class LinkAction
             ->schema([
                 TextInput::make('url')
                     ->label(__('rich-editor-plus::actions.link.modal.form.url'))
-                    ->inputMode('url'),
+                    ->inputMode('url')
+                    ->rule(static fn (): Closure => static function (string $attribute, mixed $value, Closure $fail) use ($protocols): void {
+                        if (filled($value) && ! MarkSpec::isAllowedUrl($value, $protocols)) {
+                            $fail(__('rich-editor-plus::actions.link.modal.form.url_invalid', ['protocols' => implode(', ', $protocols)]));
+                        }
+                    }),
                 Checkbox::make('shouldOpenInNewTab')
                     ->label(__('rich-editor-plus::actions.link.modal.form.should_open_in_new_tab')),
             ])
             ->action(function (array $arguments, array $data, RichEditorPlus $component): void {
-                $selection = $arguments['editorSelection'] ?? [];
-                $isCaret = ($selection['type'] ?? null) === 'text' && $selection['head'] === $selection['anchor'];
+                $selection = is_array($arguments['editorSelection'] ?? null) ? $arguments['editorSelection'] : [];
+                $isCaret = ($selection['type'] ?? null) === 'text' && isset($selection['head']) && ($selection['head'] === ($selection['anchor'] ?? null));
 
                 $commands = $isCaret ? [EditorCommand::make('extendMarkRange', ['link'])] : [];
 

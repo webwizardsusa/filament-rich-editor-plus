@@ -11,6 +11,8 @@ use function Filament\Support\generate_icon_html;
 /**
  * Renders the server-side markup for the slash menu, the block switcher and the more menu. Each is rendered once per
  * editor; the browser filters, positions and runs them.
+ *
+ * @internal The field's own rendering; it may change in any release.
  */
 class BlockMenuRenderer
 {

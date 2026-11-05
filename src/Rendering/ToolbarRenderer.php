@@ -13,6 +13,8 @@ use function Filament\Support\generate_icon_html;
 /**
  * Renders the server-side markup for the toolbars. The browser only shows, hides and positions these elements and
  * keeps their state current; the tools themselves come from the plugins.
+ *
+ * @internal The field's own rendering; it may change in any release.
  */
 class ToolbarRenderer
 {

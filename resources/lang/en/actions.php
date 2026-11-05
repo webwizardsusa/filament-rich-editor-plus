@@ -10,6 +10,7 @@ return [
             'form' => [
                 'url' => 'URL',
                 'should_open_in_new_tab' => 'Open in new tab',
+                'url_invalid' => 'Links can only use these schemes: :protocols.',
             ],
         ],
     ],

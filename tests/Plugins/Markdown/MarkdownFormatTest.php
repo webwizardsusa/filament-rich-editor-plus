@@ -6,14 +6,14 @@ use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TextAlignPlugin;
 use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Contracts\ProvidesMarkdownRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+use Hollyit\RichEditorPlus\Plugins\Plugin;
+use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
+use Hollyit\RichEditorPlus\Support\JsExtension;
+use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Tests\TestCase;
 
 uses(TestCase::class);

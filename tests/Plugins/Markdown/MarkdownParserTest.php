@@ -4,9 +4,9 @@ use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Hollyit\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
 use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
 use Tests\TestCase;
 
 uses(TestCase::class);

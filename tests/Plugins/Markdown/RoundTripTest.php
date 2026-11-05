@@ -5,13 +5,13 @@ use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
+use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
+use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Tests\TestCase;
 
 uses(TestCase::class);

@@ -10,9 +10,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\Enums\Width;
+use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\EditorCommand;
-use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 

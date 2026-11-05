@@ -12,9 +12,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Enums\Width;
+use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\EditorCommand;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 /**

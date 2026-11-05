@@ -3,8 +3,8 @@
 use Hollyit\RichEditorPlus\Content\ContentSchema;
 use Hollyit\RichEditorPlus\Content\HtmlParser;
 use Hollyit\RichEditorPlus\Content\HtmlSerializer;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
+use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Tests\TestCase;
 
 uses(TestCase::class);

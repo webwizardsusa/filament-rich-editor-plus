@@ -1,8 +1,8 @@
 <?php
 
+use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
 use Tests\TestCase;
 
 uses(TestCase::class);

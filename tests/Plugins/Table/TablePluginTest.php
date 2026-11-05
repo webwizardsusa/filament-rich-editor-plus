@@ -4,11 +4,11 @@ use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\AssetManager;
 use Filament\Support\Facades\FilamentAsset;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
+use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Tests\TestCase;
 
 uses(TestCase::class);

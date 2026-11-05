@@ -3,12 +3,12 @@
 use Hollyit\RichEditorPlus\Content\ContentSchema;
 use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
+use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
+use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Tests\TestCase;
 
 uses(TestCase::class);

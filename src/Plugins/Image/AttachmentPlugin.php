@@ -9,13 +9,13 @@ use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
 use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
+use Hollyit\RichEditorPlus\Plugins\Image\Actions\AttachmentAction;
+use Hollyit\RichEditorPlus\Plugins\Image\Concerns\StoresEditorFiles;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\BlockType;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Plugins\Image\Actions\AttachmentAction;
-use Hollyit\RichEditorPlus\Plugins\Image\Concerns\StoresEditorFiles;
 use InvalidArgumentException;
 
 /**

@@ -8,8 +8,6 @@ use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Contracts\ProvidesMarkdownRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
@@ -18,6 +16,8 @@ use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
+use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
+use Hollyit\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * Markdown (GFM) as a stored format: `RichEditorPlus::make('body')->storeAs(MarkdownFormat::make())`. A plugin is

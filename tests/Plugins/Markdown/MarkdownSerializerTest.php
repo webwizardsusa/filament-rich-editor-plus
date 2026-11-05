@@ -6,10 +6,10 @@ use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
+use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Tests\TestCase;
 
 uses(TestCase::class);

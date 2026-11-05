@@ -1,10 +1,10 @@
 <?php
 
 use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
 use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
+use Hollyit\RichEditorPlus\RichEditorPlus;
+use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Tests\TestCase;
 
 uses(TestCase::class);

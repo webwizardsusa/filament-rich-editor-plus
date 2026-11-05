@@ -6,10 +6,10 @@ use Closure;
 use DOMElement;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
+use Hollyit\RichEditorPlus\Plugins\Table\Actions\InsertTableAction;
 use Hollyit\RichEditorPlus\Support\BlockType;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Plugins\Table\Actions\InsertTableAction;
 
 /**
  * Tables for Rich Editor Plus. It adds a table block to the slash menu and a toolbar of its own that appears above

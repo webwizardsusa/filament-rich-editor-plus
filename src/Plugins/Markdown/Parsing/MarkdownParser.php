@@ -8,7 +8,6 @@ use DOMNode;
 use DOMText;
 use DOMXPath;
 use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\ContentSpec;
 use Hollyit\RichEditorPlus\Content\HtmlParser;
 use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
@@ -558,7 +557,6 @@ class MarkdownParser
 
         $image->parentNode?->replaceChild($document->createTextNode($alt), $image);
     }
-
 
     /**
      * A list or task item must start with a paragraph and a quote must hold a block, as the editor's schema says. An

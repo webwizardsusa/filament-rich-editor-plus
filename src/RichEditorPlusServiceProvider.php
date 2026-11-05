@@ -4,7 +4,6 @@ namespace Webwizardsusa\RichEditorPlus;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Webwizardsusa\RichEditorPlus\Benchmarks\Console\BenchmarkCommand;
 use Webwizardsusa\RichEditorPlus\Plugins\Image\ImageAssets;
 use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownAssets;
 use Webwizardsusa\RichEditorPlus\Plugins\Table\TableAssets;
@@ -24,10 +23,6 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
             ->name('rich-editor-plus')
             ->hasTranslations()
             ->hasViews();
-
-        if (class_exists(BenchmarkCommand::class)) {
-            $package->hasCommand(BenchmarkCommand::class);
-        }
     }
 
     public function packageBooted(): void

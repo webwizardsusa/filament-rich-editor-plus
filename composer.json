@@ -28,8 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Webwizardsusa\\RichEditorPlus\\Tests\\": "tests/",
-            "Webwizardsusa\\RichEditorPlus\\Benchmarks\\": "benchmarks/"
+            "Webwizardsusa\\RichEditorPlus\\Tests\\": "tests/"
         }
     },
     "scripts": {

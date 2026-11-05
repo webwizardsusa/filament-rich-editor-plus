@@ -1,6 +1,6 @@
 <?php
 
-namespace Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures;
+namespace Webwizardsusa\RichEditorPlus\Tests\Support;
 
 use InvalidArgumentException;
 use Random\Engine\Mt19937;

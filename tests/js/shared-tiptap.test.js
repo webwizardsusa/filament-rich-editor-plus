@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { tiptap } from '../../resources/js/shared-modules.js'
 import { sharedSpecifiers, sharedTiptap } from '../../vite/shared-tiptap.js'
 
-// Inside the project, so Vite will load the generated modules.
-const cache = resolve('../../node_modules/.cache')
+// Inside the package, so Vite will load the generated modules.
+const cache = resolve('node_modules/.cache')
 mkdirSync(cache, { recursive: true })
 const directory = mkdtempSync(join(cache, 'shared-tiptap-'))
 let loaded = 0

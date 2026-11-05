@@ -171,7 +171,8 @@ expires. Keep the lifetime as short as that staleness allows.
 
 ## Toolbar
 
-A field has a floating toolbar by default, above the selection in the active block. It can have a fixed toolbar
+A field has a floating toolbar by default, above the selection in the active block. On touch screens it goes below
+the selection instead, so it stays clear of the browser's own selection menu. It can have a fixed toolbar
 above the editor too, or instead:
 
 ```php

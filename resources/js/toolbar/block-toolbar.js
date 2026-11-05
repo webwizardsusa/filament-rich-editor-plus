@@ -33,6 +33,36 @@ export function getAnchorRect(view, { aboveBlockWithCursor = false } = {}) {
     return { x: left, y: top, left, right, top, bottom, width: right - left, height: bottom - top }
 }
 
+/**
+ * Whether the main pointer is a finger. Touch browsers draw their own selection menu above selected text, with drag
+ * handles below it.
+ */
+export function isTouchScreen() {
+    return window.matchMedia?.('(pointer: coarse)').matches ?? false
+}
+
+/**
+ * The part of the page the reader can actually see. With the on-screen keyboard open, mobile browsers shrink only
+ * the visual viewport, so a toolbar kept inside the layout viewport could end up under the keyboard.
+ */
+function visibleArea() {
+    const viewport = window.visualViewport
+
+    return viewport ? { x: viewport.offsetLeft, y: viewport.offsetTop, width: viewport.width, height: viewport.height } : 'viewport'
+}
+
+/**
+ * Where the block toolbar goes. Above the selection with a mouse, and below it on a touch screen, past the selection
+ * handles, so it doesn't sit under the browser's own selection menu. Either way it flips when there is no room, and
+ * stays inside the visible area.
+ */
+export function getToolbarPlacement({ isTouch = isTouchScreen(), rootBoundary = visibleArea() } = {}) {
+    return {
+        placement: isTouch ? 'bottom' : 'top',
+        middleware: [offset(isTouch ? 32 : 8), flip({ rootBoundary }), shift({ padding: 8, rootBoundary })],
+    }
+}
+
 class BlockToolbarView {
     constructor(view, { toolbars, root, floatingElements, onShow, onHide, onFit }) {
         this.view = view
@@ -182,14 +212,24 @@ class BlockToolbarView {
 
             computePosition(anchor, toolbar, {
                 strategy: 'fixed',
-                placement: 'top',
-                middleware: [offset(8), flip(), shift({ padding: 8 })],
+                ...getToolbarPlacement(),
             }).then(({ x, y }) => {
                 Object.assign(toolbar.style, { left: `${x}px`, top: `${y}px` })
             })
         }
 
-        const cleanup = autoUpdate(anchor, toolbar, position)
+        const stopAutoUpdate = autoUpdate(anchor, toolbar, position)
+        // Opening or closing the on-screen keyboard resizes only the visual viewport, which autoUpdate doesn't watch.
+        const onViewportChange = () => position()
+
+        window.visualViewport?.addEventListener('resize', onViewportChange)
+        window.visualViewport?.addEventListener('scroll', onViewportChange)
+
+        const cleanup = () => {
+            stopAutoUpdate()
+            window.visualViewport?.removeEventListener('resize', onViewportChange)
+            window.visualViewport?.removeEventListener('scroll', onViewportChange)
+        }
 
         this.current = { toolbar, blockElement, cleanup, position }
         this.onShow?.()

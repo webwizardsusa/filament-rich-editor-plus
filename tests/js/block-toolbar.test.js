@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { blockToolbarKey, createBlockToolbarPlugin, getAnchorRect } from '../../resources/js/toolbar/block-toolbar'
+import { blockToolbarKey, createBlockToolbarPlugin, getAnchorRect, getToolbarPlacement, isTouchScreen } from '../../resources/js/toolbar/block-toolbar'
 import { doc, makeEditor, p } from './support/make-editor'
 
 let editor
@@ -361,4 +361,33 @@ it('fits the toolbar onto one row before placing it, each time it shows', async 
     editor.commands.setTextSelection({ from: 1, to: 2 })
 
     expect(onFit).toHaveBeenCalledWith(toolbar)
+})
+
+it('sits above the selection with a mouse, and below it on a touch screen, clear of the selection handles', () => {
+    const mouse = getToolbarPlacement({ isTouch: false, rootBoundary: 'viewport' })
+    const touch = getToolbarPlacement({ isTouch: true, rootBoundary: 'viewport' })
+
+    expect(mouse.placement).toBe('top')
+    expect(touch.placement).toBe('bottom')
+    expect(touch.middleware.find(({ name }) => name === 'offset').options).toBeGreaterThan(mouse.middleware.find(({ name }) => name === 'offset').options)
+})
+
+it('keeps the toolbar inside the visible area, which the on-screen keyboard shrinks', () => {
+    const area = { x: 0, y: 120, width: 400, height: 300 }
+    const { middleware } = getToolbarPlacement({ isTouch: true, rootBoundary: area })
+
+    expect(middleware.find(({ name }) => name === 'flip').options.rootBoundary).toBe(area)
+    expect(middleware.find(({ name }) => name === 'shift').options.rootBoundary).toBe(area)
+})
+
+it('treats a coarse pointer as a touch screen', () => {
+    const matchMedia = window.matchMedia
+
+    window.matchMedia = (query) => ({ matches: query === '(pointer: coarse)' })
+    expect(isTouchScreen()).toBe(true)
+
+    window.matchMedia = () => ({ matches: false })
+    expect(isTouchScreen()).toBe(false)
+
+    window.matchMedia = matchMedia
 })

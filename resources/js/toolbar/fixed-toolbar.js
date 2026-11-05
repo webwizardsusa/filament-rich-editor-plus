@@ -7,7 +7,8 @@ export const fixedToolbarKeymapKey = new PluginKey('repFixedToolbarKeymap')
 /**
  * Makes the server-rendered toolbar above the editor work. It stays in place: tools that can't be used at the cursor
  * are disabled rather than hidden, and only its block tools section changes, showing the active block's own group
- * next to the one for every block. It is a normal tab stop, on one button at a time.
+ * next to the one for every block. It is a normal tab stop, on one button at a time. It stays on one row, moving what
+ * doesn't fit into its more menu, and refits whenever it changes size.
  */
 export function createFixedToolbar({ editor, toolbar, tools, blockControls, mountAction }) {
     const blockGroups = [...toolbar.querySelectorAll('[data-rep-block-tools-for]')]
@@ -30,13 +31,21 @@ export function createFixedToolbar({ editor, toolbar, tools, blockControls, moun
         }
     }
 
+    const fit = () => {
+        blockControls?.fit(toolbar)
+        ensureTabStop(toolbar)
+    }
+
     const sync = () => {
         syncToolbar(editor, toolbar, tools, { hideUnavailable: false })
         blockControls?.sync(toolbar, { hideUnavailable: false })
         syncBlockTools()
-        ensureTabStop(toolbar)
+        fit()
     }
 
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(fit)
+
+    resizeObserver?.observe(toolbar)
     editor.on('transaction', sync)
     sync()
 
@@ -54,6 +63,7 @@ export function createFixedToolbar({ editor, toolbar, tools, blockControls, moun
         },
 
         destroy() {
+            resizeObserver?.disconnect()
             editor.off('transaction', sync)
         },
     }

@@ -345,9 +345,30 @@ it('renders a custom floating layout with only what it names', function (): void
         ->toContain('data-rep-control="switcher"')
         ->not->toContain('data-rep-drag-handle')
         ->not->toContain('data-rep-control="moveUp"')
-        ->not->toContain('data-rep-control="more"')
+        ->not->toMatch('/data-rep-control="more"(?![^>]*data-rep-overflow-only)/')
         ->not->toContain('data-rep-list-tools')
         ->not->toContain('data-rep-tool="quote"');
+});
+
+it('gives a layout without a more button one for overflow, hidden until something moves into it', function (string $placement): void {
+    $registry = PluginRegistry::make([BoldPlugin::make()]);
+    $layout = $registry->getToolbarLayout([['bold'], ['blockSwitcher']], ToolbarPlacement::from($placement));
+
+    $html = $placement === 'floating'
+        ? (new ToolbarRenderer)->renderBlockToolbar('*', [], [], layout: $layout)
+        : (new ToolbarRenderer)->renderFixedToolbar($layout, [], false);
+
+    expect($html)
+        ->toMatch('/<button [^>]*data-rep-control="more"[^>]*data-rep-overflow-only hidden><svg/')
+        ->toMatch('/data-rep-overflow-only hidden>.*<\/button><\/div>$/s')
+        ->and(substr_count($html, 'data-rep-control="more"'))->toBe(1);
+})->with(['floating', 'fixed']);
+
+it('adds no overflow-only more button to a layout that has its own', function (): void {
+    $html = (new ToolbarRenderer)->renderBlockToolbar('*', [], [Tool::make('bold')]);
+
+    expect($html)->not->toContain('data-rep-overflow-only')
+        ->and(substr_count($html, 'data-rep-control="more"'))->toBe(1);
 });
 
 it('puts the divider that starts a group inside the section the browser can hide', function (): void {

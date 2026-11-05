@@ -34,13 +34,14 @@ export function getAnchorRect(view, { aboveBlockWithCursor = false } = {}) {
 }
 
 class BlockToolbarView {
-    constructor(view, { toolbars, root, floatingElements, onShow, onHide }) {
+    constructor(view, { toolbars, root, floatingElements, onShow, onHide, onFit }) {
         this.view = view
         this.toolbars = toolbars
         this.root = root
         this.floatingElements = floatingElements ?? []
         this.onShow = onShow
         this.onHide = onHide
+        this.onFit = onFit
         this.current = null
         this.dismissed = false
         this.isDestroyed = false
@@ -150,7 +151,7 @@ class BlockToolbarView {
         }
 
         if (this.current?.toolbar === toolbar && this.current.blockElement === blockElement) {
-            return this.current.position()
+            return this.current.position({ refit: true })
         }
 
         this.hide()
@@ -163,9 +164,20 @@ class BlockToolbarView {
             contextElement: this.view.dom,
         }
 
-        const position = () => {
-            if (this.root) {
-                toolbar.style.maxWidth = `${this.root.clientWidth}px`
+        let fittedWidth = null
+
+        // Refreshes refit, as the toolbar's buttons may have changed. Scrolling repositions far more often, and only
+        // needs a refit when the editor's width has changed.
+        const position = ({ refit = false } = {}) => {
+            const width = this.root?.clientWidth ?? null
+
+            if (width !== null) {
+                toolbar.style.maxWidth = `${width}px`
+            }
+
+            if (refit || width !== fittedWidth) {
+                fittedWidth = width
+                this.onFit?.(toolbar)
             }
 
             computePosition(anchor, toolbar, {
@@ -212,15 +224,16 @@ class BlockToolbarView {
  * shows with just a cursor in its block. Alt+F10 opens any toolbar without a selection and moves focus into it, and it
  * stays open until focus leaves. Esc dismisses it until the selection or content changes.
  *
- * `toolbars` maps a node type name to its toolbar element; `*` is the fallback.
+ * `toolbars` maps a node type name to its toolbar element; `*` is the fallback. `onFit(toolbar)` runs before the
+ * toolbar is placed, to fit it onto one row within the editor's width.
  */
-export function createBlockToolbarPlugin({ toolbars, root, floatingElements, onShow, onHide }) {
+export function createBlockToolbarPlugin({ toolbars, root, floatingElements, onShow, onHide, onFit }) {
     let pluginView = null
 
     return new Plugin({
         key: blockToolbarKey,
 
-        view: (view) => (pluginView = new BlockToolbarView(view, { toolbars, root, floatingElements, onShow, onHide })),
+        view: (view) => (pluginView = new BlockToolbarView(view, { toolbars, root, floatingElements, onShow, onHide, onFit })),
 
         props: {
             handleDOMEvents: {

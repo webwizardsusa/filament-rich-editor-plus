@@ -343,3 +343,22 @@ it('ignores Alt+F10 while the slash menu is open, because the toolbar is hidden 
 
     expect(document.activeElement).toBe(editor.view.dom)
 })
+
+it('fits the toolbar onto one row before placing it, each time it shows', async () => {
+    editor.destroy()
+    editor = makeEditor(doc(p('abc'), p('def')))
+
+    const onFit = vi.fn()
+
+    editor.registerPlugin(createBlockToolbarPlugin({ toolbars: new Map([['*', toolbar]]), root, onFit }))
+    await focusAt(1)
+
+    editor.commands.setTextSelection({ from: 1, to: 3 })
+
+    expect(onFit).toHaveBeenCalledWith(toolbar)
+
+    onFit.mockClear()
+    editor.commands.setTextSelection({ from: 1, to: 2 })
+
+    expect(onFit).toHaveBeenCalledWith(toolbar)
+})

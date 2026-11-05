@@ -8,6 +8,7 @@ import {
 } from '../blocks/active-block'
 import { findBlockType, switchBlock } from '../blocks/block-types'
 import { FloatingMenu } from './floating-menu'
+import { fitToolbar, overflowedButtons } from './overflow'
 import { createToolMenus } from './tool-menus'
 
 const setDisabled = (element, isDisabled) => element?.setAttribute('aria-disabled', isDisabled ? 'true' : 'false')
@@ -32,12 +33,67 @@ export function allowsFormatting({ selection }) {
 }
 
 /**
+ * The top of the more menu, which lists the buttons that moved off the toolbar it was opened from.
+ */
+function createOverflowSection(moreElement) {
+    const section = document.createElement('div')
+    const separator = document.createElement('span')
+
+    section.className = 'rep-menu-overflow'
+    section.setAttribute('role', 'none')
+    section.dataset.repOverflowItems = ''
+    separator.className = 'rep-menu-separator'
+    separator.setAttribute('role', 'separator')
+    separator.dataset.repOverflowSeparator = ''
+    separator.hidden = true
+    moreElement.prepend(section, separator)
+
+    return { section, separator }
+}
+
+/**
+ * A more menu item standing in for a toolbar button that moved: its icon, its current name and its state.
+ */
+function renderOverflowItem(source) {
+    const item = document.createElement('button')
+    const label = document.createElement('span')
+    const pressed = source.getAttribute('aria-pressed')
+    const icon = source.firstElementChild?.cloneNode(true)
+
+    item.type = 'button'
+    item.className = 'rep-menu-item'
+    item.tabIndex = -1
+    item.dataset.repOverflowItem = ''
+    item.setAttribute('role', pressed === null ? 'menuitem' : 'menuitemcheckbox')
+
+    if (pressed !== null) {
+        item.setAttribute('aria-checked', pressed === 'true' ? 'true' : 'false')
+    }
+
+    if (source.getAttribute('aria-haspopup') === 'menu') {
+        item.setAttribute('aria-haspopup', 'menu')
+    }
+
+    setDisabled(item, isDisabled(source))
+
+    label.className = 'rep-menu-item-label'
+    label.textContent = source.getAttribute('aria-label') ?? ''
+
+    item.append(...(icon ? [icon] : []), label)
+
+    return item
+}
+
+/**
  * The parts of the block toolbar that act on the whole block: the switcher, move buttons and more menu. One set of
  * menus serves every toolbar in the editor. `sync(toolbar, { hideUnavailable: false })` keeps the list button and
  * formatting in place, disabled, for the fixed toolbar. Menu tools (`Tool::menu()`) open and sync here too, through
  * `createToolMenus`.
+ *
+ * `fit(toolbar)` keeps a toolbar on one row, moving what doesn't fit into the more menu. `fits` replaces the width check,
+ * for tests.
  */
-export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
+export function createBlockControls({ editor, root, blockTypes, tools = {}, fits }) {
     const switcherElement = root.querySelector('[data-rep-switcher-menu]')
     const moreElement = root.querySelector('[data-rep-more-menu]')
     const listElement = root.querySelector('[data-rep-list-menu]')
@@ -57,9 +113,19 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
         },
     })
 
+    const overflow = createOverflowSection(moreElement)
+    const overflowSources = new Map()
+    let moreButton = null
+
     const moreMenu = new FloatingMenu(moreElement, {
-        itemSelector: '[data-rep-more-action]',
+        itemSelector: '[data-rep-more-action], [data-rep-overflow-item]',
         onSelect: (item) => {
+            if (item.hasAttribute('data-rep-overflow-item')) {
+                selectOverflowed(overflowSources.get(item), moreButton)
+
+                return
+            }
+
             editor.view.focus()
 
             if (!isDisabled(item) && (editor.isEditable || item.hasAttribute('data-rep-read-only-ok'))) {
@@ -99,8 +165,81 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
         moveUp: () => editor.commands.moveBlockUp() && announce(live?.dataset.repMovedUp),
         moveDown: () => editor.commands.moveBlockDown() && announce(live?.dataset.repMovedDown),
         switcher: (button) => switcherMenu.open(button),
-        more: (button) => moreMenu.open(button),
+        more: (button) => {
+            if (!moreMenu.isOpen) {
+                fillMoreMenu(button)
+            }
+
+            moreMenu.open(button)
+        },
         list: (button) => listMenu?.open(button),
+    }
+
+    /**
+     * Lists the buttons that moved off the toolbar holding `button`. A more button that is only for overflow has
+     * nothing else behind it.
+     */
+    const fillMoreMenu = (button) => {
+        const toolbar = button.closest('[role="toolbar"]')
+        const moved = toolbar ? overflowedButtons(toolbar) : []
+        const isOverflowOnly = button.hasAttribute('data-rep-overflow-only')
+
+        overflowSources.clear()
+        overflow.section.replaceChildren(
+            ...moved.map((source) => {
+                const item = renderOverflowItem(source)
+
+                overflowSources.set(item, source)
+
+                return item
+            }),
+        )
+        overflow.separator.hidden = moved.length === 0 || isOverflowOnly
+        moreElement.querySelectorAll('[data-rep-more-action]').forEach((item) => {
+            item.hidden = isOverflowOnly
+        })
+        moreButton = button
+    }
+
+    /**
+     * Does what the moved button would have: a menu tool or menu control opens its menu from the more button, and
+     * anything else is clicked, so the toolbar's own handlers run it.
+     */
+    const selectOverflowed = (source, button) => {
+        if (!source || isDisabled(source)) {
+            editor.view.focus()
+
+            return
+        }
+
+        if (source.getAttribute('aria-haspopup') !== 'menu') {
+            source.click()
+
+            return
+        }
+
+        if (source.dataset.repTool) {
+            toolMenus.open(source.dataset.repTool, button)
+        } else {
+            run[source.dataset.repControl]?.(button)
+        }
+    }
+
+    /**
+     * The more button is usable while one of its block actions is, or one of the buttons that moved into it.
+     */
+    const syncMoreButton = (toolbar) => {
+        const more = toolbar.querySelector('[data-rep-control="more"]')
+
+        if (!more) {
+            return
+        }
+
+        const hasUsableAction =
+            !more.hasAttribute('data-rep-overflow-only') &&
+            [...moreElement.querySelectorAll('[data-rep-more-action]')].some((item) => !isDisabled(item))
+
+        setDisabled(more, !hasUsableAction && overflowedButtons(toolbar).every(isDisabled))
     }
 
     let listIconHtml = null
@@ -244,7 +383,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
             const moreItems = [...moreElement.querySelectorAll('[data-rep-more-action]')]
 
             moreItems.forEach((item) => setDisabled(item, (readOnly && !item.hasAttribute('data-rep-read-only-ok')) || !editor.can()[item.dataset.repMoreAction]?.()))
-            setDisabled(toolbar.querySelector('[data-rep-control="more"]'), moreItems.every(isDisabled))
+            syncMoreButton(toolbar)
             toolMenus.sync(toolbar)
 
             if (hideUnavailable) {
@@ -252,6 +391,18 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
                     formatting.hidden = !allowsFormatting(state)
                 })
             }
+        },
+
+        /**
+         * Fits a showing toolbar onto one row; a hidden one has no width to fit.
+         */
+        fit(toolbar) {
+            if (toolbar.hidden) {
+                return
+            }
+
+            fitToolbar(toolbar, { fits })
+            syncMoreButton(toolbar)
         },
 
         closeMenus() {
@@ -265,6 +416,11 @@ export function createBlockControls({ editor, root, blockTypes, tools = {} }) {
             boundToolbars.forEach((toolbar) => toolbar.removeEventListener('click', handleControlClick))
             switcherMenu.destroy()
             moreMenu.destroy()
+            overflow.section.remove()
+            overflow.separator.remove()
+            moreElement.querySelectorAll('[data-rep-more-action]').forEach((item) => {
+                item.hidden = false
+            })
             listMenu?.destroy()
             toolMenus.destroy()
         },

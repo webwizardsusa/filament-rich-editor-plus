@@ -60,7 +60,12 @@ export class FloatingMenu {
 
         const { items } = this
 
-        ;(items.find((item) => item.getAttribute('aria-checked') === 'true') ?? items[0])?.focus()
+        // A menu of choices opens on the current one. A checkbox item is a toggle, not a choice, so it doesn't count.
+        const current = items.find(
+            (item) => item.getAttribute('aria-checked') === 'true' && item.getAttribute('role') !== 'menuitemcheckbox',
+        )
+
+        ;(current ?? items[0])?.focus()
     }
 
     close({ restoreFocus = true } = {}) {

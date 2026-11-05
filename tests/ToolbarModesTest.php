@@ -143,7 +143,7 @@ it('arranges each toolbar on its own', function (): void {
 
     expect($fixed->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['italic'])
         ->and($fixed->contains('data-rep-control="switcher"'))->toBeTrue()
-        ->and($fixed->contains('data-rep-control="more"'))->toBeFalse()
+        ->and($fixed->test('/data-rep-control="more"(?![^>]*data-rep-overflow-only)/'))->toBeFalse()
         ->and($floating->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold']);
 });
 
@@ -186,7 +186,7 @@ it('can make a formatting-only list the whole floating toolbar', function (): vo
     expect($floating->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold', 'italic', 'link'])
         ->and($floating->contains('data-rep-drag-handle'))->toBeFalse()
         ->and($floating->contains('data-rep-control="switcher"'))->toBeFalse()
-        ->and($floating->contains('data-rep-control="more"'))->toBeFalse();
+        ->and($floating->test('/data-rep-control="more"(?![^>]*data-rep-overflow-only)/'))->toBeFalse();
 });
 
 it('renders no toolbar for a flagged list that shows nothing, but keeps the slash menu', function (): void {
@@ -210,14 +210,14 @@ it('renders a full fixed toolbar next to a formatting bubble when the fixed tool
         ->and($fixed->contains('data-rep-control="more"'))->toBeTrue()
         ->and($fixed->matchAll('/data-rep-tool="([^"]+)"/')->all())->toContain('bold', 'italic', 'underline', 'strikethrough', 'link')
         ->and($floating->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold', 'italic', 'link'])
-        ->and($floating->contains('data-rep-control'))->toBeFalse();
+        ->and($floating->test('/data-rep-control="(?!more"[^>]*data-rep-overflow-only)/'))->toBeFalse();
 });
 
 it('copies the formatting bubble into the fixed toolbar when it inherits', function (): void {
     $fixed = str(toolbarModesHtml('bubble-fixed'))->betweenFirst('data-rep-fixed-toolbar', '</div>');
 
     expect($fixed->matchAll('/data-rep-tool="([^"]+)"/')->all())->toBe(['bold', 'italic', 'link'])
-        ->and($fixed->contains('data-rep-control'))->toBeFalse();
+        ->and($fixed->test('/data-rep-control="(?!more"[^>]*data-rep-overflow-only)/'))->toBeFalse();
 });
 
 it('prints the colour styles once, also when disabled, and not without the colour plugins', function (): void {

@@ -257,6 +257,7 @@ export default function richEditorPlusComponent({
                         toolbars.forEach((toolbar) => {
                             syncToolbar(editor, toolbar, tools)
                             blockControls.sync(toolbar)
+                            blockControls.fit(toolbar)
                         })
 
                     toolbars.forEach((toolbar) => {
@@ -272,6 +273,7 @@ export default function richEditorPlusComponent({
                             root: this.$el,
                             floatingElements: blockControls.floatingElements,
                             onShow: sync,
+                            onFit: (toolbar) => blockControls.fit(toolbar),
                             onHide: () => {
                                 toolbarTooltip.hide()
                                 blockControls.closeMenus()

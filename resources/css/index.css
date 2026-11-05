@@ -217,6 +217,23 @@
     display: none;
 }
 
+/* Once the browser fits a toolbar, it stays on one row and what doesn't fit moves into its more menu. */
+.rep-toolbar[data-rep-fitted] {
+    flex-wrap: nowrap;
+}
+
+.rep-toolbar[data-rep-fitted] :is(.rep-tool, .rep-toolbar-divider) {
+    flex-shrink: 0;
+}
+
+.rep-toolbar [data-rep-overflowed] {
+    display: none;
+}
+
+.rep-menu-overflow {
+    display: contents;
+}
+
 .rep-toolbar[data-rep-block-toolbar] {
     position: fixed;
     top: 0;

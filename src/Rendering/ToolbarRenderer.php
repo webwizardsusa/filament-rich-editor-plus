@@ -36,6 +36,7 @@ class ToolbarRenderer
             .' aria-label="'.e(__('rich-editor-plus::toolbar.block')).'" data-rep-block-toolbar="'.e($node).'"'
             .($showsWithCursor ? ' data-rep-show-with-cursor' : '').' hidden>'
             .$this->renderItems($layout, $blockTools === [] ? '' : $this->renderTools($blockTools), $hasListTypes, ToolbarPlacement::Floating)
+            .$this->renderOverflowMore($layout)
             .'</div>';
     }
 
@@ -52,6 +53,7 @@ class ToolbarRenderer
             .' role="toolbar" aria-orientation="horizontal" aria-label="'.e(__('rich-editor-plus::toolbar.fixed')).'"'
             .' data-rep-fixed-toolbar'.($attributes === '' ? '' : ' '.$attributes).'>'
             .$this->renderItems($layout, $this->renderBlockToolGroups($blockToolGroups), $hasListTypes, ToolbarPlacement::Fixed, ($blockToolGroups['*'] ?? []) === [])
+            .$this->renderOverflowMore($layout)
             .'</div>';
 
         return $isDisabled ? str_replace('<button ', '<button disabled ', $html) : $html;
@@ -131,6 +133,19 @@ class ToolbarRenderer
             ToolbarControl::MoveDown => $divider.$this->renderControl('moveDown', 'mdi-arrow-down', __('rich-editor-plus::toolbar.move_down'), shortcut: 'Alt-Shift-ArrowDown'),
             ToolbarControl::More => $divider.$this->renderControl('more', 'mdi-dots-horizontal', __('rich-editor-plus::toolbar.more'), 'aria-haspopup="menu" aria-expanded="false"'),
         };
+    }
+
+    /**
+     * The browser keeps a toolbar on one row by moving what doesn't fit into the more menu. A layout without a more
+     * button gets one for that, hidden until something moves.
+     */
+    protected function renderOverflowMore(ToolbarLayout $layout): string
+    {
+        if ($layout->has(ToolbarControl::More)) {
+            return '';
+        }
+
+        return $this->renderControl('more', 'mdi-dots-horizontal', __('rich-editor-plus::toolbar.more'), 'aria-haspopup="menu" aria-expanded="false" data-rep-overflow-only hidden');
     }
 
     /**

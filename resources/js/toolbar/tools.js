@@ -1,22 +1,12 @@
 import { getActiveList } from '../blocks/active-block'
 import { resolveActionArguments } from '../registry'
 import { allowsFormatting } from './block-controls'
+import { isShownWithin } from './overflow'
 import { isToolActive } from './tool-menus'
 
-const isHiddenWithin = (toolbar, element) => {
-    for (let current = element; current && current !== toolbar; current = current.parentElement) {
-        if (current.hidden) {
-            return true
-        }
-    }
-
-    return false
-}
-
+/** The buttons that show, leaving out those hidden here and those moved into the more menu. */
 const toolButtons = (toolbar) =>
-    [...toolbar.querySelectorAll('[data-rep-tool], [data-rep-control]')].filter(
-        (button) => !isHiddenWithin(toolbar, button),
-    )
+    [...toolbar.querySelectorAll('[data-rep-tool], [data-rep-control]')].filter((button) => isShownWithin(toolbar, button))
 
 export function runTool(editor, tool, mountAction) {
     if (tool?.action) {

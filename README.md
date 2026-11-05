@@ -22,7 +22,7 @@ they are edited.
 ### Content formats
 
 HTML and JSON are the built-in storage formats. A `ContentFormat` stores the field's content as something else, such as
-Markdown (see [Rich Editor Plus: Markdown](../rich-editor-plus-markdown/README.md)). The editor still edits a document;
+Markdown (see [Markdown](#markdown)). The editor still edits a document;
 the format converts it on the way in and out of the model.
 
 ```php
@@ -42,7 +42,7 @@ $field->getContentFormat(); // the ContentFormat, or null
   its registry, so it can throw when the combination doesn't suit it. `PluginRegistry::withoutTools()` builds a
   registry with some tools removed.
 - `RichContentPlusRenderer` reads string content with a format through `->format($format)`, and writes with
-  `->toFormat($format)`. The renderer is `Macroable`, so a package can add methods such as `toMarkdown()`.
+  `->toFormat($format)`. `->toMarkdown()` exports any content as Markdown. The renderer is `Macroable`, so a package can add methods of its own.
 - A tool marked `Tool::availableWhileReadOnly()` stays enabled while the editor is read-only; the toolbar, the More menu
   and the block controls disable every other tool. A tool's active state can also come from an extension's
   `editor.storage[name].isActive` boolean.
@@ -298,6 +298,396 @@ RichEditorPlus::make('body')->addPlugins([
 | `LineHeightPlugin` | A line height menu on the toolbar, from three values by default (tight, relaxed and loose). It stores the line height as a class on a span. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
+## Tables
+
+`TablePlugin` adds tables, inserted from the slash menu ("Table") or the block menu with a dialog that asks for the
+size and whether there is a header row. While the cursor is in a table, the toolbar shows its tools: add or delete
+columns and rows, merge or split cells, toggle the header row and delete the table.
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
+
+RichEditorPlus::make('body')->addPlugins([
+    TablePlugin::make()
+        ->resizable()              // the default: column widths can be dragged
+        ->defaultSize(3, 3, true), // the default: rows, columns and a header row in the insert dialog
+]);
+```
+
+Render content with the same plugins as the field. A field that stores Markdown needs `->resizable(false)`, because
+Markdown has no column widths (see [Markdown](#markdown)).
+
+## Images and attachments
+
+`ImagePlugin` adds images: upload a file to a Laravel disk or link to a web image,
+then give it alt text, a caption, an alignment and a width. Images are blocks, added from the slash menu ("Image") or
+the block menu, and edited from the block toolbar.
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
+
+RichEditorPlus::make('body')->addPlugins([ImagePlugin::make()]);
+```
+
+
+### Image options
+
+Every option is shown with its default:
+
+```php
+ImagePlugin::make()
+    ->disk(null)                                  // config('filesystems.default')
+    ->directory('editor-images')
+    ->visibility('public')                        // 'public' or 'private'
+    ->maxSize(5120)                               // kilobytes
+    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+    ->allowUrls()                                 // let editors link to an external image
+    ->allowUploads()                              // let editors upload, paste and drop image files
+    ->altRequired()                               // alt text is required unless the image is marked decorative
+    ->widths(['25' => '25%', '50' => '50%', '75' => '75%', '100' => '100%'])
+    ->defaultWidth('100')
+    ->defaultAlignment('center')                  // 'left', 'center', 'right' or 'wide'
+    ->temporaryUrlMinutes(30)
+    ->urlUsing(fn (string $disk, string $path): string => ...); // not set by default
+```
+
+- `widths()` maps a key, which is stored in the content, to a CSS length (`%`, `px`, `rem`, `em`), `auto` or a CSS
+  variable. The default width must be one of the keys.
+- `acceptedFileTypes()` takes MIME types and `type/*` wildcards such as `image/*`, in the modal and for pasted and
+  dropped files alike. A type the plugin refuses (such as `AttachmentPlugin`'s HTML and scripts) stays refused even
+  when a wildcard matches it, and a wildcard never matches SVG, HTML, XML or JavaScript (`image/*` does not take
+  `image/svg+xml`): those are taken only when listed by name.
+- `allowUploads(false)` leaves the URL field only: the modal has no upload, the editor stops taking pasted and dropped
+  image files, and the server refuses image uploads. Use it with `allowUrls()` when the content can only hold links to
+  images, as on a field that stores Markdown.
+- An invalid configuration, such as an unknown disk, throws an `InvalidArgumentException` when the plugin is used.
+
+### Where images are stored
+
+An uploaded image is saved to the plugin's disk, in the directory, and the content stores the **disk and path**, never
+the URL:
+
+```html
+<figure class="rep-image" data-type="image" data-disk="public" data-path="editor-images/cat.jpg" data-align="center" data-width="100"><img alt="A cat"><figcaption>Napping</figcaption></figure>
+```
+
+Whether it comes from the modal or a paste or drop, the file is stored under a random name with the extension of its
+real type, detected from its contents; the name and type the browser reports are never used for it. A file whose
+contents are not an accepted type is refused.
+
+The URL is resolved when content is rendered and when the editor shows the image:
+
+- With `visibility('public')` it is the disk's `url()`. A `public` disk needs `php artisan storage:link`.
+- With `visibility('private')` it is a temporary URL that lasts `temporaryUrlMinutes()`. The disk must support
+  temporary URLs, such as S3.
+- `urlUsing(fn ($disk, $path) => ...)` replaces both, for a CDN or a signed route.
+
+Because stored content comes from the browser, a path is only used when it is safe: the plugin's own disk, a relative
+path inside the plugin's directory, with no `.`, `..` or empty segments, no leading `/`, no `\` or `%` anywhere, and no
+control characters. Anything else, such as `../../.env`, `%2e%2e/.env` or a path on another disk, renders without a
+`src` and is never signed. The same rule applies to the directory you configure.
+
+The editor asks the server for the URLs of the uploaded images it shows, in batches of up to 100 paths, and keeps them
+while the editor is open. A lookup that fails is asked for again the next time the image renders. In a very long
+editing session, a temporary URL on a private disk can expire before the page is reloaded and the image stops showing;
+reloading the page fixes it.
+
+On a private disk, anyone who can open the field can get a temporary URL for any file in the plugin's directory, not
+only the images in the record they are editing. Give private images a directory per tenant (or per record), such as
+`->directory('editor-images/'.$tenant->getKey())`, so one tenant cannot reach another's files.
+
+### External images
+
+With `allowUrls()` (the default), the image modal offers a "URL" source for `http` and `https` images and for relative
+URLs (`/images/logo.png`, `images/logo.png`, `//cdn.example.com/logo.png`). They are stored as `data-url` and rendered
+with that URL as their `src`; other schemes, such as `javascript:` or `data:`, are never accepted. The URL is loaded
+straight from its site by every reader's browser.
+
+A relative URL is resolved against the page showing the content, so the editor (inside your panel) and your public pages
+may load different files. A root-relative URL (`/images/logo.png`) gives the same file on both when they share a domain.
+
+With `allowUrls(false)`, only uploads can be added. External images already in stored content keep their URL when they
+are edited.
+
+### Alt text and captions
+
+Alt text is required unless you call `altRequired(false)`. Then the modal offers a "Decorative image" checkbox, which
+saves an empty `alt` so screen readers skip the image. The caption is optional and renders as a `<figcaption>`.
+
+### Editing images
+
+Select an image to see its block toolbar: edit (reopens the modal), alignment (`left`, `center`, `right`, `wide`) and
+width (from `widths()`). When editing, leaving the upload empty keeps the current image, but only while it is still
+valid: if its stored path is not a safe path on the plugin's disk (see above), a new upload is required. Choosing a new
+file replaces the image.
+
+Deleting an image from the editor does **not** delete its file. The same file may be used by other content or by an
+older version of it, so remove files that nothing uses with your own cleanup.
+
+### Pasting and dropping files
+
+With `ImagePlugin` on a field, images pasted into the editor (screenshots, copied image files) or dropped onto it are
+uploaded and inserted. With `AttachmentPlugin` too, other accepted files become file cards. Each file shows an
+"Uploading…" placeholder with its progress; the form waits to save until every file of the paste or drop is stored
+and in the content.
+
+- One pasted or dropped image opens the image modal for its alt text and caption. Several are inserted directly and
+  show a "Needs alt text" badge in the editor until they have alt text (with `->altRequired(false)` there is no badge).
+- A paste that contains HTML (from a web page or a word processor) is pasted as content, not uploaded.
+- At most 10 files are added per paste or drop.
+- The editor routes each file by the type the browser reports, knowing its other names (a ZIP reported as
+  `application/x-zip-compressed` or `application/x-zip`, a CSV as `text/x-csv` or `application/csv`, a JPEG as
+  `image/jpg` or `image/pjpeg`). A file the browser reports no type for goes to `AttachmentPlugin`, when the field
+  has it.
+- Each plugin checks the file's real type from its contents and its size before storing it on its own disk and
+  directory. The browser only ever sends a temporary upload.
+- A file that is rejected or fails to upload loses its placeholder and shows a Filament notification. If the content
+  around a placeholder is deleted while it uploads, the file is still saved to the disk but not added to the content,
+  and a notification says so. Nothing uses that file, so your own cleanup can remove it.
+- Uploads finish without moving the caret, so you can keep typing while they run.
+- Livewire's temporary uploads have their own limit (12 MB by default). For a larger `maxSize`, raise
+  `livewire.temporary_file_upload.rules` (for example `['required', 'file', 'max:51200']`).
+
+### Attachments
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
+
+RichEditorPlus::make('content')
+    ->addPlugins([
+        ImagePlugin::make()->disk('public'),
+        AttachmentPlugin::make()
+            ->disk('public')                    // default: config('filesystems.default')
+            ->directory('editor-attachments')   // default
+            ->visibility('public')              // default; anything else renders temporary URLs
+            ->maxSize(10240)                    // KB, default
+            ->acceptedFileTypes([...])          // default: PDF, Word, Excel, PowerPoint, OpenDocument, text, CSV, ZIP
+            ->temporaryUrlMinutes(30)
+            ->urlUsing(fn (string $disk, string $path): string => ...),
+    ]);
+```
+
+Attachments are block cards with the file's name, its size and a download link, inserted from the slash menu's
+"File" block or by pasting or dropping a file. Like images, they store their disk and path and get their link when the
+content is shown, so private disks work. Include `AttachmentPlugin::make()->getStylesheet()` on pages that show
+content, as for images.
+
+HTML, XHTML, SVG, XML, JavaScript, PHP, shell scripts and executables are never accepted, even when configured: a file
+on a public disk is served from your own domain, so one of these could run script there.
+
+Deleting an attachment or image from the content does not delete its file. Run `php artisan storage:link` before using
+the `public` disk locally.
+
+### Showing images and attachments
+
+Rendered content needs the plugin's CSS for alignment and width. Include it on every page that shows the content:
+
+```blade
+<style>{!! \Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin::make()->getStylesheet() !!}</style>
+```
+
+Use the same `widths()` as the field, because the stylesheet has one rule per width. The editor loads it by itself.
+
+Render content with the same plugins as the field, so images get their URLs:
+
+```php
+use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
+
+RichContentPlusRenderer::make($post->body)
+    ->plugins([ImagePlugin::make()])
+    ->toHtml();
+```
+
+### SVG images
+
+SVG is not accepted by default, because an SVG file can carry script, and `image/*` never includes it: the type is read
+from the file's contents, so an SVG renamed to `.png` is still refused. If you add `image/svg+xml` to
+`acceptedFileTypes()` by name, only do so for trusted editors, and serve the files from a disk or domain that does not
+share cookies with your application.
+
+## Markdown
+
+`MarkdownPlugin` and `MarkdownFormat` add Markdown: store a field's content as Markdown, paste Markdown as
+formatted content, switch to a Markdown source view while editing, and export any content to Markdown. Conversion
+happens in PHP in both directions (CommonMark with the GitHub-flavoured extensions to read, a rules-based serializer to
+write), so stored content, pasted content and the source view always agree. The editor itself keeps editing a document.
+
+
+### Storing Markdown
+
+```php
+use Hollyit\RichEditorPlus\RichEditorPlus;
+use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
+
+RichEditorPlus::make('body')->addPlugins([MarkdownPlugin::make()->store()]);
+```
+
+The same, without the plugin's other features being involved:
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
+
+RichEditorPlus::make('body')->storeAs(MarkdownFormat::make());
+```
+
+The model column holds Markdown, so use a `text` or `longText` column. A value that was stored as HTML or JSON before
+is read as Markdown, so convert existing rows first (see [Exporting Markdown](#exporting-markdown)).
+
+A Markdown field only allows plugins whose content has a Markdown form:
+
+- **Default plugins** Markdown can't keep (`UnderlinePlugin`) are left out quietly.
+- **Plugins you add** that Markdown can't keep throw when the field boots, naming all of them at once:
+
+  ```
+  Markdown storage can't keep: UnderlinePlugin (no Markdown syntax for underline), TablePlugin (column widths: call ->resizable(false)).
+  ```
+
+- Tables and images need one setting each:
+
+  ```php
+  TablePlugin::make()->resizable(false);
+  ImagePlugin::make()->allowUrls()->allowUploads(false);
+  ```
+
+- The tools Markdown can't express (`mergeOrSplit`, `toggleHeaderRow`, `imageAlign`, `imageWidth`) are removed from every
+  toolbar and the slash menu. Images use the plugin's default alignment and width.
+
+### Which plugins work
+
+| Plugin | Allowed | Markdown |
+|---|---|---|
+| Document (`paragraph`, `text`, `hardBreak`) | Yes | Paragraphs separated by one blank line. Hard break: `\` + newline. |
+| Bold, Italic, Strikethrough, Code | Yes | `**b**`, `*i*`, `~~s~~`, `` `c` ``. A code span's fence is one backtick longer than the longest run inside it, padded with a space when the code starts or ends with a backtick. |
+| Link | Yes | `[text](url)`, plus `"title"` when present. URLs containing spaces or parentheses are written in `<...>`. |
+| Heading | Yes | `#` to `######`. |
+| Blockquote | Yes | `> ` on every line, nested. |
+| Bullet list, Ordered list | Yes | `- ` and `1.`; an ordered list's start number is kept. Nested content is indented to the marker width. Multi-paragraph items are written loose. |
+| Task list | Yes | `- [ ] ` and `- [x] `. |
+| Code block | Yes | Fenced with the language (`` ```php ``); the fence is longer than any backtick run in the code. |
+| Divider | Yes | `---` |
+| Find & replace, Trailing node | Yes | No content of their own. |
+| Table | With `->resizable(false)` | GFM table, see below. |
+| Image | With `->allowUploads(false)` and `allowUrls()` on | `![alt](url "caption")`, see below. |
+| Attachment | No | Stores disk and path, which Markdown can't hold. |
+| Underline, Subscript, Superscript | No | No Markdown syntax. |
+| Text colour, Background colour, Text align, Font family, Font size, Line height, Palette colour, Palette style | No | No Markdown syntax. |
+| Mention | No | No Markdown syntax. |
+
+Escaping is minimal: characters are escaped only where they would otherwise start Markdown syntax in their position
+(`\*`, `\_`, `` \` ``, `\[`, `\]`, `\<`, a leading `#`, `>`, `-`, `+`, `1.` or `|` inside table cells). Plain prose
+round-trips without added backslashes. Where CommonMark's flanking rules would not honour `**`, `*` or `~~` (for example
+bold text that starts with punctuation next to a letter), the serializer writes `<strong>`, `<em>` or `<del>` instead,
+so the emphasis survives.
+
+**Tables.** The first row is written as the GFM header row, whatever its cell type; read back, the first row's cells are
+headers. Column alignment comes from each header cell (`:--`, `:-:`, `--:`) and applies to the whole column. A cell is
+one line: several paragraphs join with `<br>` (read back as hard breaks), and `|` is escaped.
+
+**Images.** The caption is written as the title: `![Our cat](https://example.com/cat.jpg "Our cat sleeping")`. A
+paragraph holding only an image becomes an image block when read; an image inside text splits the paragraph. Relative
+URLs (`![Logo](/img/logo.png)`) are kept as written; an image whose URL has another scheme (`javascript:`, `data:`) is
+read as its alt text.
+
+### Pasting Markdown
+
+On by default, on any field whatever its storage format. Pasted plain text that looks like Markdown is converted to
+formatted content on the server, against the field's own schema, so what the field doesn't support comes back as plain
+paragraphs.
+
+- It converts when the clipboard has `text/plain` and any line starts with a heading, quote, list marker, task marker,
+  numbered item or code fence, or holds a table, `[text](url)`, `**bold**` or `` `code` ``.
+- Copied HTML wins: a paste that carries HTML is left to the normal paste, except from code editors (such as VS Code)
+  that mark their clipboard.
+- Pasting with Shift (Ctrl/Cmd+Shift+V) pastes the text as it is. Nothing converts inside a code block.
+- A failed conversion inserts the original text and shows a notice.
+
+Turn it off with `MarkdownPlugin::make()->pasteMarkdown(false)`.
+
+### Markdown source view
+
+A "Markdown source" item in the toolbar's More menu swaps the editor for a Markdown textarea. It is on
+by default when the field stores Markdown. On other fields call `->sourceToggle()`; the field's plugins must all have
+a Markdown form, or it throws at boot with the same message as above.
+
+- Edits convert back to the document after a short pause, so the form's state stays current, and the form waits for a
+  conversion in flight before saving.
+- A "Done" bar returns to the editor. While the source view is open the editor is read-only, and the toolbar, the More
+  menu and the block controls are locked, except tools marked `Tool::availableWhileReadOnly()`.
+- Undo after returning walks back through the source edits to the document as it was before the switch.
+
+### Exporting Markdown
+
+Any content can be written as Markdown, whatever the field stores:
+
+```php
+use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
+
+$markdown = RichContentPlusRenderer::make($post->body)->plugins([...])->toMarkdown();
+```
+
+Export is lenient: a node without a Markdown form writes its text, and a mark without one is dropped. Storage is strict
+and throws an `UnsupportedContentFormatException`. `MarkdownFormat::make()->lenient()` gives the lenient format for
+direct use. To migrate a column of HTML to Markdown, run each row through `toMarkdown()`.
+
+To render stored Markdown:
+
+```php
+RichContentPlusRenderer::make($post->body)->plugins([...])->format(MarkdownFormat::make())->toHtml();
+```
+
+Raw HTML in Markdown is kept only as far as the field's schema parses it. Input over 1 MB is refused.
+
+### What Markdown can't keep
+
+Content arriving outside the editor's tools (paste, programmatic content) is normalised when the field saves. Nothing is
+dropped in the browser.
+
+- Merged table cells (the content stays in the first cell; the covered cells are empty).
+- Different alignments within one column (the header cell's wins).
+- Blocks other than paragraphs inside table cells (they are reduced to their text).
+- Image alignment and width.
+- Empty paragraphs.
+- Headings outside the field's levels move to the nearest level (with levels 2 and 3, `#` becomes a level 2 heading
+  and `####` a level 3 heading).
+- Soft line breaks inside a paragraph become spaces.
+- Leading spaces at the start of a line are dropped.
+- Bare URLs and email addresses become links (GFM autolinks).
+- An image inside a table cell is written as its alt text.
+- Bold or italic on inline code (the code mark excludes other marks).
+- Whitespace at the edge of a marked run moves outside it.
+
+### Markdown for your own plugins
+
+A plugin gives Markdown forms for its nodes and marks by implementing `ProvidesMarkdownRules`. A plugin with no rules is
+not allowed on a Markdown field. Reading uses the plugin's existing HTML parse rules, because Markdown is parsed to
+HTML first.
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Markdown\Contracts\ProvidesMarkdownRules;
+use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
+use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+
+class CalloutPlugin extends Plugin implements ProvidesMarkdownRules
+{
+    // getId(), getJsExtension() and getNodes() (an `aside` node named `callout`) as usual.
+
+    public function getMarkdownNodeRules(): array
+    {
+        return ['callout' => NodeRule::using(
+            static fn (array $node, MarkdownWriter $writer) => $writer->write('> **Note:** '.$writer->textOf($node)),
+        )];
+    }
+
+    public function getMarkdownMarkRules(): array
+    {
+        return []; // MarkRule::using($open, $close) rules, keyed by mark type
+    }
+}
+```
+
+A node rule writes through the `MarkdownWriter`, which handles indentation, blank lines and escaping. A mark rule
+gives the text that opens and closes the mark.
+
 ## Global attributes
 
 A plugin can add an attribute to nodes and marks that other plugins own, such as an alignment on paragraphs and
@@ -426,8 +816,8 @@ The trait expects the service provider in `src/` and, by default:
 
 While the hot file exists in a local environment, `moduleUrl()` returns the dev server's entry and the panel loads
 its HMR client; otherwise it returns the published asset. Override `assetsDistPath()`, `devServerEntry()` or
-`assetsMissingMessage()` to change the defaults. See `RichEditorPlusTableServiceProvider` in
-`hollyit/rich-editor-plus-table` for a complete example.
+`assetsMissingMessage()` to change the defaults. The package's own table, image and Markdown modules are registered
+this way: see `src/Support/BundledPluginAssets.php`.
 
 ### Tools with a menu
 
@@ -591,8 +981,8 @@ export default defineConfig({
 ```
 
 The entry must match `devServerEntry()`, which defaults to your package's `resources/js/index.js` relative to the app
-root. The dev server is only used in a `local` environment. `vite.config.js` in `hollyit/rich-editor-plus-table`
-shows both modes in one file.
+root. The dev server is only used in a `local` environment. The package's `vite.modules.config.js`, which builds the
+table, image and Markdown modules, shows both modes in one file.
 
 The local `@tiptap/core` and `@tiptap/pm` are only read for their export names; they are never bundled. Use the same
 major version as the editor (3). If your build expects an export the editor's copy doesn't have, the browser console

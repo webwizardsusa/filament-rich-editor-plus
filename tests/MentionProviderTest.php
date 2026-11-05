@@ -89,6 +89,38 @@ it('caps results at 50 by default', function (): void {
     expect($provider->getResults(''))->toHaveCount(50);
 });
 
+it('gives the search callback the limit', function (): void {
+    $limit = null;
+
+    MentionProvider::make('@')->limit(7)->getSearchResultsUsing(function (string $query, int $max) use (&$limit): array {
+        $limit = $max;
+
+        return [];
+    })->getResults('a');
+
+    expect($limit)->toBe(7);
+});
+
+it('does not search a query over the maximum length', function (): void {
+    $searched = [];
+    $provider = MentionProvider::make('@')->maxQueryLength(5)->getSearchResultsUsing(function (string $query) use (&$searched): array {
+        $searched[] = $query;
+
+        return ['1' => 'x'];
+    });
+
+    expect($provider->getResults('abcdef'))->toBe([])
+        ->and($provider->getResults('abcde'))->toHaveCount(1)
+        ->and($searched)->toBe(['abcde']);
+});
+
+it('caps queries at 100 characters by default', function (): void {
+    $provider = MentionProvider::make('@')->getSearchResultsUsing(fn (): array => ['1' => 'x']);
+
+    expect($provider->getResults(str_repeat('a', 101)))->toBe([])
+        ->and($provider->getResults(str_repeat('a', 100)))->toHaveCount(1);
+});
+
 it('only returns labels for the ids it was asked about', function (): void {
     expect(FakePeopleMention::make()->getLabels(['7']))->toBe(['7' => 'Ada']);
 });

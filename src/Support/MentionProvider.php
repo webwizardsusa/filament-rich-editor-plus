@@ -6,6 +6,7 @@ use Closure;
 use Filament\Forms\Components\Field;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use ReflectionMethod;
 
 /**
  * One kind of mention: its trigger, and how to find and label its records. Configure it with closures, or subclass it
@@ -27,6 +28,8 @@ class MentionProvider
     protected int $minQueryLength = 0;
 
     protected int $limit = 50;
+
+    protected int $maxQueryLength = 100;
 
     protected ?string $displayFormat = null;
 
@@ -73,6 +76,12 @@ class MentionProvider
         return $this;
     }
 
+    /**
+     * The callback gets the query and the most results that will be shown, so it can limit its own query:
+     * `fn (string $query, int $limit) => User::search($query)->take($limit)->pluck('name', 'id')`.
+     *
+     * @param  ?Closure(string, int): mixed  $callback
+     */
     public function getSearchResultsUsing(?Closure $callback): static
     {
         $this->getSearchResultsUsing = $callback;
@@ -129,6 +138,22 @@ class MentionProvider
         return $this;
     }
 
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
+     * A longer query finds nothing and never reaches `search()`. The query comes from the browser, so this caps what
+     * a crafted request can send to your search.
+     */
+    public function maxQueryLength(int $length): static
+    {
+        $this->maxQueryLength = $length;
+
+        return $this;
+    }
+
     /**
      * How a token reads, with `:label` for the label. It is a string, not a method to override, because the browser
      * draws tokens too.
@@ -179,12 +204,13 @@ class MentionProvider
     }
 
     /**
-     * Finds records for a query. Return `id => label`, a list of {@see MentionItem}s, or a Collection of either.
+     * Finds records for a query. Return `id => label`, a list of {@see MentionItem}s, or a Collection of either. Only the
+     * first {@see getLimit()} are shown, so a query of your own can stop there.
      */
     public function search(string $query): mixed
     {
         if ($this->getSearchResultsUsing) {
-            return ($this->getSearchResultsUsing)($query);
+            return ($this->getSearchResultsUsing)($query, $this->limit);
         }
 
         $items = $this->getItems();
@@ -209,6 +235,18 @@ class MentionProvider
         }
 
         return array_intersect_key($this->getItems(), array_flip($ids));
+    }
+
+    /**
+     * Whether the provider can look up current labels, through `getLabelsUsing()`, `items()` or its own `labels()`. A
+     * mention such a provider leaves out of its answer is rendered without a link.
+     */
+    public function looksUpLabels(): bool
+    {
+        return $this->getLabelsUsing !== null
+            || $this->items instanceof Closure
+            || $this->items !== []
+            || (new ReflectionMethod($this, 'labels'))->getDeclaringClass()->getName() !== self::class;
     }
 
     /**
@@ -246,7 +284,9 @@ class MentionProvider
      */
     public function getResults(string $query): array
     {
-        if (mb_strlen($query) < $this->minQueryLength) {
+        $length = mb_strlen($query);
+
+        if ($length < $this->minQueryLength || $length > $this->maxQueryLength) {
             return [];
         }
 

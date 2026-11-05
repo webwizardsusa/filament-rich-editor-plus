@@ -84,11 +84,12 @@ export function createMentionMenuPlugin({ editor, root, element, provider, searc
             const message = document.createElement('div')
 
             message.className = 'rep-menu-status'
+            message.setAttribute('aria-hidden', 'true')
             message.textContent = text
             rows = []
             results = []
             element.replaceChildren(message)
-        })
+        }, text)
     }
 
     const render = (props) => {

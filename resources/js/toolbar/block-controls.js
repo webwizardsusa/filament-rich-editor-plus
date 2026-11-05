@@ -6,7 +6,9 @@ import {
     selectionSpansBlocks,
     selectsNestedBlock,
 } from '../blocks/active-block'
+import { BLOCK_MOVED_EVENT, moveSelectedBlock } from '../blocks/block-commands'
 import { findBlockType, switchBlock } from '../blocks/block-types'
+import { announce } from '../live-region'
 import { FloatingMenu } from './floating-menu'
 import { fitToolbar, overflowedButtons } from './overflow'
 import { createToolMenus } from './tool-menus'
@@ -155,15 +157,13 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
 
     const toolMenus = createToolMenus({ editor, root, tools })
 
-    const announce = (message) => {
-        if (live) {
-            live.textContent = message ?? ''
-        }
-    }
+    const announceMove = (direction) => announce(live, direction === 'up' ? live?.dataset.repMovedUp : live?.dataset.repMovedDown)
+
+    editor.on(BLOCK_MOVED_EVENT, announceMove)
 
     const run = {
-        moveUp: () => editor.commands.moveBlockUp() && announce(live?.dataset.repMovedUp),
-        moveDown: () => editor.commands.moveBlockDown() && announce(live?.dataset.repMovedDown),
+        moveUp: () => moveSelectedBlock(editor, 'up'),
+        moveDown: () => moveSelectedBlock(editor, 'down'),
         switcher: (button) => switcherMenu.open(button),
         more: (button) => {
             if (!moreMenu.isOpen) {
@@ -413,6 +413,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
         },
 
         destroy() {
+            editor.off(BLOCK_MOVED_EVENT, announceMove)
             boundToolbars.forEach((toolbar) => toolbar.removeEventListener('click', handleControlClick))
             switcherMenu.destroy()
             moreMenu.destroy()

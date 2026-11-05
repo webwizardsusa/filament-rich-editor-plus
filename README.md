@@ -183,8 +183,8 @@ RichEditorPlus::make('body')->floatingToolbar(false);                  // neithe
 The fixed toolbar stays in place. Tools that can't be used at the cursor are disabled rather than hidden, and its block
 tools section shows the active block's own tools, such as the table tools while the cursor is in a table. It sticks to
 the top of the screen while the editor scrolls past, below a Filament panel's topbar. Turn that off with
-`->stickyFixedToolbar(false)`, or move it with the `--rep-fixed-toolbar-offset` CSS variable. Sticky has no effect
-inside a container that scrolls on its own, such as a modal or slide-over.
+`->stickyFixedToolbar(false)`, or move it with the `--rep-fixed-toolbar-offset` CSS variable. In a modal or
+slide-over it sticks to the top of the modal's own scrolling area instead.
 
 ### Arranging a toolbar
 
@@ -400,6 +400,76 @@ RichEditorPlus::make('body')->addPlugins([
 | `FontSizePlugin` | A size menu on the toolbar, from four sizes by default. It stores the size as a class on a span. |
 | `LineHeightPlugin` | A line height menu on the toolbar, from three values by default (tight, relaxed and loose). It stores the line height as a class on a span. |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
+
+## Mentions
+
+`MentionPlugin` lets editors mention records by typing a trigger, such as `@` for people or `#` for tags. Each trigger
+has a `MentionProvider` that finds and labels its records. The plugin is opt-in, since it does nothing without one:
+
+```php
+use App\Models\User;
+use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
+use Hollyit\RichEditorPlus\Support\MentionItem;
+use Hollyit\RichEditorPlus\Support\MentionProvider;
+
+RichEditorPlus::make('body')->addPlugins([
+    MentionPlugin::make()->providers([
+        MentionProvider::make('@')
+            ->getSearchResultsUsing(fn (string $query, int $limit) => User::query()
+                ->where('team_id', auth()->user()->team_id)
+                ->where('name', 'like', "%{$query}%")
+                ->limit($limit)
+                ->get()
+                ->map(fn (User $user): MentionItem => MentionItem::make($user->id, $user->name)
+                    ->description($user->email)
+                    ->avatar($user->avatar_url)))
+            ->getLabelsUsing(fn (array $ids): array => User::query()
+                ->where('team_id', auth()->user()->team_id)
+                ->whereKey($ids)
+                ->pluck('name', 'id')
+                ->all())
+            ->getUrlUsing(fn (string $id): string => route('users.show', $id)),
+
+        MentionProvider::make('#')->items(['news' => 'News', 'releases' => 'Releases']),
+    ]),
+]);
+```
+
+- A search returns `id => label`, a list of `MentionItem`s, or a Collection of either. `items()` is a fixed list, searched
+  on the server.
+- `getLabelsUsing()` gets the ids of every mention in the content and returns `id => label`. Labels are looked up again
+  whenever content is rendered, so a renamed user shows their new name. Leave out ids that no longer exist.
+- `getUrlUsing()` links a rendered mention. Use `getUrlsUsing(fn (array $labels) => [...])` instead when building the
+  links needs a query: it gets `id => label` for every mention at once. Only `http`, `https` and relative URLs are used.
+- A mention whose provider looks labels up but no longer returns its id keeps the label stored in the content and is
+  never linked. That covers deleted records, and ids someone made up by editing the content by hand.
+- To keep the code in one place, extend `MentionProvider` and override `search()`, `labels()` and `url()`. Pass the
+  class name to `providers()`.
+
+Other options, with their defaults:
+
+```php
+MentionProvider::make('@')
+    ->allowSpaces(false)        // let a query run on past a space, for full names
+    ->minQueryLength(0)         // shorter queries show the search prompt instead of searching
+    ->maxQueryLength(100)       // longer queries find nothing and never reach your search
+    ->limit(50)                 // the most results shown; the search callback gets it as `$limit`
+    ->displayFormat('@:label')  // how a mention reads; defaults to the trigger followed by the label
+    ->searchPrompt('...')       // the messages in the menu; each defaults to a translation
+    ->searchingMessage('...')
+    ->noResultsMessage('...');
+```
+
+**Scope every lookup yourself.** The search and label callbacks run for anyone who can open the page, with any
+input the browser sends, so they must only return records that user may see, for example by filtering to the current
+tenant as above. In a `MentionProvider` subclass, `$this->getField()` gives you the field, or `null` when content is
+being rendered outside a form.
+
+Give the renderer `MentionPlugin` with the same providers, or mentions are left out of its output:
+
+```php
+RichContentPlusRenderer::make($post->body)->plugins([MentionPlugin::make()->providers([...])])->toHtml();
+```
 
 ## Tables
 

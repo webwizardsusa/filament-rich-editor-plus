@@ -1,4 +1,5 @@
 import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom'
+import { announce } from '../live-region'
 
 // Floating UI measures asynchronously, so it can still ask for the position just after the menu has closed.
 const emptyRect = { x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 }
@@ -34,12 +35,10 @@ export function createSuggestionList({ editor, root, element, renderItems, optio
         stopPositioning = null
         element.hidden = true
         editor.view.dom.removeAttribute('aria-activedescendant')
-        editor.view.dom.setAttribute('aria-expanded', 'false')
     }
 
     const reveal = () => {
         element.hidden = false
-        editor.view.dom.setAttribute('aria-expanded', 'true')
 
         if (stopPositioning) {
             return
@@ -101,15 +100,18 @@ export function createSuggestionList({ editor, root, element, renderItems, optio
         },
 
         /**
-         * Shows a message in place of rows, such as "Searching…". There is nothing to pick, so Enter stays normal.
+         * Shows a message in place of rows, such as "Searching…". There is nothing to pick, so Enter stays normal. A
+         * listbox may only hold options, so the message is drawn hidden from assistive technology and read out through
+         * the field's live region instead.
          */
-        showStatus(props, draw) {
+        showStatus(props, draw, message) {
             current = props
             items = []
             root.setAttribute('data-rep-suggesting', '')
             draw()
             editor.view.dom.removeAttribute('aria-activedescendant')
             reveal()
+            announce(root.querySelector('[data-rep-live]'), message)
         },
 
         onKeyDown(event) {

@@ -172,6 +172,18 @@ describe('status', () => {
         await vi.waitFor(() => expect(element.textContent).toContain('Nothing found'))
     })
 
+    it('reads status messages out through the live region, keeping them out of the listbox', async () => {
+        const { editor, root, element } = setUp({ search: async () => [] })
+        const live = document.createElement('span')
+
+        live.setAttribute('data-rep-live', '')
+        root.append(live)
+        type(editor, '@a')
+
+        await vi.waitFor(() => expect(live.textContent).toBe('Nothing found'))
+        expect(element.querySelector('.rep-menu-status').getAttribute('aria-hidden')).toBe('true')
+    })
+
     it('treats a failed request as no results', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {})
 

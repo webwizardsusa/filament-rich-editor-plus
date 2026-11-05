@@ -171,6 +171,43 @@ it('moves the block and announces it, without taking focus', () => {
     expect(document.activeElement).toBe(control('moveUp'))
 })
 
+it('announces a block moved with the keyboard shortcut', () => {
+    setUp(doc(p('a'), p('b')))
+    editor.commands.setTextSelection(4)
+
+    editor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', altKey: true, shiftKey: true, bubbles: true }))
+
+    expect(blockSummary(editor)).toEqual(['paragraph:b', 'paragraph:a'])
+    expect(root.querySelector('[data-rep-live]').textContent).toBe('Moved up')
+})
+
+it('changes the announcement when the same move happens twice, so it is read again', () => {
+    setUp(doc(p('a'), p('b'), p('c')))
+    editor.commands.setTextSelection(7)
+    controls.sync(toolbar)
+
+    control('moveUp').click()
+    const first = root.querySelector('[data-rep-live]').textContent
+    controls.sync(toolbar)
+    control('moveUp').click()
+
+    expect(blockSummary(editor)).toEqual(['paragraph:c', 'paragraph:a', 'paragraph:b'])
+    expect(first).toBe('Moved up')
+    expect(root.querySelector('[data-rep-live]').textContent).not.toBe(first)
+    expect(root.querySelector('[data-rep-live]').textContent.trim()).toBe('Moved up')
+})
+
+it('stops announcing once destroyed', () => {
+    setUp(doc(p('a'), p('b')))
+    editor.commands.setTextSelection(4)
+    controls.destroy()
+
+    editor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', altKey: true, shiftKey: true, bubbles: true }))
+
+    expect(root.querySelector('[data-rep-live]').textContent).toBe('')
+    controls = { destroy: () => {} }
+})
+
 it('ignores a click on a disabled control', () => {
     setUp(doc(p('a'), p('b')))
     editor.commands.setTextSelection(1)

@@ -273,6 +273,11 @@
     --rep-fixed-toolbar-offset: var(--topbar-height, 4rem);
 }
 
+/* A modal or slide-over scrolls on its own, below the topbar, so the toolbar sticks to the top of its scrolling area. */
+.fi-modal .rep-editor {
+    --rep-fixed-toolbar-offset: 0px;
+}
+
 .rep-fixed-toolbar [data-rep-block-tools-for] {
     display: contents;
 }

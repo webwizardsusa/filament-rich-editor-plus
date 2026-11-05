@@ -79,6 +79,11 @@ class RichEditorPlus extends Field implements HasEmbeddedView
 
     protected bool|Closure $inheritsToolbarTools = true;
 
+    /**
+     * The registry while {@see toEmbeddedHtml()} runs, and null otherwise.
+     */
+    protected ?PluginRegistry $renderingPluginRegistry = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -444,6 +449,15 @@ class RichEditorPlus extends Field implements HasEmbeddedView
 
     public function getPluginRegistry(): PluginRegistry
     {
+        return $this->renderingPluginRegistry ?? $this->buildPluginRegistry();
+    }
+
+    /**
+     * A new registry from the field's current configuration. Closures can answer differently as the form's state
+     * changes, so the registry is only kept while one render runs (see {@see toEmbeddedHtml()}).
+     */
+    protected function buildPluginRegistry(): PluginRegistry
+    {
         $plugins = $this->getPlugins();
         $format = $this->getContentFormat();
 
@@ -748,7 +762,21 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         );
     }
 
+    /**
+     * Builds the plugin registry once for the whole render, rather than once for every part of the markup that needs it.
+     */
     public function toEmbeddedHtml(): string
+    {
+        $this->renderingPluginRegistry = $this->buildPluginRegistry();
+
+        try {
+            return $this->renderEmbeddedHtml();
+        } finally {
+            $this->renderingPluginRegistry = null;
+        }
+    }
+
+    protected function renderEmbeddedHtml(): string
     {
         $id = $this->getId();
         $isDisabled = $this->isDisabled();

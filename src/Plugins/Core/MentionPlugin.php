@@ -158,11 +158,17 @@ class MentionPlugin extends Plugin implements PatchesRenderedHtml
 
             $ids = array_map('strval', array_keys($storedLabels));
 
-            $labels[$trigger] = rescue(static fn (): array => $provider->getLabels($ids), []);
+            $found = rescue(static fn (): array => $provider->getLabels($ids), null);
+            $labels[$trigger] = $found ?? [];
 
+            // A provider that looks labels up and leaves an id out says the record is gone (or never existed, when the
+            // id was forged): the mention keeps its stored label but links nowhere. When the lookup fails, or the
+            // provider has no lookup, every mention keeps its link.
+            $linkedIds = $found !== null && $provider->looksUpLabels() ? array_keys($found) : $ids;
             $currentLabels = [];
 
-            foreach ($ids as $id) {
+            foreach ($linkedIds as $id) {
+                $id = (string) $id;
                 $currentLabels[$id] = $labels[$trigger][$id] ?? $storedLabels[$id];
             }
 

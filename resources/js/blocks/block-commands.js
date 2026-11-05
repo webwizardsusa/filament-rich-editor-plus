@@ -43,6 +43,25 @@ const moveByOne = (direction) => ({ tr, dispatch }) => {
 }
 
 /**
+ * The editor event a block move fires, with `'up'` or `'down'`, so the toolbar can announce moves made from the
+ * keyboard as well as its own buttons.
+ */
+export const BLOCK_MOVED_EVENT = 'repBlockMoved'
+
+/**
+ * Moves the selected block up or down, and fires {@see BLOCK_MOVED_EVENT} when it moved.
+ */
+export function moveSelectedBlock(editor, direction) {
+    const moved = direction === 'up' ? editor.commands.moveBlockUp() : editor.commands.moveBlockDown()
+
+    if (moved) {
+        editor.emit(BLOCK_MOVED_EVENT, direction)
+    }
+
+    return moved
+}
+
+/**
  * Whole-block operations for the block toolbar. Each runs in one transaction, so it is one undo step.
  */
 export const BlockCommands = Extension.create({
@@ -159,8 +178,8 @@ export const BlockCommands = Extension.create({
 
     addKeyboardShortcuts() {
         return {
-            'Alt-Shift-ArrowUp': () => this.editor.commands.moveBlockUp(),
-            'Alt-Shift-ArrowDown': () => this.editor.commands.moveBlockDown(),
+            'Alt-Shift-ArrowUp': () => moveSelectedBlock(this.editor, 'up'),
+            'Alt-Shift-ArrowDown': () => moveSelectedBlock(this.editor, 'down'),
         }
     },
 })

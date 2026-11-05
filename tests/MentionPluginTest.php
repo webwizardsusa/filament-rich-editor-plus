@@ -199,6 +199,27 @@ it('links a mention when the provider has a URL', function (): void {
     expect($html)->toContain('<a')->toContain('href="/people/1"');
 });
 
+it('keeps the stored label of a mention the provider no longer has, but links it nowhere', function (): void {
+    $html = renderMentions(
+        docWith(mentionNode('1', 'Ada'), mentionNode('99', 'Forged')),
+        MentionProvider::make('@')->items(['1' => 'Ada Lovelace'])->getUrlUsing(fn (string $id): string => "/people/{$id}"),
+    )->toHtml();
+
+    expect($html)->toContain('href="/people/1"')->toContain('>@Ada Lovelace<')
+        ->toContain('>@Forged<')->not->toContain('/people/99');
+});
+
+it('keeps every link when the label lookup fails', function (): void {
+    $html = renderMentions(
+        docWith(mentionNode('1', 'Ada')),
+        MentionProvider::make('@')
+            ->getLabelsUsing(fn (): array => throw new RuntimeException('down'))
+            ->getUrlUsing(fn (string $id): string => "/people/{$id}"),
+    )->toHtml();
+
+    expect($html)->toContain('href="/people/1"')->toContain('>@Ada<');
+});
+
 it('renders a span for an unsafe URL', function (): void {
     $html = renderMentions(
         docWith(mentionNode('1', 'Ada')),

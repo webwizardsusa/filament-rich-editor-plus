@@ -265,7 +265,8 @@ describe('accessibility and lifecycle', () => {
         await vi.waitFor(() => expect(menu().hidden).toBe(false))
 
         expect(editor.view.dom.getAttribute('aria-activedescendant')).toBe('s-heading2')
-        expect(editor.view.dom.getAttribute('aria-expanded')).toBe('true')
+        expect(editor.view.dom.getAttribute('aria-controls')).toBe(menu().id)
+        expect(editor.view.dom.hasAttribute('aria-expanded')).toBe(false)
         expect(root.hasAttribute('data-rep-suggesting')).toBe(true)
     })
 

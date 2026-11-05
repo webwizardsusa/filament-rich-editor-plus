@@ -4,6 +4,7 @@ namespace Hollyit\RichEditorPlus;
 
 use Hollyit\RichEditorPlus\Benchmarks\Console\BenchmarkCommand;
 use Hollyit\RichEditorPlus\Plugins\Image\ImageAssets;
+use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownAssets;
 use Hollyit\RichEditorPlus\Plugins\Table\TableAssets;
 use Hollyit\RichEditorPlus\Support\RegistersPluginAssets;
 use Spatie\LaravelPackageTools\Package;
@@ -35,6 +36,7 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
 
         TableAssets::register();
         ImageAssets::register();
+        MarkdownAssets::register();
     }
 
     public static function assetPackage(): string

@@ -8,6 +8,7 @@ use Hollyit\RichEditorPlus\Content\HtmlParser;
 use Hollyit\RichEditorPlus\Content\HtmlSerializer;
 use Hollyit\RichEditorPlus\Content\TextSerializer;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Illuminate\Support\Traits\Macroable;
 
@@ -165,6 +166,15 @@ class RichContentPlusRenderer
     public function toFormat(ContentFormat $format): string
     {
         return $format->fromDocument($this->getPreparedDocument(), $this->getRegistry());
+    }
+
+    /**
+     * The content as Markdown, for export: a node Markdown has no form for is written as its text and such a mark is
+     * dropped, instead of throwing.
+     */
+    public function toMarkdown(): string
+    {
+        return $this->toFormat(MarkdownFormat::make()->lenient());
     }
 
     public function toText(): string

@@ -1,0 +1,37 @@
+/* Markdown source view (see source.js). */
+
+.rep-markdown-source {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 16rem;
+    padding: 2rem 0.75rem;
+    border: 0;
+    resize: vertical;
+    background: transparent;
+    color: inherit;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    tab-size: 4;
+}
+
+.rep-markdown-source:focus {
+    outline: none;
+}
+
+.rep-markdown-source-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 0.75rem 0;
+}
+
+.rep-markdown-source-done {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid currentColor;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+}

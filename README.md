@@ -2,6 +2,7 @@
 
 [![Latest version on Packagist](https://img.shields.io/packagist/v/webwizardsusa/filament-rich-editor-plus.svg)](https://packagist.org/packages/webwizardsusa/filament-rich-editor-plus)
 [![Tests](https://github.com/webwizardsusa/filament-rich-editor-plus/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/webwizardsusa/filament-rich-editor-plus/actions/workflows/tests.yml)
+[![Total downloads](https://img.shields.io/packagist/dt/webwizardsusa/filament-rich-editor-plus.svg)](https://packagist.org/packages/webwizardsusa/filament-rich-editor-plus/stats)
 [![License](https://img.shields.io/packagist/l/webwizardsusa/filament-rich-editor-plus.svg)](https://github.com/webwizardsusa/filament-rich-editor-plus/blob/main/LICENSE.md)
 
 A rich editor field for Filament, built on TipTap. Each block gets its own toolbar, Gutenberg style. Type `/` to insert

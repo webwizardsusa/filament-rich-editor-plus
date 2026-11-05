@@ -70,6 +70,16 @@ it('adds overflow tools to the more menu after its own items', function (): void
         ->and(strpos($html, 'selectParentBlock'))->toBeLessThan(strpos($html, 'openFindReplace'));
 });
 
+it('renders an overflow tool that opens an action as an item that mounts it', function (): void {
+    $html = (new BlockMenuRenderer)->renderMoreMenu([
+        Tool::make('htmlSource')->label('HTML source')->action('htmlSource')->overflow(),
+    ]);
+
+    expect($html)
+        ->toContain('data-rep-more-mount="htmlSource"')
+        ->not->toContain('data-rep-more-action="htmlSource"');
+});
+
 it('renders an overflow tool with no label or icon', function (): void {
     expect((new BlockMenuRenderer)->renderMoreMenu([Tool::make('find')->command('openFindReplace')->overflow()]))
         ->toContain('<span class="rep-menu-item-label">find</span>');

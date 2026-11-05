@@ -94,6 +94,8 @@ registerExtension('core/code-block', () => CodeBlock)
 registerExtension('core/divider', () => HorizontalRule)
 registerExtension('core/mention', ({ providers }) => createMentionNode(providers ?? []))
 registerExtension('core/find-replace', () => FindReplace)
+// The HTML source plugin works through a Filament action, so it adds nothing to the editor.
+registerExtension('core/html-source', () => [])
 
 registerExtension('core/link', ({ protocols, defaultProtocol, autolink, HTMLAttributes }) =>
     Link.configure({

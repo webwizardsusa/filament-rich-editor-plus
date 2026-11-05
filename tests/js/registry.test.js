@@ -39,3 +39,12 @@ it('gives factories an empty context by default', () => {
 
     expect(received).toEqual({})
 })
+
+it('registers the HTML source plugin, which needs no editor extension of its own', async () => {
+    await import('../../resources/js/extensions/core')
+
+    const { extensions, missing } = resolveExtensions([{ id: 'core/html-source' }], {})
+
+    expect(missing).toEqual([])
+    expect(extensions).toEqual([])
+})

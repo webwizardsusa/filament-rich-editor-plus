@@ -9,6 +9,7 @@ import {
 import { BLOCK_MOVED_EVENT, moveSelectedBlock } from '../blocks/block-commands'
 import { findBlockType, switchBlock } from '../blocks/block-types'
 import { announce } from '../live-region'
+import { resolveActionArguments } from '../registry'
 import { FloatingMenu } from './floating-menu'
 import { fitToolbar, overflowedButtons } from './overflow'
 import { createToolMenus } from './tool-menus'
@@ -16,6 +17,12 @@ import { createToolMenus } from './tool-menus'
 const setDisabled = (element, isDisabled) => element?.setAttribute('aria-disabled', isDisabled ? 'true' : 'false')
 
 const isDisabled = (element) => element.getAttribute('aria-disabled') === 'true'
+
+/**
+ * The more menu's own items: block commands (`data-rep-more-action`) and tools that open a Filament action
+ * (`data-rep-more-mount`).
+ */
+const MORE_ITEMS = '[data-rep-more-action], [data-rep-more-mount]'
 
 /**
  * Whether the selection can take text formatting. A code block allows no marks and a divider holds no text.
@@ -93,9 +100,9 @@ function renderOverflowItem(source) {
  * `createToolMenus`.
  *
  * `fit(toolbar)` keeps a toolbar on one row, moving what doesn't fit into the more menu. `fits` replaces the width check,
- * for tests.
+ * for tests. `mountAction(action, args)` opens a Filament action, for more menu tools that use one.
  */
-export function createBlockControls({ editor, root, blockTypes, tools = {}, fits }) {
+export function createBlockControls({ editor, root, blockTypes, tools = {}, fits, mountAction }) {
     const switcherElement = root.querySelector('[data-rep-switcher-menu]')
     const moreElement = root.querySelector('[data-rep-more-menu]')
     const listElement = root.querySelector('[data-rep-list-menu]')
@@ -120,7 +127,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
     let moreButton = null
 
     const moreMenu = new FloatingMenu(moreElement, {
-        itemSelector: '[data-rep-more-action], [data-rep-overflow-item]',
+        itemSelector: `${MORE_ITEMS}, [data-rep-overflow-item]`,
         onSelect: (item) => {
             if (item.hasAttribute('data-rep-overflow-item')) {
                 selectOverflowed(overflowSources.get(item), moreButton)
@@ -130,7 +137,15 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
 
             editor.view.focus()
 
-            if (!isDisabled(item) && (editor.isEditable || item.hasAttribute('data-rep-read-only-ok'))) {
+            if (isDisabled(item) || !(editor.isEditable || item.hasAttribute('data-rep-read-only-ok'))) {
+                return
+            }
+
+            const action = item.dataset.repMoreMount
+
+            if (action) {
+                mountAction?.(action, resolveActionArguments(action, editor))
+            } else {
                 editor.chain().focus()[item.dataset.repMoreAction]().run()
             }
         },
@@ -195,7 +210,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
             }),
         )
         overflow.separator.hidden = moved.length === 0 || isOverflowOnly
-        moreElement.querySelectorAll('[data-rep-more-action]').forEach((item) => {
+        moreElement.querySelectorAll(MORE_ITEMS).forEach((item) => {
             item.hidden = isOverflowOnly
         })
         moreButton = button
@@ -237,7 +252,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
 
         const hasUsableAction =
             !more.hasAttribute('data-rep-overflow-only') &&
-            [...moreElement.querySelectorAll('[data-rep-more-action]')].some((item) => !isDisabled(item))
+            [...moreElement.querySelectorAll(MORE_ITEMS)].some((item) => !isDisabled(item))
 
         setDisabled(more, !hasUsableAction && overflowedButtons(toolbar).every(isDisabled))
     }
@@ -380,9 +395,12 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
             setDisabled(toolbar.querySelector('[data-rep-control="moveDown"]'), locked || !editor.can().moveBlockDown())
             setDisabled(toolbar.querySelector('[data-rep-drag-handle]'), locked)
 
-            const moreItems = [...moreElement.querySelectorAll('[data-rep-more-action]')]
+            moreElement.querySelectorAll(MORE_ITEMS).forEach((item) => {
+                const isLocked = readOnly && !item.hasAttribute('data-rep-read-only-ok')
+                const canRun = item.dataset.repMoreMount ? Boolean(mountAction) : editor.can()[item.dataset.repMoreAction]?.()
 
-            moreItems.forEach((item) => setDisabled(item, (readOnly && !item.hasAttribute('data-rep-read-only-ok')) || !editor.can()[item.dataset.repMoreAction]?.()))
+                setDisabled(item, isLocked || !canRun)
+            })
             syncMoreButton(toolbar)
             toolMenus.sync(toolbar)
 
@@ -419,7 +437,7 @@ export function createBlockControls({ editor, root, blockTypes, tools = {}, fits
             moreMenu.destroy()
             overflow.section.remove()
             overflow.separator.remove()
-            moreElement.querySelectorAll('[data-rep-more-action]').forEach((item) => {
+            moreElement.querySelectorAll(MORE_ITEMS).forEach((item) => {
                 item.hidden = false
             })
             listMenu?.destroy()

@@ -6,6 +6,7 @@ return [
     'underline' => 'Underline',
     'strikethrough' => 'Strikethrough',
     'link' => 'Link',
+    'html_source' => 'HTML source',
     'code' => 'Inline code',
     'subscript' => 'Subscript',
     'superscript' => 'Superscript',

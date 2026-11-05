@@ -13,9 +13,9 @@ let controls
 
 const control = (name) => toolbar.querySelector(`[data-rep-control="${name}"]`)
 
-function setUp(content) {
+function setUp(content, { mountAction } = {}) {
     editor = makeEditor(content)
-    controls = createBlockControls({ editor, root, blockTypes })
+    controls = createBlockControls({ editor, root, blockTypes, mountAction })
     controls.bind(toolbar)
 }
 
@@ -146,6 +146,46 @@ it('runs an overflow item from the more menu', () => {
     root.querySelector('[data-rep-more-action="openFindReplace"]').click()
 
     expect(findReplaceKey.getState(editor.state).isOpen).toBe(true)
+})
+
+it('opens a Filament action from the more menu', () => {
+    const mounted = []
+    root.querySelector('[data-rep-more-menu]').insertAdjacentHTML('beforeend', '<button data-rep-more-mount="htmlSource"></button>')
+    setUp(doc(p('abc')), { mountAction: (action, args) => mounted.push([action, args]) })
+    editor.commands.setTextSelection({ from: 1, to: 3 })
+    controls.sync(toolbar)
+
+    control('more').click()
+    root.querySelector('[data-rep-more-mount="htmlSource"]').click()
+
+    expect(root.querySelector('[data-rep-more-mount="htmlSource"]').getAttribute('aria-disabled')).toBe('false')
+    expect(mounted).toEqual([['htmlSource', {}]])
+})
+
+it('keeps the more menu usable when its only usable item opens an action', () => {
+    root.querySelectorAll('[data-rep-more-menu] [data-rep-more-action]').forEach((item) => item.remove())
+    root.querySelector('[data-rep-more-menu]').insertAdjacentHTML('beforeend', '<button data-rep-more-mount="htmlSource"></button>')
+    setUp(doc(p('abc')), { mountAction: () => {} })
+    editor.commands.setTextSelection(2)
+
+    controls.sync(toolbar)
+
+    expect(control('more').getAttribute('aria-disabled')).toBe('false')
+})
+
+it('does not open an action from the more menu while read-only', () => {
+    const mounted = []
+    root.querySelector('[data-rep-more-menu]').insertAdjacentHTML('beforeend', '<button data-rep-more-mount="htmlSource"></button>')
+    setUp(doc(p('abc')), { mountAction: (action) => mounted.push(action) })
+    editor.commands.setTextSelection(2)
+    editor.setEditable(false)
+
+    controls.sync(toolbar)
+    control('more').click()
+    root.querySelector('[data-rep-more-mount="htmlSource"]').click()
+
+    expect(root.querySelector('[data-rep-more-mount="htmlSource"]').getAttribute('aria-disabled')).toBe('true')
+    expect(mounted).toEqual([])
 })
 
 it('treats an overflow item whose command is missing as unavailable', () => {

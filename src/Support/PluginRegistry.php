@@ -505,7 +505,7 @@ class PluginRegistry
     }
 
     /**
-     * The tools for the more menu, in display order.
+     * The tools for the more menu, in display order: those that run a command or open an action.
      *
      * @return array<Tool>
      */
@@ -513,7 +513,7 @@ class PluginRegistry
     {
         return $this->sortTools(array_filter(
             $this->getTools(),
-            static fn (Tool $tool): bool => $tool->getScope() === ToolScope::Overflow && $tool->getCommand() !== null,
+            static fn (Tool $tool): bool => $tool->getScope() === ToolScope::Overflow && ($tool->getCommand() !== null || $tool->getAction() !== null),
         ));
     }
 

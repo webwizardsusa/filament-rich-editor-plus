@@ -138,7 +138,7 @@ it('sends the plugin module URL to the browser only when there is one', function
         ->and($descriptors['core/bold'])->not->toHaveKey('modules');
 });
 
-it('gathers overflow tools in display order, leaving out any with no command', function (): void {
+it('gathers overflow tools in display order, leaving out any with no command or action', function (): void {
     $plugin = new class extends Plugin
     {
         public function getId(): string
@@ -156,7 +156,8 @@ it('gathers overflow tools in display order, leaving out any with no command', f
             return [
                 Tool::make('second')->command('second')->overflow()->order(2),
                 Tool::make('first')->command('first')->overflow()->order(1),
-                Tool::make('needsAction')->action('open')->overflow(),
+                Tool::make('opensAction')->action('open')->overflow()->order(3),
+                Tool::make('doesNothing')->overflow()->order(4),
                 Tool::make('inline')->command('inline'),
             ];
         }
@@ -164,7 +165,7 @@ it('gathers overflow tools in display order, leaving out any with no command', f
 
     $registry = PluginRegistry::make([$plugin]);
 
-    expect(collect($registry->getOverflowTools())->map->getName()->all())->toBe(['first', 'second'])
+    expect(collect($registry->getOverflowTools())->map->getName()->all())->toBe(['first', 'second', 'opensAction'])
         ->and(collect($registry->getInlineTools())->map->getName()->all())->toBe(['inline'])
         ->and(collect($registry->getBlockToolbars())->flatten()->map->getName()->all())->not->toContain('first');
 });

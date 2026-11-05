@@ -452,11 +452,32 @@ RichEditorPlus::make('body')->addPlugins([
 | `FontFamilyPlugin` | A font menu on the toolbar, from three font stacks by default (sans, serif and mono). It stores the font as a class on a span. |
 | `FontSizePlugin` | A size menu on the toolbar, from four sizes by default. It stores the size as a class on a span. |
 | `LineHeightPlugin` | A line height menu on the toolbar, from three values by default (tight, relaxed and loose). It stores the line height as a class on a span. |
+| `HtmlSourcePlugin` | An "HTML source" item in the more menu that opens the content as HTML in a modal, to view and edit. See [HTML source](#html-source). |
 | `TrailingNodePlugin` | Keeps an empty paragraph at the end of the document. The editor adds a trailing `<p></p>` when content ends with anything other than a paragraph (a heading, list, quote, table or code block), on the first interaction with it, which can mark a form as changed. |
 
 A task list from `TaskListPlugin`:
 
 ![A task list with one checked item and a nested item](art/task-list.png)
+
+### HTML source
+
+`HtmlSourcePlugin` adds an "HTML source" item to the toolbar's More menu. It opens a Filament modal with the field's
+content as HTML, one block per line, in a code editor:
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Core\HtmlSourcePlugin;
+
+RichEditorPlus::make('body')->addPlugins([HtmlSourcePlugin::make()]);
+```
+
+![The HTML source modal, showing the content as indented HTML in a code editor](art/html-source.png)
+
+- It shows HTML whatever the field stores: HTML, JSON or Markdown. A Markdown field also has its own
+  [Markdown source view](#markdown-source-view).
+- "Apply" replaces the editor's content with the edited HTML. Undo in the editor brings back what was there before.
+- The HTML is read with the field's plugins, as pasted HTML is: anything they don't support, such as a `<script>`,
+  an unknown tag or a class no plugin allows, is dropped. Open the modal again to see what was kept.
+- Text typed outside any block is wrapped in a paragraph. Clearing the HTML empties the editor.
 
 ## Mentions
 
@@ -1090,6 +1111,7 @@ Tool::make('textAlign')
 - A menu tool runs its items, not a command of its own.
 - `active()` without a name matches any node or mark with those attributes.
 - Menu tools can be inline or block tools, not in the more menu.
+- `overflow()` puts a tool in the more menu. It runs its `command()`, or opens its Filament `action()`, as the HTML source item does.
 - `swatch($class, $text = null)` shows a small box filled by the class (a palette colour, say) instead of an icon, with optional text such as `'A'`.
 - `fallback()` marks the item that is current when no other item is active, such as "Default" in a colour menu.
 - A plugin whose content needs CSS in the editor, such as palette classes, implements `ProvidesEditorStyles` and

@@ -145,7 +145,7 @@ class Tool
     }
 
     /**
-     * Shows the tool in the more menu. It must use a command, which runs with no arguments.
+     * Shows the tool in the more menu. It must use a command, which runs with no arguments, or an action.
      */
     public function overflow(): static
     {

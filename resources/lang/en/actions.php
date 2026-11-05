@@ -15,6 +15,15 @@ return [
         ],
     ],
 
+    'html_source' => [
+        'label' => 'HTML source',
+
+        'modal' => [
+            'heading' => 'HTML source',
+            'submit' => 'Apply',
+        ],
+    ],
+
     'table' => [
         'insert_table' => [
             'label' => 'Insert table',

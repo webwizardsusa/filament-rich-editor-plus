@@ -1,0 +1,56 @@
+/* Builds on the custom properties Rich Editor Plus defines on `.rep-editor`. */
+.rep-editor .tiptap .tableWrapper {
+    overflow-x: auto;
+}
+
+.rep-editor .tiptap table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    overflow: hidden;
+}
+
+.rep-editor .tiptap td,
+.rep-editor .tiptap th {
+    position: relative;
+    min-width: 1em;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--rep-divider);
+    vertical-align: top;
+    box-sizing: border-box;
+}
+
+.rep-editor .tiptap th {
+    background: var(--rep-tool-hover);
+    font-weight: 600;
+    text-align: start;
+}
+
+.rep-editor .tiptap td > * + *,
+.rep-editor .tiptap th > * + * {
+    margin-top: 0.5rem;
+}
+
+.rep-editor .tiptap .selectedCell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: color-mix(in srgb, var(--rep-focus) 20%, transparent);
+    pointer-events: none;
+}
+
+.rep-editor .tiptap .column-resize-handle {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    bottom: -2px;
+    width: 4px;
+    background: var(--rep-focus);
+    pointer-events: none;
+}
+
+.rep-editor .tiptap.resize-cursor {
+    cursor: col-resize;
+}

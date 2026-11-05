@@ -3,6 +3,7 @@
 namespace Hollyit\RichEditorPlus;
 
 use Hollyit\RichEditorPlus\Benchmarks\Console\BenchmarkCommand;
+use Hollyit\RichEditorPlus\Plugins\Table\TableAssets;
 use Hollyit\RichEditorPlus\Support\RegistersPluginAssets;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -30,6 +31,8 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         $this->registerPluginAssets();
+
+        TableAssets::register();
     }
 
     public static function assetPackage(): string

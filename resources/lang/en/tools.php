@@ -55,4 +55,18 @@ return [
     ],
     'decrease_level' => 'Decrease level',
     'increase_level' => 'Increase level',
+
+    'table' => [
+        'table' => 'Table',
+        'table_description' => 'Rows and columns',
+        'add_column_before' => 'Add column before',
+        'add_column_after' => 'Add column after',
+        'delete_column' => 'Delete column',
+        'add_row_before' => 'Add row before',
+        'add_row_after' => 'Add row after',
+        'delete_row' => 'Delete row',
+        'merge_or_split_cells' => 'Merge or split cells',
+        'toggle_header_row' => 'Toggle header row',
+        'delete_table' => 'Delete table',
+    ],
 ];

@@ -4,7 +4,13 @@
     "type": "module",
     "scripts": {
         "dev": "vite --config vite.config.js",
-        "build": "vite build --config vite.config.js",
+        "dev:table": "vite --config vite.modules.config.js --mode table",
+        "dev:image": "vite --config vite.modules.config.js --mode image",
+        "dev:markdown": "vite --config vite.modules.config.js --mode markdown",
+        "build": "vite build --config vite.config.js && npm run build:table && npm run build:image && npm run build:markdown",
+        "build:table": "vite build --config vite.modules.config.js --mode table",
+        "build:image": "vite build --config vite.modules.config.js --mode image",
+        "build:markdown": "vite build --config vite.modules.config.js --mode markdown",
         "test": "vitest run"
     },
     "dependencies": {
@@ -25,6 +31,7 @@
         "@tiptap/extension-strike": "^3.0.0",
         "@tiptap/extension-subscript": "^3.31.3",
         "@tiptap/extension-superscript": "^3.31.3",
+        "@tiptap/extension-table": "^3.0.0",
         "@tiptap/extension-text": "^3.0.0",
         "@tiptap/extension-underline": "^3.0.0",
         "@tiptap/extensions": "^3.0.0",

@@ -13,4 +13,20 @@ return [
             ],
         ],
     ],
+
+    'table' => [
+        'insert_table' => [
+            'label' => 'Insert table',
+
+            'modal' => [
+                'heading' => 'Insert table',
+
+                'form' => [
+                    'rows' => 'Rows',
+                    'columns' => 'Columns',
+                    'with_header_row' => 'Header row',
+                ],
+            ],
+        ],
+    ],
 ];

@@ -24,11 +24,11 @@ use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\Plugins\Plugin;
+use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlusTable\TablePlugin;
 use Tests\TestCase;
 
 uses(TestCase::class);

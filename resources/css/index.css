@@ -48,6 +48,15 @@
     border-color: var(--rep-focus);
 }
 
+/* Inside a Filament field, the input wrapper already draws the border, the focus ring, the invalid ring and the
+   disabled background, so the editor draws none of its own. */
+.fi-input-wrp .rep-editor {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+}
+
 .rep-editor .tiptap {
     min-height: 16rem;
     padding: 2rem 0.75rem;
@@ -442,10 +451,20 @@
     height: 1.25rem;
 }
 
-.rep-menu-item:hover,
+.rep-menu-item:hover {
+    background: var(--rep-tool-hover);
+}
+
+/* The keyboard's item (focused, or the active option of a list that keeps focus in the editor) gets an outline as
+   well as the tint, so it stands out from an item the mouse is only hovering over. */
 .rep-menu-item:focus-visible,
 .rep-menu-item[aria-selected='true'] {
     background: var(--rep-tool-hover);
+    outline: 2px solid var(--rep-focus);
+    outline-offset: -2px;
+}
+
+.rep-menu-item:focus:not(:focus-visible) {
     outline: none;
 }
 

@@ -131,6 +131,14 @@ export default function richEditorPlusComponent({
                 {
                     element: this.$refs.editor,
                     editable: !isDisabled,
+                    // TipTap's contenteditable is the textbox screen readers land on, so it carries the field's label.
+                    editorProps: {
+                        attributes: {
+                            'aria-labelledby': `${this.$el.id}-label`,
+                            'aria-multiline': 'true',
+                            ...(isDisabled ? { 'aria-readonly': 'true' } : {}),
+                        },
+                    },
                     extensions: [
                         ...resolved.extensions,
                         Placeholder.configure({

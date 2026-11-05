@@ -9,7 +9,7 @@ use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

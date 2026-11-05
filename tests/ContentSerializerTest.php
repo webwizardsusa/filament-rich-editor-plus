@@ -5,7 +5,7 @@ use Hollyit\RichEditorPlus\Content\GlobalAttribute;
 use Hollyit\RichEditorPlus\Content\HtmlSerializer;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

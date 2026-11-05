@@ -7,7 +7,7 @@ use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
 use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

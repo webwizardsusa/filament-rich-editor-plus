@@ -15,9 +15,9 @@ use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

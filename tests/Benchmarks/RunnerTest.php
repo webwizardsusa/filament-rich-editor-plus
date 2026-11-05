@@ -11,9 +11,9 @@ use Hollyit\RichEditorPlus\Benchmarks\Runner\ScenarioRunner;
 use Hollyit\RichEditorPlus\Benchmarks\Runner\Stats;
 use Hollyit\RichEditorPlus\Benchmarks\Strategies\ContentStrategy;
 use Hollyit\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

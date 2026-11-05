@@ -6,8 +6,8 @@ use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Attributes\Renderless;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

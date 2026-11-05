@@ -14,7 +14,7 @@ use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

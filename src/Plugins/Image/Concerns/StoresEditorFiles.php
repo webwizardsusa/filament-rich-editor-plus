@@ -3,6 +3,7 @@
 namespace Hollyit\RichEditorPlus\Plugins\Image\Concerns;
 
 use Closure;
+use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -41,7 +42,7 @@ trait StoresEditorFiles
 
     protected ?string $directory = null;
 
-    protected string $visibility = 'public';
+    protected ?string $visibility = null;
 
     protected ?int $maxSize = null;
 
@@ -64,7 +65,8 @@ trait StoresEditorFiles
     abstract protected function defaultAcceptedFileTypes(): array;
 
     /**
-     * The disk uploads go to. Defaults to the application's default disk.
+     * The disk uploads go to. Defaults to Filament's default disk (`filament.default_filesystem_disk`), using `public`
+     * in place of `local` while the visibility is `public`, as Filament's own uploads do.
      */
     public function disk(?string $disk): static
     {
@@ -85,7 +87,8 @@ trait StoresEditorFiles
     }
 
     /**
-     * `public` renders plain disk URLs, anything else renders temporary URLs.
+     * `public` (the default) renders plain disk URLs, anything else renders temporary URLs. A `public` upload is also
+     * made public on the disk when the disk allows it; a bucket that refuses ACLs keeps it as its policy says.
      */
     public function visibility(string $visibility): static
     {
@@ -135,7 +138,13 @@ trait StoresEditorFiles
 
     public function getDisk(): string
     {
-        return $this->disk ?? (string) config('filesystems.default');
+        if ($this->disk !== null) {
+            return $this->disk;
+        }
+
+        $disk = (string) (config('filament.default_filesystem_disk') ?? config('filesystems.default'));
+
+        return $disk === 'local' && $this->getVisibility() === 'public' ? 'public' : $disk;
     }
 
     public function getDirectory(): string
@@ -145,7 +154,24 @@ trait StoresEditorFiles
 
     public function getVisibility(): string
     {
-        return $this->visibility;
+        return $this->visibility ?? 'public';
+    }
+
+    /**
+     * See {@see InheritsFieldFileAttachments}. The field's accepted types and `fileAttachments(false)` are left to the
+     * plugin that uses them.
+     *
+     * @param  array{disk?: string, directory?: string, visibility?: string, maxSize?: int, acceptedFileTypes?: array<string>, uploads?: bool}  $defaults
+     */
+    public function withFieldFileAttachments(array $defaults): static
+    {
+        $plugin = clone $this;
+        $plugin->disk ??= $defaults['disk'] ?? null;
+        $plugin->directory ??= $defaults['directory'] ?? null;
+        $plugin->visibility ??= $defaults['visibility'] ?? null;
+        $plugin->maxSize ??= $defaults['maxSize'] ?? null;
+
+        return $plugin;
     }
 
     public function getMaxSize(): int
@@ -191,7 +217,7 @@ trait StoresEditorFiles
                 return ($this->urlCallback)($disk, $path);
             }
 
-            return $this->visibility === 'public'
+            return $this->getVisibility() === 'public'
                 ? Storage::disk($disk)->url($path)
                 : Storage::disk($disk)->temporaryUrl($path, now()->addMinutes($this->temporaryUrlMinutes));
         }, null, false);
@@ -290,7 +316,7 @@ trait StoresEditorFiles
             $stream = $file->readStream();
 
             try {
-                $written = is_resource($stream) && Storage::disk($this->getDisk())->put($path, $stream, ['visibility' => $this->getVisibility()]);
+                $written = is_resource($stream) && Storage::disk($this->getDisk())->put($path, $stream);
             } finally {
                 if (is_resource($stream)) {
                     fclose($stream);
@@ -299,6 +325,10 @@ trait StoresEditorFiles
 
             if ($written !== true) {
                 return ['error' => __('rich-editor-plus::errors.image.store_failed')];
+            }
+
+            if ($this->getVisibility() === 'public') {
+                rescue(fn (): mixed => Storage::disk($this->getDisk())->setVisibility($path, 'public'), report: false);
             }
 
             $name = static::sanitizeFileName($file->getClientOriginalName());

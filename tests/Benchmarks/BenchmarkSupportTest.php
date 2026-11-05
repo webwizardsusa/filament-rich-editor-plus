@@ -5,8 +5,8 @@ use Hollyit\RichEditorPlus\Benchmarks\BenchmarkSchema;
 use Hollyit\RichEditorPlus\Benchmarks\Fixtures\BenchmarkMentionProvider;
 use Hollyit\RichEditorPlus\Benchmarks\Fixtures\MentionableSeeder;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Schema;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

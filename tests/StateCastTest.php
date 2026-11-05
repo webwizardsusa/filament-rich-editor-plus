@@ -11,9 +11,9 @@ use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\StateFormat;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

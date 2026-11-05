@@ -1,5 +1,83 @@
 # Rich Editor Plus
 
+A rich editor field for Filament, built on TipTap. Each block gets its own toolbar, Gutenberg style. Type `/` to insert
+blocks from the slash menu. Everything the editor can do comes from a plugin, so you can turn features off one by one
+or write your own. Optional plugins add tables, images, file attachments, mentions and Markdown storage.
+
+## Requirements
+
+- PHP 8.3 or later
+- Filament 5
+
+## Installation
+
+```bash
+composer require hollyit/rich-editor-plus
+php artisan filament:assets
+```
+
+`filament:assets` copies the editor's JavaScript and CSS into `public/`. Run it again after every update of the
+package, or add it to the `post-autoload-dump` scripts in your `composer.json`:
+
+```json
+"post-autoload-dump": [
+    "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+    "@php artisan package:discover --ansi",
+    "@php artisan filament:assets"
+]
+```
+
+## Quick start
+
+Use the field in a form like any other Filament field:
+
+```php
+use Hollyit\RichEditorPlus\RichEditorPlus;
+
+public static function configure(Schema $schema): Schema
+{
+    return $schema->components([
+        RichEditorPlus::make('body')->required(),
+    ]);
+}
+```
+
+To show the content outside the panel, render it with the same plugins the field uses (see [Rendering](#rendering)):
+
+```blade
+{!! \Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer::make($post->body)->toHtml() !!}
+```
+
+Coming from Filament's own `RichEditor`? See [Coming from Filament's RichEditor](#coming-from-filaments-richeditor).
+
+## Coming from Filament's RichEditor
+
+| `RichEditor` | `RichEditorPlus` |
+|---|---|
+| `->toolbarButtons([...])` | `->toolbarTools([...])` (see [Arranging a toolbar](#arranging-a-toolbar)) |
+| `->json()` | `->storeAs(StateFormat::Json)`. On this field `->json()` is only Filament's JSON validation rule, so don't call it. |
+| `->mentions([...])` | `MentionPlugin` |
+| `->getFileAttachmentUrlUsing()` | `ImagePlugin::make()->urlUsing(fn (string $disk, string $path) => ...)` |
+| `->saveUploadedFileAttachmentUsing()` | Not supported: the plugins store files themselves. |
+
+The other file attachment settings carry over. The field passes them to `ImagePlugin` and `AttachmentPlugin` as
+defaults, and anything set on a plugin wins:
+
+| Field setting | Used by |
+|---|---|
+| `fileAttachmentsDisk()`, `fileAttachmentsDirectory()`, `fileAttachmentsVisibility()`, `fileAttachmentsMaxSize()` | both plugins |
+| `fileAttachmentsAcceptedFileTypes()` | `ImagePlugin` only, since Filament's editor attachments are images |
+| `fileAttachments(false)` | turns `ImagePlugin` uploads off, and the field takes no uploads at all |
+
+These settings belong to the field, so a renderer outside the form doesn't know them. Give the plugins you render
+with the same disk and directory, or set them on the plugins in the first place:
+
+```php
+RichContentPlusRenderer::make($post->body)
+    ->plugins([ImagePlugin::make()->disk('s3')->directory('posts')])
+    ->toHtml();
+```
+
 ## Storing content
 
 The field stores **HTML** by default. Use a text column (`text` or `longText`) for it:
@@ -160,6 +238,31 @@ Tool::make('highlight')->shortcut('Mod-Shift-h');
 ```
 
 Alt+F10 moves focus into the floating toolbar, or into the fixed toolbar when there is no floating one.
+
+## Links
+
+`LinkPlugin` is in the default set. To change it for a field, add it again with your settings:
+
+```php
+use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
+
+RichEditorPlus::make('body')->addPlugins([
+    LinkPlugin::make()
+        ->protocols(['http', 'https', 'mailto', 'tel']) // the default; links with other schemes keep only their text
+        ->defaultProtocol('https')                      // the default, for links typed without a scheme
+        ->openInNewTab()                                // the default for new links; the link modal can change it
+        ->autolink()                                    // the default: typed and pasted URLs become links
+        ->allowedClasses([]),                           // the default: links keep no classes
+]);
+```
+
+Stored content comes from the browser, so link attributes are checked whenever content is parsed or rendered:
+
+- `class` keeps only the names given to `allowedClasses()`, so content can't borrow your site's own utility classes
+  (`fixed inset-0 z-50`, for example) to lay a link over the page.
+- `target` is kept only when it is `_blank` or `_self`.
+- A link that opens in a new tab always gets `rel="noopener"`, and `opener` is never kept, so the page it opens
+  can't reach back to yours.
 
 ## Optional plugins
 
@@ -336,7 +439,7 @@ Every option is shown with its default:
 
 ```php
 ImagePlugin::make()
-    ->disk(null)                                  // config('filesystems.default')
+    ->disk(null)                                  // Filament's default disk; `public` in place of `local`
     ->directory('editor-images')
     ->visibility('public')                        // 'public' or 'private'
     ->maxSize(5120)                               // kilobytes
@@ -378,6 +481,8 @@ contents are not an accepted type is refused.
 The URL is resolved when content is rendered and when the editor shows the image:
 
 - With `visibility('public')` it is the disk's `url()`. A `public` disk needs `php artisan storage:link`.
+  Each upload is also made public on the disk when the disk allows it. An S3 bucket that refuses ACLs keeps the file
+  as its bucket policy says, so give such a bucket a policy that lets readers fetch the directory.
 - With `visibility('private')` it is a temporary URL that lasts `temporaryUrlMinutes()`. The disk must support
   temporary URLs, such as S3.
 - `urlUsing(fn ($disk, $path) => ...)` replaces both, for a CDN or a signed route.
@@ -457,7 +562,7 @@ RichEditorPlus::make('content')
     ->addPlugins([
         ImagePlugin::make()->disk('public'),
         AttachmentPlugin::make()
-            ->disk('public')                    // default: config('filesystems.default')
+            ->disk('public')                    // default: Filament's default disk; `public` in place of `local`
             ->directory('editor-attachments')   // default
             ->visibility('public')              // default; anything else renders temporary URLs
             ->maxSize(10240)                    // KB, default
@@ -889,6 +994,7 @@ registerExtension('acme/files', (options, tiptap, { callPlugin }) => {
 ```php
 public function answerEditorRequest(string $request, array $payload, RichEditorPlus $field): array
 {
+    // urlsFor() stands for your own lookup.
     return $request === 'urls' ? ['urls' => $this->urlsFor($payload['paths'] ?? [])] : [];
 }
 ```
@@ -896,6 +1002,9 @@ public function answerEditorRequest(string $request, array $payload, RichEditorP
 - The payload comes from the browser. Validate it and cap its size; never trust a path or an id in it.
 - The method runs as a method of the field, under the page's own authorization, so a request is only answered for
   someone who can use the page. A plugin that does not implement the interface answers `[]`.
+- Requests are answered for a disabled (read-only) field too, because a read-only editor still loads what it shows.
+  A request that changes anything, such as storing a file, must return early when `$field->isDisabled()`.
+  `$field->pullTemporaryUpload()` already returns `null` for a disabled field.
 - A plugin that throws answers `[]` too, silently: the error is not reported, so log it yourself if you need it.
 
 The context also has `upload(file, { onProgress })`, which sends a file to the field's Livewire temporary uploads and

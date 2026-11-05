@@ -11,9 +11,9 @@ use Filament\Support\Facades\FilamentAsset;
 use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

@@ -68,6 +68,12 @@ export default defineConfig(({ command, mode }) => {
         publicDir: false,
         plugins: [sharedTiptap()],
         build: {
+            // Vite only mangles ES library builds, keeping their whitespace for downstream bundlers. The browser loads
+            // this file as is, so minify it fully.
+            minify: true,
+            rolldownOptions: {
+                output: { minify: true },
+            },
             outDir: 'dist',
             // The editor's own build empties dist/ first; the modules are written after it.
             emptyOutDir: false,

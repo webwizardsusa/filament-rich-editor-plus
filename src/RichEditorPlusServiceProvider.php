@@ -51,7 +51,7 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
 
     protected static function assetsMissingMessage(): string
     {
-        return 'The Rich Editor Plus assets are not available: the Vite dev server is not running (no public/rich-editor-plus.hot) '
-            .'and the package has not been built. Run `npm run dev:rep`, or `npm run build:rep` followed by `php artisan filament:assets`.';
+        return 'The Rich Editor Plus assets are not available: the package\'s dist/ directory is missing and no Vite dev server '
+            .'is running. Reinstall hollyit/rich-editor-plus; when working on the package itself, run its `npm run dev` or `npm run build`.';
     }
 }

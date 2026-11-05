@@ -2,7 +2,7 @@
 
 use Filament\Support\Assets\AssetManager;
 use Filament\Support\Facades\FilamentAsset;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -19,6 +19,9 @@ it('registers the built module and stylesheet and loads the module from the publ
 
 it('serves the package entry from the running dev server', function (): void {
     app()->detectEnvironment(fn (): string => 'local');
+    // The package root stands in for the app, so the entry is relative to it however the package is checked out.
+    app()->setBasePath(dirname(__DIR__));
+    app()->usePublicPath(sys_get_temp_dir());
     $hotFile = public_path('acme-highlight.hot');
     file_put_contents($hotFile, "http://127.0.0.1:5199\n");
 
@@ -28,7 +31,7 @@ it('serves the package entry from the running dev server', function (): void {
         unlink($hotFile);
     }
 
-    expect($moduleUrl)->toBe('http://127.0.0.1:5199/packages/rich-editor-plus/tests/fixtures/plugin-assets/resources/js/index.js');
+    expect($moduleUrl)->toBe('http://127.0.0.1:5199/tests/fixtures/plugin-assets/resources/js/index.js');
 });
 
 it('names the package and its hot file when the assets are neither built nor served', function (): void {

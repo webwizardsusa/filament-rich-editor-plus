@@ -6,9 +6,9 @@ use Hollyit\RichEditorPlus\Benchmarks\DocumentStore;
 use Hollyit\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
 use Hollyit\RichEditorPlus\Benchmarks\Fixtures\MentionableSeeder;
 use Hollyit\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

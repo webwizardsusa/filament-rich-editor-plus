@@ -1,7 +1,7 @@
 <?php
 
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Symfony\Component\Finder\Finder;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

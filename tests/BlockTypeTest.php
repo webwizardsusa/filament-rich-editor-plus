@@ -8,7 +8,7 @@ use Hollyit\RichEditorPlus\Support\BlockType;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\PluginExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

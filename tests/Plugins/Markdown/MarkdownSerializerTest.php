@@ -10,7 +10,7 @@ use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

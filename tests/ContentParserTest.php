@@ -4,7 +4,7 @@ use Hollyit\RichEditorPlus\Content\ContentSchema;
 use Hollyit\RichEditorPlus\Content\HtmlParser;
 use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

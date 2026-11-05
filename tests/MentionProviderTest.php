@@ -2,7 +2,7 @@
 
 use Hollyit\RichEditorPlus\Support\MentionItem;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

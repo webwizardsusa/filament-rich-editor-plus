@@ -13,12 +13,12 @@ use Hollyit\RichEditorPlus\Plugins\Plugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\JsExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

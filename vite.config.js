@@ -50,6 +50,12 @@ export default defineConfig(({ command }) => {
         publicDir: false,
         build: {
             outDir: 'dist',
+            // Vite only mangles ES library builds, keeping their whitespace for downstream bundlers. The browser loads
+            // this file as is, so minify it fully.
+            minify: true,
+            rolldownOptions: {
+                output: { minify: true },
+            },
             emptyOutDir: true,
             cssCodeSplit: false,
             lib: {

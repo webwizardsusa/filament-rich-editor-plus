@@ -19,7 +19,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginExtension;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -101,12 +101,49 @@ it('leaves out new-tab attributes when links stay in the tab', function (): void
 });
 
 it('parses every link attribute the browser stores', function (): void {
-    $document = pluginParse('<p><a href="/x" title="T" class="c">x</a></p>', [LinkPlugin::make()->openInNewTab(false)]);
+    $document = pluginParse('<p><a href="/x" title="T" class="c">x</a></p>', [LinkPlugin::make()->openInNewTab(false)->allowedClasses(['c'])]);
 
     expect($document['content'][0]['content'][0]['marks'])->toEqual([[
         'type' => 'link',
         'attrs' => ['href' => '/x', 'target' => null, 'rel' => null, 'class' => 'c', 'title' => 'T'],
     ]]);
+});
+
+/**
+ * @param  array<string, mixed>  $attrs
+ */
+function linkHtml(array $attrs, LinkPlugin $plugin): string
+{
+    return pluginHtml(['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [
+        ['type' => 'text', 'text' => 'x', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'https://a.test', ...$attrs]]]],
+    ]]]], [$plugin]);
+}
+
+it('keeps only the allowed classes on a link, whether parsed or rendered', function (): void {
+    $plugin = LinkPlugin::make()->openInNewTab(false)->allowedClasses(['button']);
+
+    expect(pluginParse('<p><a href="/x" class="fixed inset-0 button z-50">x</a></p>', [$plugin])['content'][0]['content'][0]['marks'][0]['attrs']['class'])->toBe('button')
+        ->and(linkHtml(['class' => 'fixed inset-0 button'], $plugin))->toBe('<p><a href="https://a.test" class="button">x</a></p>')
+        ->and(linkHtml(['class' => 'fixed inset-0 z-50'], LinkPlugin::make()->openInNewTab(false)))->toBe('<p><a href="https://a.test">x</a></p>');
+});
+
+it('drops a link target other than _blank and _self', function (string $target): void {
+    expect(linkHtml(['target' => $target], LinkPlugin::make()->openInNewTab(false)))->toBe('<p><a href="https://a.test">x</a></p>')
+        ->and(pluginParse("<p><a href=\"/x\" target=\"{$target}\">x</a></p>", [LinkPlugin::make()->openInNewTab(false)])['content'][0]['content'][0]['marks'][0]['attrs']['target'])->toBeNull();
+})->with(['top' => '_top', 'parent' => '_parent', 'named frame' => 'login']);
+
+it('always adds noopener to a link that opens in a new tab, and never keeps opener', function (?string $rel, string $expected): void {
+    expect(linkHtml(['target' => '_blank', 'rel' => $rel], LinkPlugin::make()->openInNewTab(false)))
+        ->toBe("<p><a href=\"https://a.test\" target=\"_blank\" rel=\"{$expected}\">x</a></p>");
+})->with([
+    'no rel' => [null, 'noopener'],
+    'opener' => ['opener', 'noopener'],
+    'nofollow' => ['nofollow', 'noopener nofollow'],
+    'noopener already' => ['noopener noreferrer', 'noopener noreferrer'],
+]);
+
+it('adds noopener when the default target opens a new tab and the stored rel leaves it out', function (): void {
+    expect(linkHtml(['rel' => 'opener'], LinkPlugin::make()))->toBe('<p><a href="https://a.test" target="_blank" rel="noopener">x</a></p>');
 });
 
 it('keeps the text of a link with a disallowed protocol, without the link', function (string $href): void {

@@ -5,7 +5,7 @@ use Hollyit\RichEditorPlus\Content\MarkSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Content\TextSerializer;
 use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

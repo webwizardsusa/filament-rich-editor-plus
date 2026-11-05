@@ -5,7 +5,7 @@ use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
 use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

@@ -3,7 +3,7 @@
 use Hollyit\RichEditorPlus\Benchmarks\BenchmarkPlugins;
 use Hollyit\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

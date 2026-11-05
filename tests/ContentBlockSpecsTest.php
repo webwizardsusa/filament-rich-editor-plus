@@ -11,7 +11,7 @@ use Hollyit\RichEditorPlus\Plugins\Core\DividerPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
 use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -95,6 +95,12 @@ it('renders and parses code blocks with a language', function (): void {
     expect(blockHtml($plugins, $code))->toBe("<pre><code class=\"language-php\">  a\n  b</code></pre>")
         ->and(blockParse("<pre><code class=\"x language-php\">  a\n  b</code></pre>", $plugins))->toBe([$code]);
 });
+
+it('drops a code block language that could add classes of its own', function (string $language): void {
+    $code = ['type' => 'codeBlock', 'attrs' => ['language' => $language], 'content' => [blockText('a')]];
+
+    expect(blockHtml([CodeBlockPlugin::make()], $code))->toBe('<pre><code>a</code></pre>');
+})->with(['spaces' => 'php fixed inset-0', 'quote' => 'php"', 'too long' => str_repeat('a', 33)]);
 
 it('renders a code block without a language', function (): void {
     expect(blockHtml([CodeBlockPlugin::make()], ['type' => 'codeBlock', 'content' => [blockText('a')]]))->toBe('<pre><code>a</code></pre>')

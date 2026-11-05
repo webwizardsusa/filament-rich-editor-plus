@@ -16,6 +16,7 @@ use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
 use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\Rendering\BlockMenuRenderer;
@@ -81,6 +82,10 @@ class RichEditorPlus extends Field implements HasEmbeddedView
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Filament's defaults for these would override every plugin's own; unset, each plugin keeps its default.
+        $this->fileAttachmentsAcceptedFileTypes = null;
+        $this->fileAttachmentsMaxSize = null;
 
         $this->rule(
             static fn (RichEditorPlus $component): Closure => static function (string $attribute, mixed $value, Closure $fail) use ($component): void {
@@ -396,19 +401,45 @@ class RichEditorPlus extends Field implements HasEmbeddedView
         );
 
         $excluded = $this->evaluate($this->excludedPlugins);
+        $fileAttachments = $this->getFileAttachmentsDefaults();
 
-        return array_values(array_filter(
-            $plugins,
-            static function (EditorPlugin $plugin) use ($excluded): bool {
-                foreach ($excluded as $exclusion) {
-                    if ($plugin->getId() === $exclusion || $plugin instanceof $exclusion) {
-                        return false;
+        return array_values(array_map(
+            static fn (EditorPlugin $plugin): EditorPlugin => $plugin instanceof InheritsFieldFileAttachments && $fileAttachments !== []
+                ? $plugin->withFieldFileAttachments($fileAttachments)
+                : $plugin,
+            array_filter(
+                $plugins,
+                static function (EditorPlugin $plugin) use ($excluded): bool {
+                    foreach ($excluded as $exclusion) {
+                        if ($plugin->getId() === $exclusion || $plugin instanceof $exclusion) {
+                            return false;
+                        }
                     }
-                }
 
-                return true;
-            },
+                    return true;
+                },
+            ),
         ));
+    }
+
+    /**
+     * The Filament attachment settings given to this field, which plugins that store files take as defaults (see
+     * {@see InheritsFieldFileAttachments}). Settings that were not given are missing.
+     *
+     * @return array{disk?: string, directory?: string, visibility?: string, maxSize?: int, acceptedFileTypes?: array<string>, uploads?: bool}
+     */
+    public function getFileAttachmentsDefaults(): array
+    {
+        $acceptedFileTypes = $this->getFileAttachmentsAcceptedFileTypes();
+
+        return array_filter([
+            'disk' => $this->evaluate($this->fileAttachmentsDiskName),
+            'directory' => $this->getFileAttachmentsDirectory(),
+            'visibility' => $this->evaluate($this->fileAttachmentsVisibility),
+            'maxSize' => $this->getFileAttachmentsMaxSize(),
+            'acceptedFileTypes' => $acceptedFileTypes === null ? null : array_values($acceptedFileTypes),
+            'uploads' => $this->evaluate($this->hasFileAttachments),
+        ], static fn (mixed $value): bool => $value !== null);
     }
 
     public function getPluginRegistry(): PluginRegistry
@@ -541,10 +572,15 @@ class RichEditorPlus extends Field implements HasEmbeddedView
 
     /**
      * Filament only lets the page receive uploads under this field's `componentFileAttachments` entry when this is
-     * true, so it is true exactly when a plugin takes uploads from the editor.
+     * true, so it is true exactly when a plugin takes uploads from the editor and `fileAttachments(false)` was not
+     * called.
      */
     public function hasFileAttachments(?bool $default = null): bool
     {
+        if ($this->evaluate($this->hasFileAttachments) === false) {
+            return false;
+        }
+
         foreach ($this->getPluginRegistry()->getPlugins() as $plugin) {
             if ($plugin instanceof AcceptsEditorUploads && $plugin->acceptsEditorUploads()) {
                 return true;

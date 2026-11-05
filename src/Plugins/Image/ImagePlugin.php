@@ -7,6 +7,7 @@ use Hollyit\RichEditorPlus\Content\ContentSpec;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
 use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
 use Hollyit\RichEditorPlus\Plugins\Image\Actions\ImageAction;
@@ -24,9 +25,11 @@ use InvalidArgumentException;
  * caption, an alignment and a width. Uploads store their disk and path, never their URL: the URL is resolved when
  * content is rendered and when the editor shows it, so private disks get temporary URLs.
  */
-class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorRequests, PatchesRenderedMarkup, ProvidesEditorStyles
+class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorRequests, InheritsFieldFileAttachments, PatchesRenderedMarkup, ProvidesEditorStyles
 {
-    use StoresEditorFiles;
+    use StoresEditorFiles {
+        withFieldFileAttachments as withFieldStorage;
+    }
 
     public const string ID = 'hollyit/image';
 
@@ -99,6 +102,24 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
         $this->defaultAlignment = $alignment;
 
         return $this;
+    }
+
+    /**
+     * Also takes the field's accepted types, since Filament's editor attachments are images, and turns uploads off
+     * after `fileAttachments(false)`.
+     *
+     * @param  array{disk?: string, directory?: string, visibility?: string, maxSize?: int, acceptedFileTypes?: array<string>, uploads?: bool}  $defaults
+     */
+    public function withFieldFileAttachments(array $defaults): static
+    {
+        $plugin = $this->withFieldStorage($defaults);
+        $plugin->acceptedFileTypes ??= $defaults['acceptedFileTypes'] ?? null;
+
+        if (($defaults['uploads'] ?? true) === false) {
+            $plugin->allowsUploads = false;
+        }
+
+        return $plugin;
     }
 
     public function allowsUrls(): bool

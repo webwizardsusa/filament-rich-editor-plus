@@ -4,8 +4,8 @@ use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
 use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

@@ -9,7 +9,7 @@ use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
 use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
 use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

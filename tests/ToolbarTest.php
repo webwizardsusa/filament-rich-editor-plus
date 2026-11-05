@@ -13,7 +13,7 @@ use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Hollyit\RichEditorPlus\Support\Tool;
 use Hollyit\RichEditorPlus\Support\ToolbarLayout;
 use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
-use Tests\TestCase;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

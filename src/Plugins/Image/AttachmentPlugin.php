@@ -7,6 +7,7 @@ use Filament\Actions\Action;
 use Hollyit\RichEditorPlus\Content\NodeSpec;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
 use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
 use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
 use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
 use Hollyit\RichEditorPlus\Plugins\Image\Actions\AttachmentAction;
@@ -23,7 +24,7 @@ use InvalidArgumentException;
  * file's name and its size. Like images, they store their disk and path, never their URL: the link is resolved when
  * content is rendered and when the editor shows it.
  */
-class AttachmentPlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorRequests, PatchesRenderedMarkup, ProvidesEditorStyles
+class AttachmentPlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorRequests, InheritsFieldFileAttachments, PatchesRenderedMarkup, ProvidesEditorStyles
 {
     use StoresEditorFiles;
 

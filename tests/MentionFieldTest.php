@@ -10,9 +10,9 @@ use Filament\Support\Facades\FilamentAsset;
 use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\MentionProvider;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

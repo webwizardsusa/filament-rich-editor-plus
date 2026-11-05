@@ -11,13 +11,13 @@ use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
 use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
 use Hollyit\RichEditorPlus\RichEditorPlus;
 use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

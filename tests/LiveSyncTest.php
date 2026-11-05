@@ -8,9 +8,9 @@ use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
 use Hollyit\RichEditorPlus\RichEditorPlus;
+use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 uses(TestCase::class);
 

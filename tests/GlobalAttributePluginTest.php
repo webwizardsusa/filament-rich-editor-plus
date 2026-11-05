@@ -1,16 +1,16 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\PluginExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HeadingPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Concerns;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Concerns;
 
 use DOMElement;
-use Hollyit\RichEditorPlus\Content\MarkSpec;
+use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
 
 /**
  * The `textStyle` span that colour and type plugins hang their attributes on. Each such plugin declares it; the registry

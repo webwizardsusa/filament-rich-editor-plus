@@ -15,7 +15,7 @@ const context = {
 }
 
 const labels = { done: 'Done', source: 'Markdown source', converting: 'Converting Markdown…', convertFailed: 'Could not convert.' }
-const make = (content) => makeEditor(content, [...defaultPluginIds, { id: 'hollyit/markdown', options: { paste: false, source: true, labels } }], context)
+const make = (content) => makeEditor(content, [...defaultPluginIds, { id: 'webwizardsusa/markdown', options: { paste: false, source: true, labels } }], context)
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
 const paragraphDoc = (text) => ({ document: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text }] }] } })
 const textarea = () => editor.view.dom.parentElement.querySelector('textarea.rep-markdown-source')
@@ -48,7 +48,7 @@ describe('the Markdown source view', () => {
 
         await enter()
 
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/markdown', 'toMarkdown', { document: editor.getJSON() })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/markdown', 'toMarkdown', { document: editor.getJSON() })
         expect(textarea().value).toBe('hello\n')
         expect(editor.view.dom.hidden).toBe(true)
         expect(editor.isEditable).toBe(false)
@@ -68,7 +68,7 @@ describe('the Markdown source view', () => {
         await vi.advanceTimersByTimeAsync(1)
         await flush()
 
-        expect(context.callPlugin).toHaveBeenLastCalledWith('hollyit/markdown', 'toDocument', { markdown: 'changed' })
+        expect(context.callPlugin).toHaveBeenLastCalledWith('webwizardsusa/markdown', 'toDocument', { markdown: 'changed' })
         expect(editor.getText()).toBe('changed')
         expect(updates).toHaveBeenCalled()
     })
@@ -220,7 +220,7 @@ describe('the Markdown source view', () => {
         await flush()
 
         expect(textarea().value).toBe('outside\n')
-        expect(context.callPlugin).toHaveBeenLastCalledWith('hollyit/markdown', 'toMarkdown', { document: editor.getJSON() })
+        expect(context.callPlugin).toHaveBeenLastCalledWith('webwizardsusa/markdown', 'toMarkdown', { document: editor.getJSON() })
     })
 
     it('drops a slow refresh that was asked for before the user typed', async () => {

@@ -7,7 +7,7 @@ import cases from '../../../Plugins/Image/fixtures/attachment-parity.json'
 install({ registerExtension, registerActionArguments })
 
 const imageOptions = { widths: ['25', '50', '75', '100'], defaultWidth: '100', defaultAlignment: 'center', labels: {} }
-const pluginIds = [...defaultPluginIds, { id: 'hollyit/image', options: imageOptions }, { id: 'hollyit/attachment', options: { labels: {} } }]
+const pluginIds = [...defaultPluginIds, { id: 'webwizardsusa/image', options: imageOptions }, { id: 'webwizardsusa/attachment', options: { labels: {} } }]
 
 describe('attachment parity with the PHP engine', () => {
     it.each(cases)('renders $name to the same HTML', ({ document, html }) => {

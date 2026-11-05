@@ -7,13 +7,13 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\StateFormat;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\StateFormat;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -22,7 +22,7 @@ beforeEach(function (): void {
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../resources/js/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 });
 
 class StateCastTestForm extends Component implements HasActions, HasSchemas

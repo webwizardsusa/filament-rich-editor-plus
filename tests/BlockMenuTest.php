@@ -1,11 +1,11 @@
 <?php
 
-use Hollyit\RichEditorPlus\Rendering\BlockMenuRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\BlockType;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Rendering\BlockMenuRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\BlockType;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

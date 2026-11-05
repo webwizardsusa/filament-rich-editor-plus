@@ -58,7 +58,7 @@ const isAttachmentSelected = (state) => state.selection instanceof NodeSelection
  * link's URL is looked up through the field and never written to the HTML.
  */
 export function attachmentExtension({ uploads = null, labels = {} }, { callPlugin } = {}) {
-    const cache = createUrlCache(callPlugin, 'hollyit/attachment')
+    const cache = createUrlCache(callPlugin, 'webwizardsusa/attachment')
 
     const clean = (attrs) => {
         const cleaners = { disk: cleanString, path: cleanString, name: cleanName, size: cleanSize, mime: cleanMime }
@@ -80,7 +80,7 @@ export function attachmentExtension({ uploads = null, labels = {} }, { callPlugi
 
         addStorage() {
             return {
-                uploadRoute: uploads ? { plugin: 'hollyit/attachment', kind: 'attachment', accept: uploads.accept ?? [], maxSize: uploads.maxSize ?? 0 } : null,
+                uploadRoute: uploads ? { plugin: 'webwizardsusa/attachment', kind: 'attachment', accept: uploads.accept ?? [], maxSize: uploads.maxSize ?? 0 } : null,
                 urlCache: cache,
             }
         },

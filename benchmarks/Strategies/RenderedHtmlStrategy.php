@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Strategies;
 
 /**
  * Stores the final display HTML. Reads are a column read; a renamed mention re-renders every document that has it.

@@ -22,7 +22,7 @@ const context = () => ({ callPlugin: vi.fn(() => Promise.resolve({ urls: {} })),
 const image = (alt) => ({ type: 'image', attrs: { disk: null, path: null, url: 'https://example.test/a.png', alt, caption: '', align: 'center', width: '100' } })
 
 const make = (content, extra, ctx = context()) => {
-    editor = makeEditor(content, [...defaultPluginIds, { id: 'hollyit/image', options: options(extra) }], ctx)
+    editor = makeEditor(content, [...defaultPluginIds, { id: 'webwizardsusa/image', options: options(extra) }], ctx)
 
     return ctx
 }
@@ -70,7 +70,7 @@ describe('the image upload route', () => {
     it('is in the editor storage with the plugin, kind, types and size', () => {
         make(doc(p('a')))
 
-        expect(editor.storage.image.uploadRoute).toEqual({ plugin: 'hollyit/image', kind: 'image', accept: ['image/png'], maxSize: 5120 })
+        expect(editor.storage.image.uploadRoute).toEqual({ plugin: 'webwizardsusa/image', kind: 'image', accept: ['image/png'], maxSize: 5120 })
     })
 
     it('is null without upload options', () => {

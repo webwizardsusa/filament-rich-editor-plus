@@ -1,15 +1,15 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
-use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Rendering\HtmlPatcher;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\MentionProvider;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\MentionPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Rendering\HtmlPatcher;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

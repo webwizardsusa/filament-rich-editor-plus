@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
 
 /**
  * Keeps an empty paragraph at the end of the document, so there is always somewhere to type after a table or code

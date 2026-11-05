@@ -1,28 +1,28 @@
 <?php
 
-use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\DividerPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\DocumentPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\FindReplacePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\ToolScope;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BlockquotePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BulletListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\DividerPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\DocumentPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\FindReplacePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HeadingPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\LinkPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\OrderedListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\SubscriptPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\UnderlinePlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\ToolScope;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

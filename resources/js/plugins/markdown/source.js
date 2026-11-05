@@ -27,7 +27,7 @@ export function markdownSourceExtension({ labels = {} } = {}, { callPlugin, proc
         // A refresh still in flight was asked for before this Markdown, so its answer must not replace it.
         session.refreshing++
 
-        session.inFlight = Promise.resolve(callPlugin('hollyit/markdown', 'toDocument', { markdown }))
+        session.inFlight = Promise.resolve(callPlugin('webwizardsusa/markdown', 'toDocument', { markdown }))
             .then((answer) => {
                 if (id !== session.latest || editor.isDestroyed) {
                     return false
@@ -75,7 +75,7 @@ export function markdownSourceExtension({ labels = {} } = {}, { callPlugin, proc
         }
 
         sessions.set(editor, null)
-        const answer = await Promise.resolve(processing(callPlugin('hollyit/markdown', 'toMarkdown', { document: editor.getJSON() }), labels.converting)).catch(() => null)
+        const answer = await Promise.resolve(processing(callPlugin('webwizardsusa/markdown', 'toMarkdown', { document: editor.getJSON() }), labels.converting)).catch(() => null)
 
         if (editor.isDestroyed || typeof answer?.markdown !== 'string') {
             sessions.delete(editor)
@@ -210,7 +210,7 @@ export function markdownSourceExtension({ labels = {} } = {}, { callPlugin, proc
 
             const ticket = ++session.refreshing
 
-            Promise.resolve(callPlugin('hollyit/markdown', 'toMarkdown', { document: this.editor.getJSON() }))
+            Promise.resolve(callPlugin('webwizardsusa/markdown', 'toMarkdown', { document: this.editor.getJSON() }))
                 .then((answer) => {
                     const isStale = ticket !== session.refreshing || session.timer !== null || session.release || session.leaving || session.textarea.value !== session.applied
 

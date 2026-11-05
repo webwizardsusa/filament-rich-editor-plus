@@ -1,11 +1,11 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules;
 
 use Closure;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
 
 /**
  * Markdown for the core plugins' nodes and marks.

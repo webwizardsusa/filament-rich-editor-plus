@@ -1,14 +1,14 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
 use DOMElement;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedHtml;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\MentionProvider;
 use InvalidArgumentException;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PatchesRenderedHtml;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
 
 /**
  * Inline mentions, with one {@see MentionProvider} per trigger. It is opt-in because it does nothing without providers.

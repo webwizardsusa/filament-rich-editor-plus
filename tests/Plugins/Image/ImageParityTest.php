@@ -1,9 +1,9 @@
 <?php
 
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

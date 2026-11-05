@@ -1,16 +1,16 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown;
 
-use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Content\Contracts\ContentFormat;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
 
 /**
  * Markdown on a Rich Editor Plus field: `store()` keeps the field's content as Markdown, `pasteMarkdown()` (on by
@@ -19,7 +19,7 @@ use Hollyit\RichEditorPlus\Support\Tool;
  */
 class MarkdownPlugin extends Plugin implements AnswersEditorRequests, ChecksFieldPlugins, ProvidesContentFormat
 {
-    public const string ID = 'hollyit/markdown';
+    public const string ID = 'webwizardsusa/markdown';
 
     protected bool $stores = false;
 

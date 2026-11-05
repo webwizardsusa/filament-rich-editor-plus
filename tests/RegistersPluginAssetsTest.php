@@ -2,7 +2,7 @@
 
 use Filament\Support\Assets\AssetManager;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

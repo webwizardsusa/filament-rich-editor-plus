@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Strategies;
 
 /**
  * One way of storing, rendering and caching content. Every strategy must render exactly what `json` renders.

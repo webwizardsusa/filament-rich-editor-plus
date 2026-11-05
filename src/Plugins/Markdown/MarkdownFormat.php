@@ -1,23 +1,23 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Contracts\ProvidesMarkdownRules;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\Contracts\ContentFormat;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Contracts\ProvidesMarkdownRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TablePlugin;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * Markdown (GFM) as a stored format: `RichEditorPlus::make('body')->storeAs(MarkdownFormat::make())`. A plugin is

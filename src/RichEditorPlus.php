@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus;
+namespace Webwizardsusa\RichEditorPlus;
 
 use Closure;
 use Filament\Actions\Action;
@@ -10,30 +10,30 @@ use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Filament\Support\Components\Contracts\HasEmbeddedView;
-use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
-use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
-use Hollyit\RichEditorPlus\Rendering\BlockMenuRenderer;
-use Hollyit\RichEditorPlus\Rendering\ToolbarRenderer;
-use Hollyit\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
-use Hollyit\RichEditorPlus\Support\EditorCommand;
-use Hollyit\RichEditorPlus\Support\MentionItem;
-use Hollyit\RichEditorPlus\Support\MentionProvider;
-use Hollyit\RichEditorPlus\Support\PluginExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\StateFormat;
-use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
 use InvalidArgumentException;
 use Livewire\Attributes\Renderless;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Webwizardsusa\RichEditorPlus\Content\Contracts\ContentFormat;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\MentionPlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\BlockMenuRenderer;
+use Webwizardsusa\RichEditorPlus\Rendering\ToolbarRenderer;
+use Webwizardsusa\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
+use Webwizardsusa\RichEditorPlus\Support\EditorCommand;
+use Webwizardsusa\RichEditorPlus\Support\MentionItem;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
+use Webwizardsusa\RichEditorPlus\Support\PluginExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\StateFormat;
+use Webwizardsusa\RichEditorPlus\Support\ToolbarPlacement;
 
 class RichEditorPlus extends Field implements HasEmbeddedView
 {

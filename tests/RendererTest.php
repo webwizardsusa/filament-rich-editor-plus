@@ -1,11 +1,11 @@
 <?php
 
-use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\Support\MentionProvider;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BlockquotePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\MentionPlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

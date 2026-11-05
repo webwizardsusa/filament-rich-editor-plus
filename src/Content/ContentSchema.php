@@ -1,10 +1,10 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Content;
+namespace Webwizardsusa\RichEditorPlus\Content;
 
 use DOMElement;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use InvalidArgumentException;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * The nodes and marks one editor understands. `doc` and `text` are built into the engine.

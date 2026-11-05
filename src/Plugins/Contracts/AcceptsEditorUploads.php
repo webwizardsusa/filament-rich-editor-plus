@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Contracts;
 
 /**
  * A plugin that takes files uploaded from the editor (see `RichEditorPlus::pullTemporaryUpload()`). A field with one

@@ -1,8 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Contracts;
 
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
 
 /**
  * A plugin that adds attributes to nodes and marks other plugins own, such as text alignment on paragraphs and

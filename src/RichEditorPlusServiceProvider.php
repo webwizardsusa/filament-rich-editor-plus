@@ -1,20 +1,20 @@
 <?php
 
-namespace Hollyit\RichEditorPlus;
+namespace Webwizardsusa\RichEditorPlus;
 
-use Hollyit\RichEditorPlus\Benchmarks\Console\BenchmarkCommand;
-use Hollyit\RichEditorPlus\Plugins\Image\ImageAssets;
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownAssets;
-use Hollyit\RichEditorPlus\Plugins\Table\TableAssets;
-use Hollyit\RichEditorPlus\Support\RegistersPluginAssets;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Console\BenchmarkCommand;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImageAssets;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownAssets;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TableAssets;
+use Webwizardsusa\RichEditorPlus\Support\RegistersPluginAssets;
 
 class RichEditorPlusServiceProvider extends PackageServiceProvider
 {
     use RegistersPluginAssets;
 
-    public const string PACKAGE = 'hollyit/rich-editor-plus';
+    public const string PACKAGE = 'webwizardsusa/rich-editor-plus';
 
     public const string ALPINE_COMPONENT = 'rich-editor-plus';
 
@@ -52,6 +52,6 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
     protected static function assetsMissingMessage(): string
     {
         return 'The Rich Editor Plus assets are not available: the package\'s dist/ directory is missing and no Vite dev server '
-            .'is running. Reinstall hollyit/rich-editor-plus; when working on the package itself, run its `npm run dev` or `npm run build`.';
+            .'is running. Reinstall webwizardsusa/rich-editor-plus; when working on the package itself, run its `npm run dev` or `npm run build`.';
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules;
 
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
 
 /**
  * GFM tables. The first row is the header; column alignment comes from its cells; merged cells are unmerged (the

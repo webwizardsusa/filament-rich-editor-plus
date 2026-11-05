@@ -8,14 +8,14 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\HtmlSourcePlugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\StateFormat;
-use Hollyit\RichEditorPlus\Support\ToolScope;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HtmlSourcePlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\StateFormat;
+use Webwizardsusa\RichEditorPlus\Support\ToolScope;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -23,7 +23,7 @@ beforeEach(function (): void {
     // Rendering the field needs its Alpine component asset, which only exists once the package has been built.
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../resources/js/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 });
 
 class HtmlSourceActionTestForm extends Component implements HasActions, HasSchemas

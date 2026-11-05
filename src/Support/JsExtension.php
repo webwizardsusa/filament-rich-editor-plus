@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 /**
  * Tells the JS side which TipTap extension a plugin needs. The id is looked up in the JS extension registry

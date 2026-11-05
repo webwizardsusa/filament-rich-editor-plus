@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Contracts;
 
 /**
  * For plugins whose rendered nodes are elements that contain markup, such as an image's `<figure>` with an `<img>` and a

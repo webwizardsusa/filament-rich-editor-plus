@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Strategies;
 
 /**
  * The baseline: store the document JSON and render it on every read.

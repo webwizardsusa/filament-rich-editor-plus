@@ -1,12 +1,12 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 use Filament\Actions\Action;
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
-use Hollyit\RichEditorPlus\Content\MarkSpec;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
 
 /**
  * What another package or the app adds to an existing plugin, collected by `RichEditorPlus::extendPlugin()`.

@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Contracts;
 
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
 
 /**
  * For plugins whose nodes or marks have a Markdown form. A plugin's content is allowed on a Markdown field when every

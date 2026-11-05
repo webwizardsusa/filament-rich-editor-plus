@@ -1,12 +1,12 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks;
 
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use stdClass;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
 
 /**
  * Reads and writes `bench_documents` and keeps `bench_document_mentions` in sync, for every strategy.

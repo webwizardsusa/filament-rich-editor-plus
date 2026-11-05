@@ -7,16 +7,16 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\AttachmentPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -149,7 +149,7 @@ it('stores a public upload even when the disk refuses to change its visibility',
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../../../resources/js/index.js'),
         AlpineComponent::make('rich-editor-plus-image', __DIR__.'/../../../resources/js/plugins/image/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 
     $filesystem = Mockery::mock(Filesystem::class);
     $filesystem->shouldReceive('put')->once()->withArgs(fn (string $path, mixed $contents, mixed ...$options): bool => $options === [])->andReturn(true);

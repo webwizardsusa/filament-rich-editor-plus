@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Image\Actions;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Image\Actions;
 
 use Closure;
 use Filament\Actions\Action;
@@ -12,10 +12,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Enums\Width;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\EditorCommand;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\EditorCommand;
 
 /**
  * The modal for inserting an image, or editing the selected one. The browser mounts it with the selection and, when

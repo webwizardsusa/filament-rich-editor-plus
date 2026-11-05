@@ -1,7 +1,7 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

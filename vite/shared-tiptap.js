@@ -7,7 +7,7 @@
  * subtle ways, and the copy would add hundreds of KB. This plugin rewrites imports of the shared modules, by any name
  * they are imported under, to read from that object. In an app that installed the package with Composer:
  *
- *     import { sharedTiptap } from './vendor/hollyit/rich-editor-plus/vite/shared-tiptap.js'
+ *     import { sharedTiptap } from './vendor/webwizardsusa/rich-editor-plus/vite/shared-tiptap.js'
  *
  *     export default defineConfig({ plugins: [sharedTiptap({ exclude: ['@tiptap/extension-table'] })] })
  *

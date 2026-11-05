@@ -1,14 +1,14 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Support\ToolMenuItem;
 use InvalidArgumentException;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Support\ToolMenuItem;
 
 /**
  * Aligns paragraphs and headings with `style="text-align: …"`, from one block-toolbar menu that every block toolbar

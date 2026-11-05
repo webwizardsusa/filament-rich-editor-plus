@@ -1,16 +1,16 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Rendering;
+namespace Webwizardsusa\RichEditorPlus\Rendering;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\HtmlParser;
-use Hollyit\RichEditorPlus\Content\HtmlSerializer;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedHtml;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use LogicException;
 use RuntimeException;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\HtmlParser;
+use Webwizardsusa\RichEditorPlus\Content\HtmlSerializer;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PatchesRenderedHtml;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * Renders stored HTML for display by refreshing only the nodes plugins fill in at render time, such as mentions, and

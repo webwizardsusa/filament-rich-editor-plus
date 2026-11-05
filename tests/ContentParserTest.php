@@ -1,10 +1,10 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\HtmlParser;
-use Hollyit\RichEditorPlus\Content\MarkSpec;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\HtmlParser;
+use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

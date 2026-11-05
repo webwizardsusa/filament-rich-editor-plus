@@ -1,12 +1,12 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Micro;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Micro;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\ParamProviders;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 #[BeforeMethods('setUp')]
 #[ParamProviders('provideShapes')]

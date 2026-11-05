@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 use Closure;
 use Filament\Forms\Components\Field;

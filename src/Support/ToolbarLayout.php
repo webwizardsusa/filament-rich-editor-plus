@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 /**
  * What a toolbar shows, in order: groups of formatting tools and controls, with a divider between groups. Build one

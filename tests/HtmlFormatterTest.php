@@ -1,6 +1,6 @@
 <?php
 
-use Hollyit\RichEditorPlus\Support\HtmlFormatter;
+use Webwizardsusa\RichEditorPlus\Support\HtmlFormatter;
 
 it('puts each block on its own line and indents nested blocks', function (): void {
     expect(HtmlFormatter::format('<h2>Title</h2><ul><li><p>One</p></li><li><p>Two</p></li></ul>'))

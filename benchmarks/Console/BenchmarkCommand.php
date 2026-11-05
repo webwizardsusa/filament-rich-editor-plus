@@ -1,24 +1,24 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Console;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Console;
 
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkPlugins;
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkSchema;
-use Hollyit\RichEditorPlus\Benchmarks\DocumentStore;
-use Hollyit\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\BenchmarkRun;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\Environment;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\ParityChecker;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\ParityException;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\ScenarioResult;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\ScenarioRunner;
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
 use Illuminate\Cache\Repository;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use InvalidArgumentException;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkPlugins;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkSchema;
+use Webwizardsusa\RichEditorPlus\Benchmarks\DocumentStore;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\BenchmarkRun;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\Environment;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\ParityChecker;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\ParityException;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\ScenarioResult;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\ScenarioRunner;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
 
 class BenchmarkCommand extends Command
 {

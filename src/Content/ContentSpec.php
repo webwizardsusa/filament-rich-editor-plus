@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Content;
+namespace Webwizardsusa\RichEditorPlus\Content;
 
 use Closure;
 use DOMElement;

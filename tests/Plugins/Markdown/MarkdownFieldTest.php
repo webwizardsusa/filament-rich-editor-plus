@@ -7,17 +7,17 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\UnderlinePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TablePlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -26,7 +26,7 @@ beforeEach(function (): void {
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../../../resources/js/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 });
 
 class MarkdownFieldTestForm extends Component implements HasActions, HasSchemas

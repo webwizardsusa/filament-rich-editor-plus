@@ -7,19 +7,19 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\MentionProvider;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\MentionPlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
 beforeEach(function (): void {
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../resources/js/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 
     MentionFieldTestForm::$disabled = false;
     MentionFieldTestForm::$providers = fn (): array => [

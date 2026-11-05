@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 /**
  * The parts of a toolbar that are not plugin tools. Their values are the names a toolbar arrangement places them by,

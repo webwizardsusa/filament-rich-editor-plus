@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Serializing;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
 
 /**
  * A document to Markdown with the given rules. Strict (for storage) throws on nodes and marks without a rule; lenient

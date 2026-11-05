@@ -7,23 +7,23 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
-use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\StateFormat;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Livewire\Component;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\Content\Contracts\ContentFormat;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ChecksFieldPlugins;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesContentFormat;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\UnderlinePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\StateCasts\RichEditorPlusStateCast;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\StateFormat;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -32,7 +32,7 @@ beforeEach(function (): void {
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../resources/js/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 });
 
 /**

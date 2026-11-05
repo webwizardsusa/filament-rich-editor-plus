@@ -1,10 +1,10 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Strategies;
 
-use Hollyit\RichEditorPlus\Benchmarks\DocumentStore;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusBatchRenderer;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Benchmarks\DocumentStore;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusBatchRenderer;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
 
 abstract class Strategy implements ContentStrategy
 {

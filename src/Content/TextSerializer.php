@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Content;
+namespace Webwizardsusa\RichEditorPlus\Content;
 
 /**
  * Turns a TipTap document into plain text: inline nodes join up, and blocks are separated by a blank line.

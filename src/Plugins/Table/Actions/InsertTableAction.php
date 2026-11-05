@@ -1,13 +1,13 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Table\Actions;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Table\Actions;
 
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\Width;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\EditorCommand;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\EditorCommand;
 
 class InsertTableAction
 {

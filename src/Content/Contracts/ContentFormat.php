@@ -1,10 +1,10 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Content\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Content\Contracts;
 
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * A text format a field stores its content in, such as Markdown (`RichEditorPlus::storeAs()`). The editor still edits

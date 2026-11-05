@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Serializing;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing;
 
 use Closure;
 

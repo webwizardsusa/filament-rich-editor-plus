@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Fixtures;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures;
 
 use Illuminate\Support\Facades\DB;
 use Random\Engine\Mt19937;

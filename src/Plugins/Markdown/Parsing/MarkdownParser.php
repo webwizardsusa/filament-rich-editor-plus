@@ -1,21 +1,21 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Parsing;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Parsing;
 
 use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMText;
 use DOMXPath;
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\HtmlParser;
-use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\MarkdownConverter;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\HtmlParser;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HeadingPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * Markdown (GFM) to a document: CommonMark writes HTML, a few DOM passes shape it the way the plugins parse it, and the

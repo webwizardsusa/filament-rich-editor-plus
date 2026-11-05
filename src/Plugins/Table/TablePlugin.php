@@ -1,15 +1,15 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Table;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Table;
 
 use Closure;
 use DOMElement;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Plugins\Table\Actions\InsertTableAction;
-use Hollyit\RichEditorPlus\Support\BlockType;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\Actions\InsertTableAction;
+use Webwizardsusa\RichEditorPlus\Support\BlockType;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
 
 /**
  * Tables for Rich Editor Plus. It adds a table block to the slash menu and a toolbar of its own that appears above
@@ -20,7 +20,7 @@ use Hollyit\RichEditorPlus\Support\Tool;
  */
 class TablePlugin extends Plugin
 {
-    public const string ID = 'hollyit/table';
+    public const string ID = 'webwizardsusa/table';
 
     protected bool $isResizable = true;
 

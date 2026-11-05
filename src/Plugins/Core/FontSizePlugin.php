@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
 use InvalidArgumentException;
 

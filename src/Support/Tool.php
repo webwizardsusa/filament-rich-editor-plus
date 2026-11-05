@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 /**
  * A toolbar button contributed by a plugin. The block toolbar renders these; the command is a

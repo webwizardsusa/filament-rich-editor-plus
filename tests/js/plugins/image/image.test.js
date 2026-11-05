@@ -18,7 +18,7 @@ const context = {
 install({ registerExtension, registerActionArguments })
 
 const options = { widths: ['25', '50', '75', '100'], defaultWidth: '100', defaultAlignment: 'center', labels: { loading: 'Loading image…', missing: 'Image missing' } }
-const pluginIds = [...defaultPluginIds, { id: 'hollyit/image', options }]
+const pluginIds = [...defaultPluginIds, { id: 'webwizardsusa/image', options }]
 
 const make = (content) => makeEditor(content, pluginIds, context)
 
@@ -105,7 +105,7 @@ describe('the node view', () => {
 
         await flush()
 
-        expect(calls).toEqual([{ plugin: 'hollyit/image', request: 'urls', payload: { paths: ['editor-images/a.jpg'] } }])
+        expect(calls).toEqual([{ plugin: 'webwizardsusa/image', request: 'urls', payload: { paths: ['editor-images/a.jpg'] } }])
         expect(editor.view.dom.querySelector('figure img').getAttribute('src')).toBe('https://files.test/a.jpg')
     })
 

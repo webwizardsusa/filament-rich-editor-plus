@@ -1,11 +1,11 @@
 <?php
 
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -28,8 +28,8 @@ function renderImage(string $html, ?ImagePlugin $plugin = null): string
 const UPLOAD = '<figure class="rep-image" data-type="image" data-disk="media" data-path="editor-images/a.jpg" data-align="center" data-width="50"><img alt="A cat"><figcaption>Our cat</figcaption></figure>';
 
 it('has its id and stays out of the default plugins', function (): void {
-    expect(imagePlugin()->getId())->toBe('hollyit/image')
-        ->and(array_map(fn ($plugin): string => $plugin->getId(), PluginRegistry::defaultPlugins()))->not->toContain('hollyit/image');
+    expect(imagePlugin()->getId())->toBe('webwizardsusa/image')
+        ->and(array_map(fn ($plugin): string => $plugin->getId(), PluginRegistry::defaultPlugins()))->not->toContain('webwizardsusa/image');
 });
 
 it('parses an uploaded image and renders its URL for display, never storing it', function (): void {
@@ -119,13 +119,13 @@ it('answers the urls request for the safe paths among the first 100 it is asked 
     $field = RichEditorPlus::make('body')->addPlugins([imagePlugin()]);
     $paths = ['editor-images/a.jpg', '../x', 'other/b.jpg', ...array_map(fn (int $i): string => "editor-images/{$i}.jpg", range(1, 200))];
 
-    $answer = $field->answerPluginRequestForJs('hollyit/image', 'urls', ['paths' => $paths]);
+    $answer = $field->answerPluginRequestForJs('webwizardsusa/image', 'urls', ['paths' => $paths]);
 
     expect($answer['urls']['editor-images/a.jpg'])->toBe('https://files.test/media/editor-images/a.jpg')
         ->and($answer['urls'])->not->toHaveKey('../x')->not->toHaveKey('other/b.jpg')
         ->and(array_keys($answer['urls']))->toBe(['editor-images/a.jpg', ...array_map(fn (int $i): string => "editor-images/{$i}.jpg", range(1, 97))])
-        ->and($field->answerPluginRequestForJs('hollyit/image', 'nonsense', []))->toBe([])
-        ->and($field->answerPluginRequestForJs('hollyit/image', 'urls', ['paths' => 'x']))->toBe(['urls' => []]);
+        ->and($field->answerPluginRequestForJs('webwizardsusa/image', 'nonsense', []))->toBe([])
+        ->and($field->answerPluginRequestForJs('webwizardsusa/image', 'urls', ['paths' => 'x']))->toBe(['urls' => []]);
 });
 
 it('writes CSS for its widths and alignments', function (): void {

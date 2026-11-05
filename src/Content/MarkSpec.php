@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Content;
+namespace Webwizardsusa\RichEditorPlus\Content;
 
 /**
  * A mark such as bold or a link. See {@see ContentSpec}.

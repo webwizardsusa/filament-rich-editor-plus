@@ -20,7 +20,7 @@ It works on phones too (see [On mobile](#on-mobile)) and follows Filament's dark
 ## Installation
 
 ```bash
-composer require hollyit/rich-editor-plus
+composer require webwizardsusa/rich-editor-plus
 php artisan filament:assets
 ```
 
@@ -40,7 +40,7 @@ package, or add it to the `post-autoload-dump` scripts in your `composer.json`:
 Use the field in a form like any other Filament field:
 
 ```php
-use Hollyit\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
 
 public static function configure(Schema $schema): Schema
 {
@@ -53,7 +53,7 @@ public static function configure(Schema $schema): Schema
 To show the content outside the panel, render it with the same plugins the field uses (see [Rendering](#rendering)):
 
 ```blade
-{!! \Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer::make($post->body)->toHtml() !!}
+{!! \Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer::make($post->body)->toHtml() !!}
 ```
 
 Coming from Filament's own `RichEditor`? See [Coming from Filament's RichEditor](#coming-from-filaments-richeditor).
@@ -97,7 +97,7 @@ $table->longText('body')->nullable();
 To store the TipTap document instead, use a `json` column with an `array` cast and opt in:
 
 ```php
-use Hollyit\RichEditorPlus\Support\StateFormat;
+use Webwizardsusa\RichEditorPlus\Support\StateFormat;
 
 RichEditorPlus::make('body')->storeAs(StateFormat::Json);
 ```
@@ -136,7 +136,7 @@ $field->getContentFormat(); // the ContentFormat, or null
 ### Rendering
 
 ```php
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
 
 RichContentPlusRenderer::make($post->body)->plugins($plugins)->toHtml();
 
@@ -293,7 +293,7 @@ under [Optional plugins](#optional-plugins)).
 `LinkPlugin` is in the default set. To change it for a field, add it again with your settings:
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\LinkPlugin;
 
 RichEditorPlus::make('body')->addPlugins([
     LinkPlugin::make()
@@ -319,14 +319,14 @@ These plugins ship with the package but aren't in the default set. Add them to a
 service provider:
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TextAlignPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\SubscriptPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TextAlignPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TextColorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TrailingNodePlugin;
 
 RichEditorPlus::make('body')->addPlugins([CodePlugin::make(), TaskListPlugin::make()]);
 
@@ -343,8 +343,8 @@ RichEditorPlus::registerDefaultPlugins([CodePlugin::class, TaskListPlugin::class
 The colour plugins take a palette of named colours. Each entry has a label for the menu and a CSS colour:
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TextColorPlugin;
 
 RichEditorPlus::make('body')->addPlugins([
     TextColorPlugin::make()->colors([
@@ -371,11 +371,11 @@ RichEditorPlus::make('body')->addPlugins([
 
   ```blade
   @php
-      use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
-      use Hollyit\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
-      use Hollyit\RichEditorPlus\Plugins\Core\FontSizePlugin;
-      use Hollyit\RichEditorPlus\Plugins\Core\LineHeightPlugin;
-      use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
+      use Webwizardsusa\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+      use Webwizardsusa\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
+      use Webwizardsusa\RichEditorPlus\Plugins\Core\FontSizePlugin;
+      use Webwizardsusa\RichEditorPlus\Plugins\Core\LineHeightPlugin;
+      use Webwizardsusa\RichEditorPlus\Plugins\Core\TextColorPlugin;
   @endphp
 
   <style>
@@ -398,9 +398,9 @@ The font, size and line height plugins store their choice on the same `textStyle
 with them and with each other. They take a palette of named values, and each has a default:
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\FontSizePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\LineHeightPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\FontSizePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\LineHeightPlugin;
 
 RichEditorPlus::make('body')->addPlugins([
     FontFamilyPlugin::make()->fonts([
@@ -465,7 +465,7 @@ A task list from `TaskListPlugin`:
 content as HTML, one block per line, in a code editor:
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Core\HtmlSourcePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HtmlSourcePlugin;
 
 RichEditorPlus::make('body')->addPlugins([HtmlSourcePlugin::make()]);
 ```
@@ -489,9 +489,9 @@ has a `MentionProvider` that finds and labels its records. The plugin is opt-in,
 
 ```php
 use App\Models\User;
-use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
-use Hollyit\RichEditorPlus\Support\MentionItem;
-use Hollyit\RichEditorPlus\Support\MentionProvider;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\MentionPlugin;
+use Webwizardsusa\RichEditorPlus\Support\MentionItem;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
 
 RichEditorPlus::make('body')->addPlugins([
     MentionPlugin::make()->providers([
@@ -561,7 +561,7 @@ columns and rows, merge or split cells, toggle the header row and delete the tab
 ![A table with the cursor in a header cell and the table tools open in the More menu](art/table.png)
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TablePlugin;
 
 RichEditorPlus::make('body')->addPlugins([
     TablePlugin::make()
@@ -582,7 +582,7 @@ the block menu, and edited from the block toolbar.
 ![An image with a caption, its block toolbar, and the width menu open](art/image.png)
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
 
 RichEditorPlus::make('body')->addPlugins([ImagePlugin::make()]);
 ```
@@ -715,7 +715,7 @@ and in the content.
 ![An attached PDF shown as a file card, with its block toolbar](art/attachment.png)
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\AttachmentPlugin;
 
 RichEditorPlus::make('content')
     ->addPlugins([
@@ -747,7 +747,7 @@ the `public` disk locally.
 Rendered content needs the plugin's CSS for alignment and width. Include it on every page that shows the content:
 
 ```blade
-<style>{!! \Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin::make()->getStylesheet() !!}</style>
+<style>{!! \Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin::make()->getStylesheet() !!}</style>
 ```
 
 Use the same `widths()` as the field, because the stylesheet has one rule per width. The editor loads it by itself.
@@ -755,7 +755,7 @@ Use the same `widths()` as the field, because the stylesheet has one rule per wi
 Render content with the same plugins as the field, so images get their URLs:
 
 ```php
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
 
 RichContentPlusRenderer::make($post->body)
     ->plugins([ImagePlugin::make()])
@@ -780,8 +780,8 @@ write), so stored content, pasted content and the source view always agree. The 
 ### Storing Markdown
 
 ```php
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
 
 RichEditorPlus::make('body')->addPlugins([MarkdownPlugin::make()->store()]);
 ```
@@ -789,7 +789,7 @@ RichEditorPlus::make('body')->addPlugins([MarkdownPlugin::make()->store()]);
 The same, without the plugin's other features being involved:
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
 
 RichEditorPlus::make('body')->storeAs(MarkdownFormat::make());
 ```
@@ -886,7 +886,7 @@ a Markdown form, or it throws at boot with the same message as above.
 Any content can be written as Markdown, whatever the field stores:
 
 ```php
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
 
 $markdown = RichContentPlusRenderer::make($post->body)->plugins([...])->toMarkdown();
 ```
@@ -929,9 +929,9 @@ not allowed on a Markdown field. Reading uses the plugin's existing HTML parse r
 HTML first.
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Markdown\Contracts\ProvidesMarkdownRules;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Contracts\ProvidesMarkdownRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
 
 class CalloutPlugin extends Plugin implements ProvidesMarkdownRules
 {
@@ -961,8 +961,8 @@ headings. Declare it once in PHP: the server parses and renders it, and the edit
 so no JavaScript is needed.
 
 ```php
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
 
 class AlignmentPlugin extends Plugin implements ProvidesGlobalAttributes
 {
@@ -982,9 +982,9 @@ class AlignmentPlugin extends Plugin implements ProvidesGlobalAttributes
 To add one to an existing plugin, such as anchors on headings, extend it from a service provider:
 
 ```php
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginExtension;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginExtension;
 
 RichEditorPlus::extendPlugin('core/heading', fn (PluginExtension $extension) => $extension->addGlobalAttributes([
     GlobalAttribute::html('anchor', 'id')->types(['heading'])->pattern('[A-Za-z][A-Za-z0-9_-]*'),
@@ -1023,7 +1023,7 @@ stylesheet with Filament so `filament:assets` publishes them, and `moduleUrl()` 
 module from:
 
 ```php
-use Hollyit\RichEditorPlus\Support\RegistersPluginAssets;
+use Webwizardsusa\RichEditorPlus\Support\RegistersPluginAssets;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -1054,8 +1054,8 @@ class HighlightServiceProvider extends PackageServiceProvider
 ```
 
 ```php
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
 
 class HighlightPlugin extends Plugin
 {
@@ -1091,8 +1091,8 @@ A tool with `menu()` opens a list of items instead of running a command of its o
 item's label through `currentLabel()`:
 
 ```php
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Support\ToolMenuItem;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Support\ToolMenuItem;
 
 Tool::make('textAlign')
     ->label('Text align')
@@ -1213,7 +1213,7 @@ npm i -D vite @tiptap/core@^3 @tiptap/pm@^3
 ```js
 // vite.config.js
 import { defineConfig } from 'vite'
-import { sharedTiptap } from './vendor/hollyit/rich-editor-plus/vite/shared-tiptap.js'
+import { sharedTiptap } from './vendor/webwizardsusa/rich-editor-plus/vite/shared-tiptap.js'
 
 export default defineConfig({
     // List packages you import that import TipTap themselves (such as `@tiptap/extension-*`), so dev mode doesn't
@@ -1242,7 +1242,7 @@ trait looks for. Set `root` to the app root, give the entry relative to it, and 
 // vite.dev.config.js
 import { defineConfig } from 'vite'
 import laravel from 'laravel-vite-plugin'
-import { sharedTiptap } from './vendor/hollyit/rich-editor-plus/vite/shared-tiptap.js'
+import { sharedTiptap } from './vendor/webwizardsusa/rich-editor-plus/vite/shared-tiptap.js'
 
 const appRoot = '../..' // the host app, relative to your package
 

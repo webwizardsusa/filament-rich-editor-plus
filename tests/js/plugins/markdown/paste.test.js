@@ -18,7 +18,7 @@ const context = {
 }
 
 const labels = { converting: 'Converting Markdown…', pasteFailed: 'Pasted as plain text.' }
-const make = (content, options = {}) => makeEditor(content, [...defaultPluginIds, { id: 'hollyit/markdown', options: { paste: true, source: false, labels, ...options } }], context)
+const make = (content, options = {}) => makeEditor(content, [...defaultPluginIds, { id: 'webwizardsusa/markdown', options: { paste: true, source: false, labels, ...options } }], context)
 
 const paste = (text, { html = '', types = ['text/plain'] } = {}) => {
     const event = {
@@ -53,7 +53,7 @@ describe('pasting Markdown', () => {
         editor.commands.setTextSelection(editor.state.doc.child(0).nodeSize)
 
         expect(paste('## Title')).toBe(true)
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/markdown', 'toDocument', { markdown: '## Title' })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/markdown', 'toDocument', { markdown: '## Title' })
         expect(context.processing).toHaveBeenCalledWith(expect.any(Promise), 'Converting Markdown…')
 
         resolveRequest({ document: heading })

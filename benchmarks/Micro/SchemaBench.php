@@ -1,10 +1,10 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Micro;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Micro;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use PhpBench\Attributes\BeforeMethods;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 #[BeforeMethods('setUp')]
 class SchemaBench extends MicroBench

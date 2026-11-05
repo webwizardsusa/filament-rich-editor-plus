@@ -1,12 +1,12 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
 use DOMElement;
-use Hollyit\RichEditorPlus\Content\MarkSpec;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
 
 /**
  * Superscript text. It replaces subscript on the same text.

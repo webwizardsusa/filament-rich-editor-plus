@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Fixtures;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures;
 
 use InvalidArgumentException;
 use Random\Engine\Mt19937;

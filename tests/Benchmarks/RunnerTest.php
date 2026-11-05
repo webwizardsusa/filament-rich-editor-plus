@@ -1,19 +1,19 @@
 <?php
 
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkPlugins;
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkSchema;
-use Hollyit\RichEditorPlus\Benchmarks\DocumentStore;
-use Hollyit\RichEditorPlus\Benchmarks\Fixtures\MentionableSeeder;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\BenchmarkRun;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\ParityChecker;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\ParityException;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\ScenarioRunner;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\Stats;
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\ContentStrategy;
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkPlugins;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkSchema;
+use Webwizardsusa\RichEditorPlus\Benchmarks\DocumentStore;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures\MentionableSeeder;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\BenchmarkRun;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\ParityChecker;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\ParityException;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\ScenarioRunner;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\Stats;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Strategies\ContentStrategy;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

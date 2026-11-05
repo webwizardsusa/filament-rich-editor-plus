@@ -95,7 +95,7 @@ export function markdownPasteExtension({ paste = true, labels = {} } = {}, { cal
                                 view.dispatch(tr)
                             }
 
-                            const request = Promise.resolve(callPlugin('hollyit/markdown', 'toDocument', { markdown: text }))
+                            const request = Promise.resolve(callPlugin('webwizardsusa/markdown', 'toDocument', { markdown: text }))
                                 .then((answer) => {
                                     const content = answer?.document?.content
 

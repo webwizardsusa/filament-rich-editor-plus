@@ -1,11 +1,11 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\HtmlParser;
-use Hollyit\RichEditorPlus\Content\HtmlSerializer;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\HtmlParser;
+use Webwizardsusa\RichEditorPlus\Content\HtmlSerializer;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TablePlugin;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

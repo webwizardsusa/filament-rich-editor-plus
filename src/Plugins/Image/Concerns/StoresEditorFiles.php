@@ -1,10 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Image\Concerns;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Image\Concerns;
 
 use Closure;
-use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
-use Hollyit\RichEditorPlus\RichEditorPlus;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -12,6 +10,8 @@ use League\MimeTypeDetection\FinfoMimeTypeDetector;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 use Throwable;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
 
 /**
  * Files on a Laravel disk that editor content points to by disk and path: where uploads go, which stored paths are

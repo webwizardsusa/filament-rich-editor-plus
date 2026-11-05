@@ -8,17 +8,17 @@ use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -27,7 +27,7 @@ beforeEach(function (): void {
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../resources/js/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 
     UploadsTestForm::$disabled = false;
     UploadsTestForm::$withUploadPlugin = true;

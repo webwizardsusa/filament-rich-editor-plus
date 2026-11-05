@@ -1,11 +1,11 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
-use Hollyit\RichEditorPlus\Actions\HtmlSourceAction;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Actions\HtmlSourceAction;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
 
 /**
  * An "HTML source" item in the toolbar's more menu, which opens the field's content as HTML in a modal to view and

@@ -62,7 +62,7 @@ const makeContext = ({ answer, upload } = {}) => ({
 
         stored++
 
-        return plugin === 'hollyit/image'
+        return plugin === 'webwizardsusa/image'
             ? { disk: 'media', path: `editor-images/${stored}.png`, name: 'x.png', size: 10, mime: 'image/png', url: `https://files.test/${stored}.png` }
             : { disk: 'media', path: `editor-attachments/${stored}.pdf`, name: 'Q3.pdf', size: 2048, mime: 'application/pdf' }
     }),
@@ -74,8 +74,8 @@ const withAccept = (options, accept) => (accept ? { ...options, uploads: { ...op
 const make = (context, { withAttachments = true, content = doc(p('ab')), imageAccept = null, attachmentAccept = null } = {}) => {
     editor = makeEditor(content, [
         ...defaultPluginIds,
-        { id: 'hollyit/image', options: withAccept(imageOptions, imageAccept) },
-        ...(withAttachments ? [{ id: 'hollyit/attachment', options: withAccept(attachmentOptions, attachmentAccept) }] : []),
+        { id: 'webwizardsusa/image', options: withAccept(imageOptions, imageAccept) },
+        ...(withAttachments ? [{ id: 'webwizardsusa/attachment', options: withAccept(attachmentOptions, attachmentAccept) }] : []),
     ], context)
     editor.commands.setTextSelection(2)
 
@@ -108,7 +108,7 @@ describe('routing', () => {
         expect(paste([png()]).handled).toBe(true)
         await settleAll()
 
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/image', 'store', { key: 'key-a.png' })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/image', 'store', { key: 'key-a.png' })
         const image = editor.getJSON().content.find(({ type }) => type === 'image')
         expect(image.attrs).toMatchObject({ disk: 'media', path: 'editor-images/1.png', alt: '' })
         expect(editor.state.selection.node?.type.name).toBe('image')
@@ -122,7 +122,7 @@ describe('routing', () => {
         drop([pdf()])
         await settleAll()
 
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/attachment', 'store', { key: 'key-Q3.pdf' })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/attachment', 'store', { key: 'key-Q3.pdf' })
         expect(editor.getJSON().content.find(({ type }) => type === 'attachment').attrs).toEqual({ disk: 'media', path: 'editor-attachments/1.pdf', name: 'Q3.pdf', size: 2048, mime: 'application/pdf' })
         expect(context.runAction).not.toHaveBeenCalled()
     })
@@ -176,12 +176,12 @@ describe('routing', () => {
         await settleAll()
 
         expect(context.callPlugin.mock.calls.filter(([, request]) => request === 'store').map(([plugin, , { key }]) => [plugin, key])).toEqual([
-            ['hollyit/attachment', 'key-site.zip'],
-            ['hollyit/attachment', 'key-old.zip'],
-            ['hollyit/attachment', 'key-a.csv'],
-            ['hollyit/attachment', 'key-b.csv'],
-            ['hollyit/image', 'key-cat.jpg'],
-            ['hollyit/image', 'key-dog.jpg'],
+            ['webwizardsusa/attachment', 'key-site.zip'],
+            ['webwizardsusa/attachment', 'key-old.zip'],
+            ['webwizardsusa/attachment', 'key-a.csv'],
+            ['webwizardsusa/attachment', 'key-b.csv'],
+            ['webwizardsusa/image', 'key-cat.jpg'],
+            ['webwizardsusa/image', 'key-dog.jpg'],
         ])
         expect(sent).toEqual([])
     })
@@ -192,7 +192,7 @@ describe('routing', () => {
         drop([new File(['x'], 'cat.webp', { type: 'image/webp' })])
         await settleAll()
 
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/image', 'store', { key: 'key-cat.webp' })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/image', 'store', { key: 'key-cat.webp' })
         expect(sent).toEqual([])
     })
 
@@ -211,7 +211,7 @@ describe('routing', () => {
         drop([new File(['<svg/>'], 'logo.svg', { type: 'image/svg+xml' })])
         await settleAll()
 
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/image', 'store', { key: 'key-logo.svg' })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/image', 'store', { key: 'key-logo.svg' })
     })
 
     it('sends a file the browser has no type for to the attachment plugin, which decides', async () => {
@@ -220,7 +220,7 @@ describe('routing', () => {
         drop([new File(['x'], 'notes', { type: '' })])
         await settleAll()
 
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/attachment', 'store', { key: 'key-notes' })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/attachment', 'store', { key: 'key-notes' })
         expect(sent).toEqual([])
     })
 

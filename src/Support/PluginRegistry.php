@@ -1,33 +1,33 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 use Closure;
 use Filament\Actions\Action;
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\ContentSpec;
-use Hollyit\RichEditorPlus\Content\GlobalAttribute;
-use Hollyit\RichEditorPlus\Content\MarkSpec;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
-use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\DividerPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\DocumentPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\FindReplacePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 use InvalidArgumentException;
 use LogicException;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\ContentSpec;
+use Webwizardsusa\RichEditorPlus\Content\GlobalAttribute;
+use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BlockquotePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BulletListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\DividerPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\DocumentPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\FindReplacePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HeadingPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\LinkPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\OrderedListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\UnderlinePlugin;
 
 /**
  * Resolves a list of plugins into the single, ordered set an editor (or renderer) works from.

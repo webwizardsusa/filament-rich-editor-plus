@@ -1,16 +1,16 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Rendering;
+namespace Webwizardsusa\RichEditorPlus\Rendering;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
-use Hollyit\RichEditorPlus\Content\HtmlParser;
-use Hollyit\RichEditorPlus\Content\HtmlSerializer;
-use Hollyit\RichEditorPlus\Content\TextSerializer;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
 use Illuminate\Support\Traits\Macroable;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\Contracts\ContentFormat;
+use Webwizardsusa\RichEditorPlus\Content\HtmlParser;
+use Webwizardsusa\RichEditorPlus\Content\HtmlSerializer;
+use Webwizardsusa\RichEditorPlus\Content\TextSerializer;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * Converts stored editor content (TipTap JSON as an array or string, or HTML) on the server, using the nodes and marks

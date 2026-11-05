@@ -38,8 +38,8 @@ describe('the plugin context', () => {
     it('calls the field for plugin requests', async () => {
         const { context, wire } = setUp()
 
-        await expect(context.callPlugin('hollyit/image', 'urls', { paths: ['a'] })).resolves.toEqual({ ok: true })
-        expect(wire.callSchemaComponentMethod).toHaveBeenCalledWith('form.content', 'answerPluginRequestForJs', { plugin: 'hollyit/image', request: 'urls', payload: { paths: ['a'] } })
+        await expect(context.callPlugin('webwizardsusa/image', 'urls', { paths: ['a'] })).resolves.toEqual({ ok: true })
+        expect(wire.callSchemaComponentMethod).toHaveBeenCalledWith('form.content', 'answerPluginRequestForJs', { plugin: 'webwizardsusa/image', request: 'urls', payload: { paths: ['a'] } })
     })
 
     it('uploads to the field\'s attachments, reports progress, and resolves the key', async () => {

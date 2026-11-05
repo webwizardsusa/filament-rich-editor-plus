@@ -1,11 +1,11 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
-use Hollyit\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownFormat;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownPlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -60,19 +60,19 @@ it('pastes Markdown on any field', function (): void {
 it('converts Markdown for the editor', function (): void {
     $field = markdownPluginField();
 
-    expect($field->answerPluginRequestForJs('hollyit/markdown', 'toDocument', ['markdown' => '**hi**']))
+    expect($field->answerPluginRequestForJs('webwizardsusa/markdown', 'toDocument', ['markdown' => '**hi**']))
         ->toMatchArray(['document' => ['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'hi', 'marks' => [['type' => 'bold']]]]]]]]);
 });
 
 it('converts documents to Markdown for the editor', function (): void {
     $document = ['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'hi']]]]];
 
-    expect(markdownPluginField()->answerPluginRequestForJs('hollyit/markdown', 'toMarkdown', ['document' => $document]))
+    expect(markdownPluginField()->answerPluginRequestForJs('webwizardsusa/markdown', 'toMarkdown', ['document' => $document]))
         ->toBe(['markdown' => "hi\n"]);
 });
 
 it('refuses bad and oversized requests', function (string $request, array $payload, string $error): void {
-    expect(markdownPluginField()->answerPluginRequestForJs('hollyit/markdown', $request, $payload))
+    expect(markdownPluginField()->answerPluginRequestForJs('webwizardsusa/markdown', $request, $payload))
         ->toBe(['error' => __("rich-editor-plus::markdown.errors.{$error}")]);
 })->with([
     'no markdown' => ['toDocument', [], 'invalid'],

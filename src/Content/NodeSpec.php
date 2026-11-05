@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Content;
+namespace Webwizardsusa\RichEditorPlus\Content;
 
 /**
  * A block or inline node. See {@see ContentSpec}.

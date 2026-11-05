@@ -1,18 +1,18 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HeadingPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Parsing\MarkdownParser;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules\ImageRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules\TableRules;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TablePlugin;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

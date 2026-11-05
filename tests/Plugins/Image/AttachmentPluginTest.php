@@ -1,11 +1,11 @@
 <?php
 
-use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\AttachmentPlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -30,8 +30,8 @@ class CompanyFilesPlugin extends AttachmentPlugin {}
 const CARD = '<div class="rep-attachment" data-type="attachment" data-disk="media" data-path="editor-attachments/a.pdf" data-size="482133" data-mime="application/pdf"><a download="Q3 report.pdf">Q3 report.pdf</a><span class="rep-attachment-size">471 KB</span></div>';
 
 it('has its id and stays out of the default plugins', function (): void {
-    expect(attachmentPlugin()->getId())->toBe('hollyit/attachment')
-        ->and(array_map(fn ($plugin): string => $plugin->getId(), PluginRegistry::defaultPlugins()))->not->toContain('hollyit/attachment');
+    expect(attachmentPlugin()->getId())->toBe('webwizardsusa/attachment')
+        ->and(array_map(fn ($plugin): string => $plugin->getId(), PluginRegistry::defaultPlugins()))->not->toContain('webwizardsusa/attachment');
 });
 
 it('has its defaults', function (): void {
@@ -92,7 +92,7 @@ it('answers urls only for safe paths, at most 100', function (): void {
     $field = RichEditorPlus::make('body')->addPlugins([attachmentPlugin()]);
     $paths = [...array_map(fn (int $i): string => "editor-attachments/{$i}.pdf", range(1, 105)), '../x.pdf'];
 
-    $urls = $field->answerPluginRequestForJs('hollyit/attachment', 'urls', ['paths' => $paths])['urls'];
+    $urls = $field->answerPluginRequestForJs('webwizardsusa/attachment', 'urls', ['paths' => $paths])['urls'];
 
     expect($urls)->toHaveCount(100)
         ->and($urls['editor-attachments/1.pdf'])->toBe('https://files.test/media/editor-attachments/1.pdf')

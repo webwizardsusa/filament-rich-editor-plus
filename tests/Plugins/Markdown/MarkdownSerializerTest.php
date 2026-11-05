@@ -1,16 +1,16 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\HeadingPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\HeadingPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\LinkPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownSerializer;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkRule;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules\CoreRules;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

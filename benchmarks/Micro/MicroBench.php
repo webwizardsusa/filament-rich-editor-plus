@@ -1,11 +1,11 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Micro;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Micro;
 
 use Generator;
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkPlugins;
-use Hollyit\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkPlugins;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 
 /**
  * Shared setup: the benchmark plugin set with mentions looked up in memory, so only the renderer is measured.

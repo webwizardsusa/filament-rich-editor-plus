@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Runner;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Runner;
 
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\ContentStrategy;
 use Illuminate\Support\Facades\DB;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Strategies\ContentStrategy;
 
 /**
  * Makes sure every strategy renders exactly what the baseline renders, before and after a mentioned entity is renamed,

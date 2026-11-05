@@ -3,7 +3,7 @@ import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table
 import '../../../resources/js/extensions/core'
 import { registerExtension, resolveExtensions } from '../../../resources/js/registry'
 
-registerExtension('hollyit/table', () => [Table, TableRow, TableHeader, TableCell])
+registerExtension('webwizardsusa/table', () => [Table, TableRow, TableHeader, TableCell])
 
 export const defaultPluginIds = [
     'core/document',
@@ -16,7 +16,7 @@ export const defaultPluginIds = [
     'core/divider',
     'core/mention',
     'core/find-replace',
-    'hollyit/table',
+    'webwizardsusa/table',
 ]
 
 const optionsFor = {

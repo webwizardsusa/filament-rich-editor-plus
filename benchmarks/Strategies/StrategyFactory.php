@@ -1,11 +1,11 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Strategies;
 
-use Hollyit\RichEditorPlus\Benchmarks\DocumentStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
+use Webwizardsusa\RichEditorPlus\Benchmarks\DocumentStore;
 
 class StrategyFactory
 {

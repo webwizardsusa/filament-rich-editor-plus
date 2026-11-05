@@ -1,10 +1,10 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Rendering;
+namespace Webwizardsusa\RichEditorPlus\Rendering;
 
-use Hollyit\RichEditorPlus\Support\BlockType;
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Support\ToolMenuItem;
+use Webwizardsusa\RichEditorPlus\Support\BlockType;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Support\ToolMenuItem;
 
 use function Filament\Support\generate_icon_html;
 

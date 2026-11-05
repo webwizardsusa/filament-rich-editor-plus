@@ -1,5 +1,5 @@
 {
-    "name": "hollyit/rich-editor-plus",
+    "name": "webwizardsusa/rich-editor-plus",
     "description": "A plugin-driven, TipTap based rich editor for Filament with a Gutenberg style block toolbar.",
     "keywords": [
         "laravel",
@@ -23,13 +23,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Hollyit\\RichEditorPlus\\": "src/"
+            "Webwizardsusa\\RichEditorPlus\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Hollyit\\RichEditorPlus\\Tests\\": "tests/",
-            "Hollyit\\RichEditorPlus\\Benchmarks\\": "benchmarks/"
+            "Webwizardsusa\\RichEditorPlus\\Tests\\": "tests/",
+            "Webwizardsusa\\RichEditorPlus\\Benchmarks\\": "benchmarks/"
         }
     },
     "scripts": {
@@ -38,7 +38,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Hollyit\\RichEditorPlus\\RichEditorPlusServiceProvider"
+                "Webwizardsusa\\RichEditorPlus\\RichEditorPlusServiceProvider"
             ]
         }
     },

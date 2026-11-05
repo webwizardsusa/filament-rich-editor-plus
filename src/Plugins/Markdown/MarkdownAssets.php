@@ -1,8 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown;
 
-use Hollyit\RichEditorPlus\Support\BundledPluginAssets;
+use Webwizardsusa\RichEditorPlus\Support\BundledPluginAssets;
 
 /**
  * The Markdown plugin's JS module and stylesheet (paste and the source view), loaded only on fields with

@@ -1,19 +1,19 @@
 <?php
 
-use Hollyit\RichEditorPlus\Plugins\Core\BlockquotePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\OrderedListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Rendering\ToolbarRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Support\ToolbarLayout;
-use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BlockquotePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BulletListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\OrderedListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Rendering\ToolbarRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Support\ToolbarLayout;
+use Webwizardsusa\RichEditorPlus\Support\ToolbarPlacement;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

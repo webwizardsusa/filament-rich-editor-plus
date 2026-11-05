@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
 /**
  * Text colour from a palette, stored as `has-{name}-color` classes on the `textStyle` span.

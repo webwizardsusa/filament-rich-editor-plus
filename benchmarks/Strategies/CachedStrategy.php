@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Strategies;
 
-use Hollyit\RichEditorPlus\Benchmarks\DocumentStore;
 use Illuminate\Cache\Repository;
+use Webwizardsusa\RichEditorPlus\Benchmarks\DocumentStore;
 
 /**
  * Caches another strategy's HTML. Keys include `updated_at` and the render version, so a save or a plugin change

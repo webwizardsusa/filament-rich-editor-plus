@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Contracts;
 
 /**
  * A plugin whose content needs CSS in the editor, such as palette classes. The field prints it in a `<style>` element,

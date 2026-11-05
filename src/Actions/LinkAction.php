@@ -1,15 +1,15 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Actions;
+namespace Webwizardsusa\RichEditorPlus\Actions;
 
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\Width;
-use Hollyit\RichEditorPlus\Content\MarkSpec;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\EditorCommand;
+use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\EditorCommand;
 
 /**
  * The modal for adding, editing and removing a link. The browser mounts it with the current selection and, when

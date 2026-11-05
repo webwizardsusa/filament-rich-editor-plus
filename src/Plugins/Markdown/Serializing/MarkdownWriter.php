@@ -1,10 +1,10 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Serializing;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\ContentSpec;
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\ContentSpec;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
 
 /**
  * Renders nodes with the rules. Each rule writes into a buffer of its own, so a rule can render its children, get

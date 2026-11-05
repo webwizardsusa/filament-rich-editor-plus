@@ -30,7 +30,7 @@ const isImageSelected = (state) => state.selection instanceof NodeSelection && s
  * width. Uploads keep their disk and path; their URL is looked up through the field and never written to the HTML.
  */
 export function imageExtension({ widths = [], defaultWidth = '100', defaultAlignment = 'center', altRequired = false, uploads = null, labels = {} }, { callPlugin, runAction } = {}) {
-    const cache = createUrlCache(callPlugin, 'hollyit/image')
+    const cache = createUrlCache(callPlugin, 'webwizardsusa/image')
     const alignment = (value) => (ALIGNMENTS.includes(value) ? value : defaultAlignment)
     const width = (value) => (widths.includes(String(value)) ? String(value) : defaultWidth)
     const text = (value) => (typeof value === 'string' ? value : '')
@@ -123,7 +123,7 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
 
         addStorage() {
             return {
-                uploadRoute: uploads ? { plugin: 'hollyit/image', kind: 'image', accept: uploads.accept ?? [], maxSize: uploads.maxSize ?? 0 } : null,
+                uploadRoute: uploads ? { plugin: 'webwizardsusa/image', kind: 'image', accept: uploads.accept ?? [], maxSize: uploads.maxSize ?? 0 } : null,
                 urlCache: cache,
             }
         },

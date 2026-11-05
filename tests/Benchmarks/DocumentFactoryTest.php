@@ -1,9 +1,9 @@
 <?php
 
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkPlugins;
-use Hollyit\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkPlugins;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

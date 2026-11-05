@@ -1,12 +1,12 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Rendering;
+namespace Webwizardsusa\RichEditorPlus\Rendering;
 
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Support\ToolbarControl;
-use Hollyit\RichEditorPlus\Support\ToolbarLayout;
-use Hollyit\RichEditorPlus\Support\ToolbarPlacement;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Support\ToolbarControl;
+use Webwizardsusa\RichEditorPlus\Support\ToolbarLayout;
+use Webwizardsusa\RichEditorPlus\Support\ToolbarPlacement;
 
 use function Filament\Support\generate_icon_html;
 

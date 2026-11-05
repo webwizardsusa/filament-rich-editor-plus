@@ -1,25 +1,25 @@
 <?php
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\HtmlParser;
-use Hollyit\RichEditorPlus\Content\HtmlSerializer;
-use Hollyit\RichEditorPlus\Content\MarkSpec;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BulletListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\CodePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\LinkPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\SubscriptPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TaskListPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\HtmlParser;
+use Webwizardsusa\RichEditorPlus\Content\HtmlSerializer;
+use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BulletListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodeBlockPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\CodePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\LinkPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\StrikethroughPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\SubscriptPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\SuperscriptPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TaskListPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\UnderlinePlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

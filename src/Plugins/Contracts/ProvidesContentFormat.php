@@ -1,8 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Contracts;
 
-use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
+use Webwizardsusa\RichEditorPlus\Content\Contracts\ContentFormat;
 
 /**
  * A plugin that chooses the field's stored format, as `storeAs()` would. Only plugins added to the field explicitly

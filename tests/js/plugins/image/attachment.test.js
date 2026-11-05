@@ -12,7 +12,7 @@ const context = { callPlugin: vi.fn(() => Promise.resolve(answer)) }
 const options = { uploads: { accept: ['application/pdf'], maxSize: 10240 }, labels: { open: 'Open', loading: 'Loading…', missing: 'File missing' } }
 
 const make = (content) => {
-    editor = makeEditor(content, [...defaultPluginIds, { id: 'hollyit/attachment', options }], context)
+    editor = makeEditor(content, [...defaultPluginIds, { id: 'webwizardsusa/attachment', options }], context)
 }
 
 const card = (attrs = {}) => ({ type: 'attachment', attrs: { disk: 'media', path: 'editor-attachments/a.pdf', name: 'a.pdf', size: 2048, mime: 'application/pdf', ...attrs } })
@@ -71,7 +71,7 @@ describe('the attachment card in the editor', () => {
         await flush()
 
         const view = editor.view.dom.querySelector('.rep-attachment')
-        expect(context.callPlugin).toHaveBeenCalledWith('hollyit/attachment', 'urls', { paths: ['editor-attachments/a.pdf'] })
+        expect(context.callPlugin).toHaveBeenCalledWith('webwizardsusa/attachment', 'urls', { paths: ['editor-attachments/a.pdf'] })
         expect(view.textContent).toContain('a.pdf')
         expect(view.textContent).toContain('2 KB')
         expect(view.dataset.mime).toBe('application/pdf')
@@ -91,7 +91,7 @@ describe('the attachment card in the editor', () => {
     it('has its upload route in the editor storage', () => {
         make(doc(p('a')))
 
-        expect(editor.storage.attachment.uploadRoute).toEqual({ plugin: 'hollyit/attachment', kind: 'attachment', accept: ['application/pdf'], maxSize: 10240 })
+        expect(editor.storage.attachment.uploadRoute).toEqual({ plugin: 'webwizardsusa/attachment', kind: 'attachment', accept: ['application/pdf'], maxSize: 10240 })
     })
 })
 

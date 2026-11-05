@@ -1,10 +1,10 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\Rules;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\Rules;
 
-use Hollyit\RichEditorPlus\Content\UnsupportedContentFormatException;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
-use Hollyit\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
+use Webwizardsusa\RichEditorPlus\Content\UnsupportedContentFormatException;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\MarkdownWriter;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\Serializing\NodeRule;
 
 /**
  * Images at a URL as `![alt](url "caption")`. Alignment and width have no Markdown form. Images stored on a disk have

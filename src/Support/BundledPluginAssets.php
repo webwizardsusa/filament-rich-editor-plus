@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
-use Hollyit\RichEditorPlus\RichEditorPlusServiceProvider;
 use Illuminate\Support\Str;
+use Webwizardsusa\RichEditorPlus\RichEditorPlusServiceProvider;
 
 /**
  * The JS module and stylesheet of a plugin that ships inside this package but loads only on fields that use it

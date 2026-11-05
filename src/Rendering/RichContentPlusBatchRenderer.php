@@ -1,13 +1,13 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Rendering;
+namespace Webwizardsusa\RichEditorPlus\Rendering;
 
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\Contracts\ContentFormat;
-use Hollyit\RichEditorPlus\Content\HtmlSerializer;
-use Hollyit\RichEditorPlus\Content\TextSerializer;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\Contracts\ContentFormat;
+use Webwizardsusa\RichEditorPlus\Content\HtmlSerializer;
+use Webwizardsusa\RichEditorPlus\Content\TextSerializer;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * Renders several pieces of stored content (each an array, JSON or HTML) for display at once, such as a list of posts.

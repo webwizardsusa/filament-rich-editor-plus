@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 /**
  * One entry in a tool's menu (see {@see Tool::menu()}): a TipTap chain command and how the browser tells it is the

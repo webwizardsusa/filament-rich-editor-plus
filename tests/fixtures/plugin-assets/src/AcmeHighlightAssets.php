@@ -1,6 +1,6 @@
 <?php
 
-use Hollyit\RichEditorPlus\Support\RegistersPluginAssets;
+use Webwizardsusa\RichEditorPlus\Support\RegistersPluginAssets;
 
 /**
  * Stands in for a plugin package's service provider, with its built files in `../dist`.

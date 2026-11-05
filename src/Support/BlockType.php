@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 /**
  * What a block is: how to recognise it, how to apply it, and how it appears in the slash menu and block switcher.

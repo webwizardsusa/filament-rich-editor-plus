@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Fixtures;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures;
 
-use Hollyit\RichEditorPlus\Support\MentionProvider;
 use Illuminate\Support\Facades\DB;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
 
 /**
  * Mentions of rows in `bench_mentionables`, so every render pays for a real label lookup on the configured database.

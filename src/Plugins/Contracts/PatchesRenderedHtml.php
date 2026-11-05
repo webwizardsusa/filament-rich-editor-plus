@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Contracts;
 
 /**
  * For plugins that prepare rendered content by refreshing only certain nodes, such as mentions. Declaring those nodes

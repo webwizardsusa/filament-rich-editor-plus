@@ -1,8 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Contracts;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Contracts;
 
-use Hollyit\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
 
 /**
  * For plugins whose JS needs data from the server while editing, such as URLs for stored files. The editor's

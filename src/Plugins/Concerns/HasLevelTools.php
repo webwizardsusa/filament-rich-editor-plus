@@ -1,8 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Concerns;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Concerns;
 
-use Hollyit\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
 
 /**
  * Decrease and increase level buttons for a node that can nest. Each plugin gets its own pair, shown only on its own

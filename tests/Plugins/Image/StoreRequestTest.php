@@ -7,17 +7,17 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Plugins\Image\AttachmentPlugin;
-use Hollyit\RichEditorPlus\Plugins\Image\ImagePlugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\AttachmentPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -30,10 +30,10 @@ beforeEach(function (): void {
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../../../resources/js/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus-image', __DIR__.'/../../../resources/js/plugins/image/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 
     StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media')];
     StoreTestForm::$disabled = false;
@@ -89,7 +89,7 @@ function storeUpload(string $plugin, ?UploadedFile $file, string $key = 'k-1', ?
 }
 
 it('stores a pasted image on the plugin\'s disk and answers its file and URL', function (): void {
-    $answer = storeUpload('hollyit/image', UploadedFile::fake()->image('cat.png', 20, 20));
+    $answer = storeUpload('webwizardsusa/image', UploadedFile::fake()->image('cat.png', 20, 20));
 
     expect($answer)->toHaveKeys(['disk', 'path', 'name', 'size', 'mime', 'url'])
         ->and($answer['disk'])->toBe('media')
@@ -102,7 +102,7 @@ it('stores a pasted image on the plugin\'s disk and answers its file and URL', f
 });
 
 it('refuses a file whose contents are not an accepted type, whatever its name says', function (): void {
-    $answer = storeUpload('hollyit/image', UploadedFile::fake()->createWithContent('cat.png', 'just some text'));
+    $answer = storeUpload('webwizardsusa/image', UploadedFile::fake()->createWithContent('cat.png', 'just some text'));
 
     expect($answer)->toBe(['error' => __('rich-editor-plus::errors.image.type_not_accepted')])
         ->and(Storage::disk('media')->allFiles())->toBe([]);
@@ -115,7 +115,7 @@ it('refuses a file over the maximum size', function (): void {
     $file = UploadedFile::fake()->createWithContent('big.png', $png);
 
     expect($file->getSize())->toBeGreaterThan(1024)
-        ->and(storeUpload('hollyit/image', $file))->toBe(['error' => __('rich-editor-plus::errors.image.too_large', ['size' => '1 KB'])])
+        ->and(storeUpload('webwizardsusa/image', $file))->toBe(['error' => __('rich-editor-plus::errors.image.too_large', ['size' => '1 KB'])])
         ->and(Storage::disk('media')->allFiles())->toBe([]);
 });
 
@@ -123,7 +123,7 @@ it('answers upload_missing for an unknown key, a malformed key and a disabled fi
     StoreTestForm::$disabled = $disabled;
     $component = Livewire::test(StoreTestForm::class)->set('componentFileAttachments.data.content.k-1', UploadedFile::fake()->image('cat.png'));
 
-    expect(storeUpload('hollyit/image', null, $key, $component))->toBe(['error' => __('rich-editor-plus::errors.image.upload_missing')])
+    expect(storeUpload('webwizardsusa/image', null, $key, $component))->toBe(['error' => __('rich-editor-plus::errors.image.upload_missing')])
         ->and(Storage::disk('media')->allFiles())->toBe([]);
 })->with([
     'unknown key' => ['nope', false],
@@ -134,14 +134,14 @@ it('answers upload_missing for an unknown key, a malformed key and a disabled fi
 it('takes an upload once: the same key again is missing', function (): void {
     $component = Livewire::test(StoreTestForm::class);
 
-    expect(storeUpload('hollyit/image', UploadedFile::fake()->image('cat.png'), 'k-1', $component))->toHaveKey('path')
-        ->and(storeUpload('hollyit/image', null, 'k-1', $component))->toBe(['error' => __('rich-editor-plus::errors.image.upload_missing')])
+    expect(storeUpload('webwizardsusa/image', UploadedFile::fake()->image('cat.png'), 'k-1', $component))->toHaveKey('path')
+        ->and(storeUpload('webwizardsusa/image', null, 'k-1', $component))->toBe(['error' => __('rich-editor-plus::errors.image.upload_missing')])
         ->and(Storage::disk('media')->allFiles())->toHaveCount(1);
 });
 
 it('removes the temporary entry whether storing succeeds or not', function (UploadedFile $file): void {
     $component = Livewire::test(StoreTestForm::class);
-    storeUpload('hollyit/image', $file, 'k-1', $component);
+    storeUpload('webwizardsusa/image', $file, 'k-1', $component);
 
     expect(data_get($component->instance()->componentFileAttachments, 'data.content.k-1'))->toBeNull();
 })->with([
@@ -155,7 +155,7 @@ it('answers store_failed when the disk refuses the write without throwing', func
     Storage::set('media', $filesystem);
     $component = Livewire::test(StoreTestForm::class);
 
-    expect(storeUpload('hollyit/image', UploadedFile::fake()->image('cat.png'), 'k-1', $component))
+    expect(storeUpload('webwizardsusa/image', UploadedFile::fake()->image('cat.png'), 'k-1', $component))
         ->toBe(['error' => __('rich-editor-plus::errors.image.store_failed')])
         ->and(data_get($component->instance()->componentFileAttachments, 'data.content.k-1'))->toBeNull();
 });
@@ -188,7 +188,7 @@ it('sanitises file names', function (string $name, string $clean): void {
 it('stores an attachment and answers its file without a URL', function (): void {
     StoreTestForm::$plugins = fn (): array => [AttachmentPlugin::make()->disk('media')];
 
-    $answer = storeUpload('hollyit/attachment', UploadedFile::fake()->createWithContent('Q3 report.pdf', "%PDF-1.4\n".str_repeat('x', 200)));
+    $answer = storeUpload('webwizardsusa/attachment', UploadedFile::fake()->createWithContent('Q3 report.pdf', "%PDF-1.4\n".str_repeat('x', 200)));
 
     expect($answer)->toHaveKeys(['disk', 'path', 'name', 'size', 'mime'])
         ->and($answer)->not->toHaveKey('url')
@@ -201,7 +201,7 @@ it('stores an attachment and answers its file without a URL', function (): void 
 it('refuses HTML disguised as an accepted file', function (): void {
     StoreTestForm::$plugins = fn (): array => [AttachmentPlugin::make()->disk('media')];
 
-    expect(storeUpload('hollyit/attachment', UploadedFile::fake()->createWithContent('notes.pdf', '<!DOCTYPE html><html><body><script>alert(1)</script></body></html>')))
+    expect(storeUpload('webwizardsusa/attachment', UploadedFile::fake()->createWithContent('notes.pdf', '<!DOCTYPE html><html><body><script>alert(1)</script></body></html>')))
         ->toBe(['error' => __('rich-editor-plus::errors.image.type_not_accepted')])
         ->and(Storage::disk('media')->allFiles())->toBe([]);
 });
@@ -209,21 +209,21 @@ it('refuses HTML disguised as an accepted file', function (): void {
 it('refuses an attachment over the maximum size', function (): void {
     StoreTestForm::$plugins = fn (): array => [AttachmentPlugin::make()->disk('media')->maxSize(1)];
 
-    expect(storeUpload('hollyit/attachment', UploadedFile::fake()->createWithContent('big.pdf', "%PDF-1.4\n".str_repeat('x', 3000))))
+    expect(storeUpload('webwizardsusa/attachment', UploadedFile::fake()->createWithContent('big.pdf', "%PDF-1.4\n".str_repeat('x', 3000))))
         ->toBe(['error' => __('rich-editor-plus::errors.image.too_large', ['size' => '1 KB'])]);
 });
 
 it('sends a file only to the plugin it names', function (): void {
     StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media'), AttachmentPlugin::make()->disk('media')];
 
-    expect(storeUpload('hollyit/image', UploadedFile::fake()->createWithContent('a.pdf', "%PDF-1.4\n".str_repeat('x', 200))))
+    expect(storeUpload('webwizardsusa/image', UploadedFile::fake()->createWithContent('a.pdf', "%PDF-1.4\n".str_repeat('x', 200))))
         ->toBe(['error' => __('rich-editor-plus::errors.image.type_not_accepted')]);
 });
 
 it('takes a type/* wildcard as accepting every type of that kind', function (): void {
     StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/*'])];
 
-    $answer = storeUpload('hollyit/image', UploadedFile::fake()->image('cat.png', 20, 20));
+    $answer = storeUpload('webwizardsusa/image', UploadedFile::fake()->image('cat.png', 20, 20));
 
     expect($answer)->toHaveKey('path')
         ->and($answer['path'])->toEndWith('.png')
@@ -233,7 +233,7 @@ it('takes a type/* wildcard as accepting every type of that kind', function (): 
 it('never lets a wildcard take an SVG image, even renamed', function (string $name): void {
     StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/*'])];
 
-    expect(storeUpload('hollyit/image', UploadedFile::fake()->createWithContent($name, SVG_WITH_SCRIPT)))
+    expect(storeUpload('webwizardsusa/image', UploadedFile::fake()->createWithContent($name, SVG_WITH_SCRIPT)))
         ->toBe(['error' => __('rich-editor-plus::errors.image.type_not_accepted')])
         ->and(Storage::disk('media')->allFiles())->toBe([]);
 })->with(['logo.svg', 'logo.png']);
@@ -241,7 +241,7 @@ it('never lets a wildcard take an SVG image, even renamed', function (string $na
 it('takes an SVG image when image/svg+xml is accepted by name', function (): void {
     StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media')->acceptedFileTypes(['image/*', 'image/svg+xml'])->urlUsing(fn (string $disk, string $path): string => "https://files.example/{$path}")];
 
-    $answer = storeUpload('hollyit/image', UploadedFile::fake()->createWithContent('logo.svg', SVG_WITH_SCRIPT));
+    $answer = storeUpload('webwizardsusa/image', UploadedFile::fake()->createWithContent('logo.svg', SVG_WITH_SCRIPT));
 
     expect($answer['mime'] ?? null)->toBe('image/svg+xml')
         ->and($answer['path'])->toEndWith('.svg');
@@ -250,15 +250,15 @@ it('takes an SVG image when image/svg+xml is accepted by name', function (): voi
 it('refuses a denied type even when a wildcard matches it', function (): void {
     StoreTestForm::$plugins = fn (): array => [AttachmentPlugin::make()->disk('media')->acceptedFileTypes(['text/*'])];
 
-    expect(storeUpload('hollyit/attachment', UploadedFile::fake()->createWithContent('page.txt', '<!DOCTYPE html><html><body><script>alert(1)</script></body></html>')))
+    expect(storeUpload('webwizardsusa/attachment', UploadedFile::fake()->createWithContent('page.txt', '<!DOCTYPE html><html><body><script>alert(1)</script></body></html>')))
         ->toBe(['error' => __('rich-editor-plus::errors.image.type_not_accepted')])
-        ->and(storeUpload('hollyit/attachment', UploadedFile::fake()->createWithContent('notes.txt', "Just some notes.\n"))['mime'] ?? null)->toBe('text/plain');
+        ->and(storeUpload('webwizardsusa/attachment', UploadedFile::fake()->createWithContent('notes.txt', "Just some notes.\n"))['mime'] ?? null)->toBe('text/plain');
 });
 
 it('refuses a shell script even when a wildcard would take it', function (): void {
     StoreTestForm::$plugins = fn (): array => [AttachmentPlugin::make()->disk('media')->acceptedFileTypes(['text/*'])];
 
-    expect(storeUpload('hollyit/attachment', UploadedFile::fake()->createWithContent('notes.txt', "#!/bin/sh\nrm -rf /tmp/x\n")))
+    expect(storeUpload('webwizardsusa/attachment', UploadedFile::fake()->createWithContent('notes.txt', "#!/bin/sh\nrm -rf /tmp/x\n")))
         ->toBe(['error' => __('rich-editor-plus::errors.image.type_not_accepted')])
         ->and(Storage::disk('media')->allFiles())->toBe([]);
 });

@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Support;
+namespace Webwizardsusa\RichEditorPlus\Support;
 
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;

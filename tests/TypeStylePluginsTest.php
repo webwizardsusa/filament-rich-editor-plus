@@ -1,18 +1,18 @@
 <?php
 
-use Hollyit\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\BoldPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\FontSizePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\ItalicPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\LineHeightPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\PaletteStylePlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\TextColorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\UnderlinePlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\ToolMenuItem;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BackgroundColorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\FontFamilyPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\FontSizePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\ItalicPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\LineHeightPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\PaletteStylePlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\TextColorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\UnderlinePlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\ToolMenuItem;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Image;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Image;
 
-use Hollyit\RichEditorPlus\Support\BundledPluginAssets;
+use Webwizardsusa\RichEditorPlus\Support\BundledPluginAssets;
 
 /**
  * The JS module and stylesheet shared by {@see ImagePlugin} and {@see AttachmentPlugin}, loaded only on fields with

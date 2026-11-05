@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Strategies;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Strategies;
 
 /**
  * Stores storable HTML next to the JSON, and renders it with the package's default path for HTML, which patches only

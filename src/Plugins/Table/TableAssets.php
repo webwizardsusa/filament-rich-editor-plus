@@ -1,8 +1,8 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Table;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Table;
 
-use Hollyit\RichEditorPlus\Support\BundledPluginAssets;
+use Webwizardsusa\RichEditorPlus\Support\BundledPluginAssets;
 
 /**
  * The table plugin's JS module and stylesheet, loaded only on fields with {@see TablePlugin}.

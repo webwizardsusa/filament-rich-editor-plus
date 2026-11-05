@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Runner;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Runner;
 
 use RuntimeException;
 

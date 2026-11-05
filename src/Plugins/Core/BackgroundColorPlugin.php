@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Core;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Core;
 
 /**
  * Background colour (highlight) from a palette, stored as `has-{name}-background-color` classes on the `textStyle` span.

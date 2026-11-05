@@ -1,23 +1,23 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Image;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Image;
 
 use DOMElement;
 use Filament\Actions\Action;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
-use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
-use Hollyit\RichEditorPlus\Plugins\Image\Actions\AttachmentAction;
-use Hollyit\RichEditorPlus\Plugins\Image\Concerns\StoresEditorFiles;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\BlockType;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\Tool;
 use InvalidArgumentException;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\Actions\AttachmentAction;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\Concerns\StoresEditorFiles;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\BlockType;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
 
 /**
  * Files other than images, as `<div class="rep-attachment" data-type="attachment">` cards with a download link, the
@@ -28,7 +28,7 @@ class AttachmentPlugin extends Plugin implements AcceptsEditorUploads, AnswersEd
 {
     use StoresEditorFiles;
 
-    public const string ID = 'hollyit/attachment';
+    public const string ID = 'webwizardsusa/attachment';
 
     /**
      * @var array<string>

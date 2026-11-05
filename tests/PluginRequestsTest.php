@@ -1,14 +1,14 @@
 <?php
 
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\Exceptions;
 use Livewire\Attributes\Renderless;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

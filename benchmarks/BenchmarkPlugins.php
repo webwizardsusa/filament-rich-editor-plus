@@ -1,12 +1,12 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks;
 
-use Hollyit\RichEditorPlus\Benchmarks\Fixtures\BenchmarkMentionProvider;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
-use Hollyit\RichEditorPlus\Plugins\Core\MentionPlugin;
-use Hollyit\RichEditorPlus\Support\MentionProvider;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures\BenchmarkMentionProvider;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Core\MentionPlugin;
+use Webwizardsusa\RichEditorPlus\Support\MentionProvider;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
 
 /**
  * The plugin set every strategy renders with: the editor defaults plus mentions.

@@ -1,10 +1,10 @@
 <?php
 
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkSchema;
-use Hollyit\RichEditorPlus\Benchmarks\Runner\BenchmarkRun;
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
-use Hollyit\RichEditorPlus\Tests\TestCase;
 use Illuminate\Support\Facades\File;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkSchema;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Runner\BenchmarkRun;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 

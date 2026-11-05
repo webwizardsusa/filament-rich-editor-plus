@@ -1,6 +1,6 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Content;
+namespace Webwizardsusa\RichEditorPlus\Content;
 
 /**
  * Turns a TipTap document into HTML. Output is safe to print: every element and attribute comes from a spec, all text

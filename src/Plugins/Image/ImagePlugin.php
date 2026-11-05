@@ -1,24 +1,24 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins\Image;
+namespace Webwizardsusa\RichEditorPlus\Plugins\Image;
 
 use DOMElement;
-use Hollyit\RichEditorPlus\Content\ContentSpec;
-use Hollyit\RichEditorPlus\Content\NodeSpec;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
-use Hollyit\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
-use Hollyit\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
-use Hollyit\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
-use Hollyit\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
-use Hollyit\RichEditorPlus\Plugins\Image\Actions\ImageAction;
-use Hollyit\RichEditorPlus\Plugins\Image\Concerns\StoresEditorFiles;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\BlockType;
-use Hollyit\RichEditorPlus\Support\JsExtension;
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Support\ToolMenuItem;
 use InvalidArgumentException;
+use Webwizardsusa\RichEditorPlus\Content\ContentSpec;
+use Webwizardsusa\RichEditorPlus\Content\NodeSpec;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AcceptsEditorUploads;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\AnswersEditorRequests;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\InheritsFieldFileAttachments;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\Actions\ImageAction;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\Concerns\StoresEditorFiles;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\BlockType;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Support\ToolMenuItem;
 
 /**
  * Images on a Laravel disk or at a URL, as `<figure class="rep-image" data-type="image">` blocks with alt text, a
@@ -31,7 +31,7 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
         withFieldFileAttachments as withFieldStorage;
     }
 
-    public const string ID = 'hollyit/image';
+    public const string ID = 'webwizardsusa/image';
 
     /**
      * @var array<string>

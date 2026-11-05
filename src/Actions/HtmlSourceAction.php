@@ -1,17 +1,17 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Actions;
+namespace Webwizardsusa\RichEditorPlus\Actions;
 
 use Filament\Actions\Action;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\CodeEditor\Enums\Language;
 use Filament\Support\Enums\Width;
-use Hollyit\RichEditorPlus\Content\ContentSchema;
-use Hollyit\RichEditorPlus\Content\HtmlParser;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\EditorCommand;
-use Hollyit\RichEditorPlus\Support\HtmlFormatter;
+use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
+use Webwizardsusa\RichEditorPlus\Content\HtmlParser;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\EditorCommand;
+use Webwizardsusa\RichEditorPlus\Support\HtmlFormatter;
 
 /**
  * The modal for viewing and editing a field's content as HTML. It opens with the field's current content, written

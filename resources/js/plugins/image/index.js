@@ -10,8 +10,8 @@ import { imageExtension } from './image'
 // through the `sharedTiptap()` Vite plugin.
 export default function ({ registerExtension, registerActionArguments }) {
     // Both plugins add the same paste-and-drop extension; the editor keeps one, which routes to every plugin present.
-    registerExtension('hollyit/image', (options, tiptap, context) => [imageExtension(options, context), fileUploadsExtension(options, context)])
-    registerExtension('hollyit/attachment', (options, tiptap, context) => [attachmentExtension(options, context), fileUploadsExtension(options, context)])
+    registerExtension('webwizardsusa/image', (options, tiptap, context) => [imageExtension(options, context), fileUploadsExtension(options, context)])
+    registerExtension('webwizardsusa/attachment', (options, tiptap, context) => [attachmentExtension(options, context), fileUploadsExtension(options, context)])
 
     // Each modal edits the selected node of its type, and inserts a new one otherwise.
     const selected = (name) => (editor) => {

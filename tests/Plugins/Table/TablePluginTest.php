@@ -3,13 +3,13 @@
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\AssetManager;
 use Filament\Support\Facades\FilamentAsset;
-use Hollyit\RichEditorPlus\Plugins\Plugin;
-use Hollyit\RichEditorPlus\Plugins\Table\TablePlugin;
-use Hollyit\RichEditorPlus\Rendering\RichContentPlusRenderer;
-use Hollyit\RichEditorPlus\RichEditorPlus;
-use Hollyit\RichEditorPlus\Support\PluginRegistry;
-use Hollyit\RichEditorPlus\Support\Tool;
-use Hollyit\RichEditorPlus\Tests\TestCase;
+use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TablePlugin;
+use Webwizardsusa\RichEditorPlus\Rendering\RichContentPlusRenderer;
+use Webwizardsusa\RichEditorPlus\RichEditorPlus;
+use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
+use Webwizardsusa\RichEditorPlus\Support\Tool;
+use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
 
@@ -20,7 +20,7 @@ beforeEach(function (): void {
     // The module URL comes from the built asset, which only exists once the package has been built.
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus-table', __DIR__.'/../../../resources/js/plugins/table/index.js'),
-    ], 'hollyit/rich-editor-plus');
+    ], 'webwizardsusa/rich-editor-plus');
 });
 
 afterEach(function (): void {
@@ -42,10 +42,10 @@ it('provides the table nodes for rendering on the server', function (): void {
 it('tells the browser which extension to build and where to load it from', function (): void {
     $descriptor = TablePlugin::make()->resizable(false)->getJsExtension()->toArray();
 
-    expect($descriptor['id'])->toBe('hollyit/table')
+    expect($descriptor['id'])->toBe('webwizardsusa/table')
         ->and($descriptor['options'])->toBe(['resizable' => false])
         ->and($descriptor['modules'])->toHaveCount(1)
-        ->and($descriptor['modules'][0])->toContain('/js/hollyit/rich-editor-plus/components/rich-editor-plus-table.js');
+        ->and($descriptor['modules'][0])->toContain('/js/webwizardsusa/rich-editor-plus/components/rich-editor-plus-table.js');
 });
 
 it('explains what to do when its assets are neither built nor served', function (): void {
@@ -104,14 +104,14 @@ it('can be added to a single field', function (): void {
 
     $descriptors = collect($field->getPluginRegistry()->getJsExtensions())->keyBy('id');
 
-    expect($descriptors)->toHaveKey('hollyit/table')
-        ->and(collect(RichEditorPlus::make('content')->getPluginRegistry()->getJsExtensions())->pluck('id')->all())->not->toContain('hollyit/table');
+    expect($descriptors)->toHaveKey('webwizardsusa/table')
+        ->and(collect(RichEditorPlus::make('content')->getPluginRegistry()->getJsExtensions())->pluck('id')->all())->not->toContain('webwizardsusa/table');
 });
 
 it('can be added to every editor', function (): void {
     RichEditorPlus::registerDefaultPlugins([TablePlugin::class]);
 
-    expect(collect(RichEditorPlus::make('any')->getPluginRegistry()->getJsExtensions())->pluck('id')->all())->toContain('hollyit/table');
+    expect(collect(RichEditorPlus::make('any')->getPluginRegistry()->getJsExtensions())->pluck('id')->all())->toContain('webwizardsusa/table');
 });
 
 it('registers its insert action with the editor', function (): void {

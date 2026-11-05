@@ -4,7 +4,7 @@ import { markdownSourceExtension } from './source'
 
 // Loaded by Rich Editor Plus before it builds the editor (see MarkdownPlugin::getJsExtension()).
 export default function ({ registerExtension }) {
-    registerExtension('hollyit/markdown', (options, tiptap, context) => [
+    registerExtension('webwizardsusa/markdown', (options, tiptap, context) => [
         ...(options.paste ? [markdownPasteExtension(options, context)] : []),
         ...(options.source ? [markdownSourceExtension(options, context)] : []),
     ])

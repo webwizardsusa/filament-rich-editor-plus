@@ -1,9 +1,9 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Plugins;
+namespace Webwizardsusa\RichEditorPlus\Plugins;
 
 use Closure;
-use Hollyit\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 
 abstract class Plugin implements EditorPlugin
 {

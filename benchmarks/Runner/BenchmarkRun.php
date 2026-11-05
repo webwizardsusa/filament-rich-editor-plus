@@ -1,17 +1,17 @@
 <?php
 
-namespace Hollyit\RichEditorPlus\Benchmarks\Runner;
+namespace Webwizardsusa\RichEditorPlus\Benchmarks\Runner;
 
-use Hollyit\RichEditorPlus\Benchmarks\BenchmarkSchema;
-use Hollyit\RichEditorPlus\Benchmarks\DocumentStore;
-use Hollyit\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
-use Hollyit\RichEditorPlus\Benchmarks\Fixtures\MentionableSeeder;
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\ContentStrategy;
-use Hollyit\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\DB;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
+use Webwizardsusa\RichEditorPlus\Benchmarks\BenchmarkSchema;
+use Webwizardsusa\RichEditorPlus\Benchmarks\DocumentStore;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures\DocumentFactory;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Fixtures\MentionableSeeder;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Strategies\ContentStrategy;
+use Webwizardsusa\RichEditorPlus\Benchmarks\Strategies\StrategyFactory;
 
 /**
  * Runs one fixture: seeds it, checks parity, then times every scenario for every strategy. Each strategy gets freshly

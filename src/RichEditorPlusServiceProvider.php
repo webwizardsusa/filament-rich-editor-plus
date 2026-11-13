@@ -21,8 +21,7 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('rich-editor-plus')
-            ->hasTranslations()
-            ->hasViews();
+            ->hasTranslations();
     }
 
     public function packageBooted(): void

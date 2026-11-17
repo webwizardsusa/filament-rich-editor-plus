@@ -15,6 +15,7 @@ use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
 use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
 use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
 use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesGlobalAttributes;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\TransformsRenderedHtml;
 use Webwizardsusa\RichEditorPlus\Plugins\Core\BlockquotePlugin;
 use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Webwizardsusa\RichEditorPlus\Plugins\Core\BulletListPlugin;
@@ -234,6 +235,31 @@ class PluginRegistry
         }
 
         return $documents;
+    }
+
+    /**
+     * Hands every piece of HTML rendered for display to each plugin that transforms it, in priority order.
+     *
+     * @param  array<array-key, string>  $htmls
+     * @return array<array-key, string>
+     */
+    public function transformRenderedHtml(array $htmls): array
+    {
+        $keys = array_keys($htmls);
+
+        foreach ($this->plugins as $plugin) {
+            if (! $plugin instanceof TransformsRenderedHtml) {
+                continue;
+            }
+
+            $htmls = $plugin->transformRenderedHtml($htmls);
+
+            if (array_keys($htmls) !== $keys) {
+                throw new LogicException("The editor plugin [{$plugin->getId()}] must return the HTML it was given, with the same keys.");
+            }
+        }
+
+        return $htmls;
     }
 
     /**

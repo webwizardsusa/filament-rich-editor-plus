@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.2.0...v0.2.1) (2026-11-17)
+
+
+### Bug Fixes
+
+* let a plugin that needs no JS leave out its JS extension ([2769926](https://github.com/webwizardsusa/filament-rich-editor-plus/commit/2769926ba5474c9b7c6ea562a5cf3176f934e449))
+* register the assets under the Composer package name ([2769926](https://github.com/webwizardsusa/filament-rich-editor-plus/commit/2769926ba5474c9b7c6ea562a5cf3176f934e449))
+
 ## [0.2.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.1.0...v0.2.0) (2026-11-17)
 
 

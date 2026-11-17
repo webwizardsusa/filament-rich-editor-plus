@@ -40,7 +40,7 @@ Render the stored content with the same plugins:
 
 ## Documentation
 
-Read the full documentation at [https://DOCS_SITE_URL/docs/rich-editor-plus](https://DOCS_SITE_URL/docs/rich-editor-plus).
+Read the full documentation in the [`docs` folder](https://github.com/webwizardsusa/filament-rich-editor-plus/tree/main/docs).
 
 ## License
 

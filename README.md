@@ -1207,6 +1207,16 @@ element from its opening tag, which carries `data-type="<node name>"`, to the fi
 - a document whose element does not parse back to exactly one node of that type, such as hand-edited markup, is rendered
   by parsing the whole document. Other documents in the same batch are still patched.
 
+### Plugins that rewrite rendered HTML
+
+A plugin that needs to change the finished HTML, such as highlighting code blocks, implements
+`TransformsRenderedHtml`. Its `transformRenderedHtml(array $htmls)` gets every piece of HTML in a render at once,
+after patching or serializing, and returns them with the same keys. It runs only for display (`toHtml()`), never for
+`toStorableHtml()` or another format, and its output is printed as it is, so escape anything you add.
+
+In Markdown, a code fence with more than a language (```` ```php showLineNumbers ````) keeps its whole info string
+in `data-info` on the `<code>`, so a code block plugin can parse the rest.
+
 ### Bundling without a second copy of TipTap
 
 Never bundle `@tiptap/core` or `@tiptap/pm`. The editor already ships them, and ProseMirror breaks in subtle ways when

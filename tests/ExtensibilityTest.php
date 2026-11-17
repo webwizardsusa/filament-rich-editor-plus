@@ -2,6 +2,7 @@
 
 use Webwizardsusa\RichEditorPlus\Content\MarkSpec;
 use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PreparesRenderedContent;
+use Webwizardsusa\RichEditorPlus\Plugins\Contracts\TransformsRenderedHtml;
 use Webwizardsusa\RichEditorPlus\Plugins\Core\BoldPlugin;
 use Webwizardsusa\RichEditorPlus\Plugins\Core\LinkPlugin;
 use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
@@ -190,6 +191,64 @@ it('hands a preparing plugin every document in one call', function (): void {
 it('rejects a preparing plugin that changes the documents keys', function (): void {
     $plugin = PreparingTestPlugin::make();
     $plugin->prepareUsing = fn (array $documents): array => array_values($documents);
+
+    RichContentPlusRenderer::many(['x' => '<p>a</p>'])->plugins([$plugin])->toHtml();
+})->throws(LogicException::class);
+
+class TransformingTestPlugin extends Plugin implements TransformsRenderedHtml
+{
+    /**
+     * @var array<int, array<array-key, string>>
+     */
+    public array $batches = [];
+
+    public ?Closure $transformUsing = null;
+
+    public function getId(): string
+    {
+        return 'test/transforming';
+    }
+
+    public function getJsExtension(): JsExtension
+    {
+        return JsExtension::make($this->getId());
+    }
+
+    public function transformRenderedHtml(array $htmls): array
+    {
+        $this->batches[] = $htmls;
+
+        return $this->transformUsing ? ($this->transformUsing)($htmls) : array_map(strtoupper(...), $htmls);
+    }
+}
+
+it('hands a transforming plugin the rendered HTML of the whole batch at once', function (): void {
+    $plugin = TransformingTestPlugin::make();
+
+    $html = RichContentPlusRenderer::many(['x' => '<p>a</p>', 'y' => ['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'b']]]]]])
+        ->plugins([$plugin])
+        ->toHtml();
+
+    expect($plugin->batches)->toHaveCount(1)
+        ->and($html)->toBe(['x' => '<P>A</P>', 'y' => '<P>B</P>']);
+});
+
+it('transforms single HTML for display, whether it is patched or parsed', function (bool $parsesHtml): void {
+    $html = RichContentPlusRenderer::make('<p>a</p>')->plugins([TransformingTestPlugin::make()])->parseHtml($parsesHtml)->toHtml();
+
+    expect($html)->toBe('<P>A</P>');
+})->with(['patched' => false, 'parsed' => true]);
+
+it('leaves HTML for storage untransformed', function (): void {
+    $plugin = TransformingTestPlugin::make();
+
+    expect(RichContentPlusRenderer::make('<p>a</p>')->plugins([$plugin])->toStorableHtml())->toBe('<p>a</p>')
+        ->and($plugin->batches)->toBe([]);
+});
+
+it('rejects a transforming plugin that changes the HTML keys', function (): void {
+    $plugin = TransformingTestPlugin::make();
+    $plugin->transformUsing = fn (array $htmls): array => array_values($htmls);
 
     RichContentPlusRenderer::many(['x' => '<p>a</p>'])->plugins([$plugin])->toHtml();
 })->throws(LogicException::class);

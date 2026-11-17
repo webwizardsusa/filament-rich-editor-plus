@@ -101,7 +101,7 @@ class RichContentPlusBatchRenderer
             $html[$key] = array_key_exists($key, $patched) ? $patched[$key] : $rendered[$key];
         }
 
-        return $html;
+        return $this->getRegistry()->transformRenderedHtml($html);
     }
 
     /**

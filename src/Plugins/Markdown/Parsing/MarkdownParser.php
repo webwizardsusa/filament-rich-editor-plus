@@ -8,7 +8,9 @@ use DOMNode;
 use DOMText;
 use DOMXPath;
 use League\CommonMark\Environment\Environment;
+use League\CommonMark\Event\DocumentParsedEvent;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\MarkdownConverter;
 use Webwizardsusa\RichEditorPlus\Content\ContentSchema;
@@ -73,8 +75,23 @@ class MarkdownParser
         $environment = new Environment(['html_input' => 'allow', 'allow_unsafe_links' => false, 'max_nesting_level' => self::MAX_NESTING_LEVEL]);
         $environment->addExtension(new CommonMarkCoreExtension);
         $environment->addExtension(new GithubFlavoredMarkdownExtension);
+        $environment->addEventListener(DocumentParsedEvent::class, $this->keepFenceInfo(...));
 
         return (string) (new MarkdownConverter($environment))->convert($markdown);
+    }
+
+    /**
+     * CommonMark only keeps a fence's first info word, as the `language-*` class. A fence with more
+     * (```` ```php showLineNumbers ````) keeps its whole info string in `data-info` on the `<code>`, for a code block
+     * plugin to parse.
+     */
+    protected function keepFenceInfo(DocumentParsedEvent $event): void
+    {
+        foreach ($event->getDocument()->iterator() as $node) {
+            if ($node instanceof FencedCode && count($node->getInfoWords()) > 1) {
+                $node->data->set('attributes/data-info', trim((string) $node->getInfo()));
+            }
+        }
     }
 
     protected function prepareHtml(string $html, PluginRegistry $registry, ContentSchema $schema): string

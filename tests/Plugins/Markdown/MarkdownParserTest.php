@@ -92,6 +92,14 @@ it('parses code blocks without the trailing newline', function (): void {
     ]);
 });
 
+it('keeps a fence info string longer than the language for code block plugins', function (): void {
+    $parser = new MarkdownParser;
+
+    expect($parser->toHtml("```php showLineNumbers {2}\necho 1;\n```"))->toContain('<code data-info="php showLineNumbers {2}" class="language-php">')
+        ->and($parser->toHtml("```php\necho 1;\n```"))->not->toContain('data-info')
+        ->and(mdParse("```php showLineNumbers\necho 1;\n```")['content'][0]['attrs'])->toBe(['language' => 'php']);
+});
+
 it('parses a standalone image with its title as the caption', function (): void {
     $doc = mdParse('![A cat](https://example.com/cat.jpg "Our cat")');
 

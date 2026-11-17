@@ -135,11 +135,11 @@ class RichContentPlusRenderer
     {
         $schema = $this->getSchema();
 
-        if ($this->patchesHtml()) {
-            return (new HtmlPatcher($this->getRegistry(), $schema))->patch([$this->content])[0];
-        }
+        $html = $this->patchesHtml()
+            ? (new HtmlPatcher($this->getRegistry(), $schema))->patch([$this->content])[0]
+            : (new HtmlSerializer($schema))->serialize($this->getPreparedDocument());
 
-        return (new HtmlSerializer($schema))->serialize($this->getPreparedDocument());
+        return $this->getRegistry()->transformRenderedHtml([$html])[0];
     }
 
     /**

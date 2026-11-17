@@ -30,10 +30,10 @@ beforeEach(function (): void {
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../../../resources/js/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus-image', __DIR__.'/../../../resources/js/plugins/image/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
 
     StoreTestForm::$plugins = fn (): array => [ImagePlugin::make()->disk('media')];
     StoreTestForm::$disabled = false;

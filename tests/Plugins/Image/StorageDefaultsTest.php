@@ -149,7 +149,7 @@ it('stores a public upload even when the disk refuses to change its visibility',
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../../../resources/js/index.js'),
         AlpineComponent::make('rich-editor-plus-image', __DIR__.'/../../../resources/js/plugins/image/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
 
     $filesystem = Mockery::mock(Filesystem::class);
     $filesystem->shouldReceive('put')->once()->withArgs(fn (string $path, mixed $contents, mixed ...$options): bool => $options === [])->andReturn(true);

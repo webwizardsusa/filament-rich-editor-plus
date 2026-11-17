@@ -19,11 +19,11 @@ uses(TestCase::class);
 beforeEach(function (): void {
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../../rich-editor-plus/resources/js/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus-table', __DIR__.'/../../../resources/js/plugins/table/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
 });
 
 class InsertTableTestForm extends Component implements HasActions, HasSchemas

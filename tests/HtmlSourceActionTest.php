@@ -23,7 +23,7 @@ beforeEach(function (): void {
     // Rendering the field needs its Alpine component asset, which only exists once the package has been built.
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../resources/js/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
 });
 
 class HtmlSourceActionTestForm extends Component implements HasActions, HasSchemas

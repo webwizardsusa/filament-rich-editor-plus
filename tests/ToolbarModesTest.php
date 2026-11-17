@@ -23,7 +23,7 @@ beforeEach(function (): void {
 
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus', __DIR__.'/../resources/js/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
 });
 
 class ToolbarModesTestForm extends Component implements HasActions, HasSchemas

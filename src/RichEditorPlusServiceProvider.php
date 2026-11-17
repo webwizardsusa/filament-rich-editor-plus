@@ -13,7 +13,7 @@ class RichEditorPlusServiceProvider extends PackageServiceProvider
 {
     use RegistersPluginAssets;
 
-    public const string PACKAGE = 'webwizardsusa/rich-editor-plus';
+    public const string PACKAGE = 'webwizardsusa/filament-rich-editor-plus';
 
     public const string ALPINE_COMPONENT = 'rich-editor-plus';
 

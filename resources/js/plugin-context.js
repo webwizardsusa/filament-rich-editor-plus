@@ -8,8 +8,8 @@ const randomKey = () =>
  * What extension factories get as their third argument. `callPlugin` asks a plugin on the field (see
  * `AnswersEditorRequests`); `upload` sends a file to the field's Livewire temporary uploads and resolves with the key
  * a plugin's `store` request takes (see `RichEditorPlus::pullTemporaryUpload()`); `processing` keeps the form from
- * saving until a promise settles, showing an optional message (default: the uploading message); `runAction` opens a field action with the arguments registered for it, as a toolbar
- * tool does.
+ * saving until a promise settles, showing an optional message (default: the uploading message); `runAction` opens a
+ * field action with the arguments registered for it, as a toolbar tool does.
  */
 export function createPluginContext({ wire, key, statePath, root, uploadingMessage, getEditor, mountAction }) {
     // The form's own save button waits while any field is processing, as with Filament's rich editor.

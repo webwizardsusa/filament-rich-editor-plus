@@ -33,8 +33,10 @@ class JsExtension
      * Adds the URL of an ES module the browser imports before the editor is built, for plugins that ship their
      * own JS. The module registers its extensions with `registerExtension()` (or decorates existing ones with
      * `extendExtension()`) and may default-export a function that is called with the shared editor API:
-     * `{ tiptap, registerExtension, extendExtension, registerActionArguments }`. Use the shared `tiptap` modules
-     * rather than bundling TipTap, so every extension runs on the same ProseMirror instance.
+     * `{ tiptap, registerExtension, extendExtension, registerActionArguments }`. A factory is called with this
+     * extension's options, the shared `tiptap` modules and the editor's context,
+     * `{ callPlugin, upload, processing, runAction }`. Use the shared `tiptap` modules rather than bundling TipTap,
+     * so every extension runs on the same ProseMirror instance.
      */
     public function module(string $url): static
     {

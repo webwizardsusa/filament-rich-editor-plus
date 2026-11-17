@@ -2,6 +2,10 @@
 
 use Filament\Support\Assets\AssetManager;
 use Filament\Support\Facades\FilamentAsset;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImageAssets;
+use Webwizardsusa\RichEditorPlus\Plugins\Markdown\MarkdownAssets;
+use Webwizardsusa\RichEditorPlus\Plugins\Table\TableAssets;
+use Webwizardsusa\RichEditorPlus\RichEditorPlusServiceProvider;
 use Webwizardsusa\RichEditorPlus\Tests\TestCase;
 
 uses(TestCase::class);
@@ -37,3 +41,12 @@ it('serves the package entry from the running dev server', function (): void {
 it('names the package and its hot file when the assets are neither built nor served', function (): void {
     AcmeHighlightAssets::moduleUrl();
 })->throws(LogicException::class, 'The assets for acme/highlight are not available: its Vite dev server is not running (no public/acme-highlight.hot)');
+
+it('registers the editor and its bundled plugins under the Composer package name, which Filament versions assets by', function (): void {
+    $composerName = json_decode((string) file_get_contents(dirname(__DIR__).'/composer.json'), true)['name'];
+
+    expect(RichEditorPlusServiceProvider::assetPackage())->toBe($composerName)
+        ->and(TableAssets::assetPackage())->toBe($composerName)
+        ->and(ImageAssets::assetPackage())->toBe($composerName)
+        ->and(MarkdownAssets::assetPackage())->toBe($composerName);
+});

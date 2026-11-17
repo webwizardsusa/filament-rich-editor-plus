@@ -48,9 +48,11 @@ interface EditorPlugin
     public function getMarks(): array;
 
     /**
-     * The TipTap JS extension that the browser must load for this plugin.
+     * The TipTap JS extension that the browser must load for this plugin, or null when the plugin needs no JS of its
+     * own, for example one that only declares global attributes or works on the server. The editor refuses to start
+     * when a returned extension's id has no registered JS factory.
      */
-    public function getJsExtension(): JsExtension;
+    public function getJsExtension(): ?JsExtension;
 
     /**
      * @return array<Tool>

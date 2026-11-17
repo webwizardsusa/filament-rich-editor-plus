@@ -138,6 +138,37 @@ it('sends the plugin module URL to the browser only when there is one', function
         ->and($descriptors['core/bold'])->not->toHaveKey('modules');
 });
 
+it('sends nothing to the browser for a plugin with no JS extension', function (): void {
+    $serverOnly = new class extends Plugin
+    {
+        public function getId(): string
+        {
+            return 'test/server-only';
+        }
+    };
+
+    expect(PluginRegistry::make([BoldPlugin::make(), $serverOnly])->getJsExtensions())->toBe([
+        ['id' => 'core/document', 'options' => []],
+        ['id' => 'core/bold', 'options' => []],
+    ]);
+});
+
+it('still loads the modules added to a plugin with no JS extension', function (): void {
+    $serverOnly = new class extends Plugin
+    {
+        public function getId(): string
+        {
+            return 'test/server-only';
+        }
+    };
+
+    PluginRegistry::extendPlugin('test/server-only', fn (PluginExtension $extension): PluginExtension => $extension->addModule('https://cdn.test/extend.js'));
+
+    expect(PluginRegistry::make([$serverOnly])->getJsExtensions())
+        ->toContain(['modules' => ['https://cdn.test/extend.js']])
+        ->not->toContain(['id' => 'test/server-only', 'options' => []]);
+});
+
 it('gathers overflow tools in display order, leaving out any with no command or action', function (): void {
     $plugin = new class extends Plugin
     {

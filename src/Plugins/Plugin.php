@@ -4,6 +4,7 @@ namespace Webwizardsusa\RichEditorPlus\Plugins;
 
 use Closure;
 use Webwizardsusa\RichEditorPlus\Plugins\Contracts\EditorPlugin;
+use Webwizardsusa\RichEditorPlus\Support\JsExtension;
 
 abstract class Plugin implements EditorPlugin
 {
@@ -62,6 +63,14 @@ abstract class Plugin implements EditorPlugin
     public function getMarks(): array
     {
         return [];
+    }
+
+    /**
+     * None by default: a plugin that adds nodes, marks or editor behaviour in the browser returns its `JsExtension`.
+     */
+    public function getJsExtension(): ?JsExtension
+    {
+        return null;
     }
 
     public function getTools(): array

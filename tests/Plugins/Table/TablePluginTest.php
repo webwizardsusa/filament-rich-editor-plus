@@ -20,7 +20,7 @@ beforeEach(function (): void {
     // The module URL comes from the built asset, which only exists once the package has been built.
     FilamentAsset::register([
         AlpineComponent::make('rich-editor-plus-table', __DIR__.'/../../../resources/js/plugins/table/index.js'),
-    ], 'webwizardsusa/rich-editor-plus');
+    ], 'webwizardsusa/filament-rich-editor-plus');
 });
 
 afterEach(function (): void {
@@ -45,7 +45,7 @@ it('tells the browser which extension to build and where to load it from', funct
     expect($descriptor['id'])->toBe('webwizardsusa/table')
         ->and($descriptor['options'])->toBe(['resizable' => false])
         ->and($descriptor['modules'])->toHaveCount(1)
-        ->and($descriptor['modules'][0])->toContain('/js/webwizardsusa/rich-editor-plus/components/rich-editor-plus-table.js');
+        ->and($descriptor['modules'][0])->toContain('/js/webwizardsusa/filament-rich-editor-plus/components/rich-editor-plus-table.js');
 });
 
 it('explains what to do when its assets are neither built nor served', function (): void {

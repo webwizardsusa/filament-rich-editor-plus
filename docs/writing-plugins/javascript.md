@@ -242,15 +242,28 @@ from npm, so anything beyond the shared modules needs the Vite setup above.
 
 ## Plugins with nothing to add in the browser
 
-Every plugin returns a `JsExtension`, and the editor refuses to start when its id has no registered factory. A plugin
-with nothing to add in the browser, such as one that only declares a [global attribute](global-attributes.md) or only
-opens a Filament action, still registers its id, with a factory that returns no extensions:
+A plugin with nothing to add in the browser, such as one that only declares a [global attribute](global-attributes.md),
+only opens a Filament action, or only works on the server, doesn't return a `JsExtension`. Leave `getJsExtension()`
+out (`Plugin` returns `null`), and ship no module:
 
-```js
-// dist/acme-indent.js
-export default function ({ registerExtension }) {
-    registerExtension('acme/indent', () => [])
+```php
+class IndentPlugin extends Plugin implements ProvidesGlobalAttributes
+{
+    public function getId(): string
+    {
+        return 'acme/indent';
+    }
+
+    public function getGlobalAttributes(): array
+    {
+        return [/* ... */];
+    }
 }
 ```
 
-The core HTML source plugin works this way: its JS id is registered with an empty factory.
+The browser builds no extension for the plugin and needs no factory for it. Its global attributes are still sent, and
+a module added to it with `PluginExtension::addModule()` is still loaded.
+
+A plugin that does return a `JsExtension` must register a factory for its id, even an empty one
+(`registerExtension(id, () => [])`): the editor refuses to start when a returned id has no factory, as it does when a
+module fails to load or forgets to register.

@@ -21,10 +21,9 @@ A plugin that adds content lives on both sides:
 The two must agree on names, tags and attributes: a node the browser creates but PHP doesn't declare loses its tag
 when the content is saved or rendered.
 
-Some plugins have almost no JavaScript: a plugin that only adds a [global attribute](global-attributes.md), a tool
-running a command an existing extension already has, or a Filament action. They still need a registered JS
-extension id, because the editor refuses to start when a plugin names one it can't find. See
-[plugins with nothing to add in the browser](javascript.md#plugins-with-nothing-to-add-in-the-browser).
+Some plugins have no JavaScript at all: a plugin that only adds a [global attribute](global-attributes.md), a tool
+running a command an existing extension already has, or a Filament action. Such a plugin returns no JS extension and
+ships no module. See [plugins with nothing to add in the browser](javascript.md#plugins-with-nothing-to-add-in-the-browser).
 
 ## A working example
 

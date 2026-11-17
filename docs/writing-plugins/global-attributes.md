@@ -34,7 +34,7 @@ class IndentPlugin extends Plugin implements ProvidesGlobalAttributes
         ];
     }
 
-    // getJsExtension(), and the tools that set the attribute.
+    // The tools that set the attribute. No getJsExtension() is needed: the attribute's JS is generated.
 }
 ```
 

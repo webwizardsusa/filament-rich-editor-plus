@@ -165,7 +165,9 @@ RichContentPlusRenderer::make($post->body)->plugins($plugins)->format(MarkdownFo
 Raw HTML in Markdown is kept only as far as the field's plugins parse it.
 
 The editor's conversion requests (pasting and the source view) refuse anything over 1 MB
-(`MarkdownFormat::MAX_LENGTH`). Storage and rendering have no limit of their own.
+(`MarkdownFormat::MAX_LENGTH`), because they parse whatever the browser sends. Saving, loading and rendering have no
+limit of their own: saving serializes the editor's document without parsing Markdown, and loading and rendering parse
+what your app stored. Validate the field yourself to cap the size of stored content.
 
 ## Your own plugins
 

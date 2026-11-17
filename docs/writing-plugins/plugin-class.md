@@ -76,7 +76,7 @@ Passing the shortcut to the JS as an option keeps the key the editor binds and t
 | `getPriority()` | `100` | Registration order: lower numbers first |
 | `getNodes()` | `[]` | `NodeSpec`s for the server. See [schema](schema.md). |
 | `getMarks()` | `[]` | `MarkSpec`s for the server |
-| `getJsExtension()` | (required) | The `JsExtension` the browser loads |
+| `getJsExtension()` | `null` | The `JsExtension` the browser loads, or `null` for none |
 | `getTools()` | `[]` | Toolbar `Tool`s. See [tools and block types](tools-and-block-types.md). |
 | `getBlockTypes()` | `[]` | `BlockType`s for the slash menu and block switcher |
 | `getActions()` | `[]` | Filament `Action`s, such as modals. See [actions](actions.md). |
@@ -106,8 +106,12 @@ JsExtension::make('acme/keyboard', ['shortcut' => 'Mod-Shift-k'])
 [assets](assets.md). The JS id usually equals the plugin id, but doesn't have to: a plugin that replaces a core plugin
 keeps the core id and registers its JS under an id of its own.
 
+A plugin with nothing to add in the browser leaves `getJsExtension()` out, and `Plugin` returns `null`: the browser
+loads nothing for it and needs no factory. See
+[plugins with nothing to add in the browser](javascript.md#plugins-with-nothing-to-add-in-the-browser).
+
 > [!IMPORTANT]
-> The editor refuses to start, and shows an error naming the plugin, when a JS extension id has no registered
+> The editor refuses to start, and shows an error naming the plugin, when a returned JS extension id has no registered
 > factory. Starting without a plugin's schema would make ProseMirror drop its content, which a save would persist.
 
 ### Dependencies and priority

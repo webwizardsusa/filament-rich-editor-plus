@@ -26,6 +26,16 @@ use Webwizardsusa\RichEditorPlus\Support\PluginRegistry;
  */
 class MarkdownFormat implements ContentFormat
 {
+    /**
+     * The most bytes the editor's Markdown requests accept, before they parse or serialize anything: the Markdown that
+     * `MarkdownPlugin`'s `toDocument` request parses (pasting Markdown, editing in the source view) and the JSON
+     * document its `toMarkdown` request serializes (opening the source view and refreshing it). Those requests carry
+     * whatever the browser sends.
+     *
+     * Nothing else applies it. Saving a Markdown field serializes the editor's document with {@see fromDocument()} and
+     * parses no Markdown; loading a stored value and rendering it parse with {@see toDocument()}, which trusts what
+     * the app stored. An app that wants to cap the size of stored content validates it itself.
+     */
     public const int MAX_LENGTH = 1_048_576;
 
     protected bool $isLenient = false;

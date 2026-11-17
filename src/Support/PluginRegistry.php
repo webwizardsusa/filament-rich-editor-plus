@@ -337,7 +337,10 @@ class PluginRegistry
      * (other than those a TipTap extension provides), so the browser collects them in the same order as the server.
      * `'*'`, `'nodes'` and `'marks'` are resolved here, so both sides target the same types.
      *
-     * @return array<array{id: string, options: array<string, mixed>, modules?: array<string>}>
+     * A plugin with no JS extension gets no descriptor of its own, so the browser needs no factory for it. Modules
+     * added to it with `PluginExtension::addModule()` are still sent, in a descriptor that has only `modules`.
+     *
+     * @return array<array{id?: string, options?: array<string, mixed>, modules?: array<string>}>
      */
     public function getJsExtensions(): array
     {
@@ -353,15 +356,17 @@ class PluginRegistry
         }
 
         foreach ($this->plugins as $id => $plugin) {
-            $descriptor = $plugin->getJsExtension()->toArray();
+            $descriptor = $plugin->getJsExtension()?->toArray();
 
             $modules = [...($descriptor['modules'] ?? []), ...$this->extensions[$id]->getModules()];
 
             if ($modules !== []) {
-                $descriptor['modules'] = array_values(array_unique($modules));
+                $descriptor = [...($descriptor ?? []), 'modules' => array_values(array_unique($modules))];
             }
 
-            $descriptors[] = $descriptor;
+            if ($descriptor !== null) {
+                $descriptors[] = $descriptor;
+            }
 
             $attributes = array_values(array_filter(
                 $this->globalAttributesOf($id),

@@ -96,6 +96,25 @@ it('sends each plugin its attributes to the browser straight after the plugin', 
         ]);
 });
 
+it('sends the attributes of a plugin that has no JS extension of its own', function (): void {
+    $plugin = new class extends Plugin implements ProvidesGlobalAttributes
+    {
+        public function getId(): string
+        {
+            return 'test/attributes-only';
+        }
+
+        public function getGlobalAttributes(): array
+        {
+            return [alignment()];
+        }
+    };
+
+    $ids = array_column(PluginRegistry::make([$plugin])->getJsExtensions(), 'id');
+
+    expect($ids)->toBe(['core/document', 'core/global-attributes']);
+});
+
 it('sends attributes added to an existing plugin after that plugin', function (): void {
     PluginRegistry::extendPlugin('core/heading', fn (PluginExtension $extension): PluginExtension => $extension->addGlobalAttributes([
         GlobalAttribute::html('anchor', 'id')->types('nodes')->pattern('[a-z]+'),

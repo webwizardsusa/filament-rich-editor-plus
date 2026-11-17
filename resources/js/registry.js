@@ -24,7 +24,8 @@ export function extendExtension(id, decorator) {
 /**
  * Builds the TipTap extensions for the descriptors PHP sent. `missing` lists the ids that have no registered
  * factory; the caller must not start an editor when any are missing, because ProseMirror would silently drop
- * whatever content it has no schema for. Extensions with the same name are only used once. Factories get the
+ * whatever content it has no schema for. A descriptor without an id only carries modules (a plugin with no JS
+ * extension of its own) and needs no factory. Extensions with the same name are only used once. Factories get the
  * options from PHP, the shared TipTap modules, and the editor's context: `{ callPlugin, upload, runAction }`.
  */
 export function resolveExtensions(descriptors, tiptap, context = {}) {
@@ -32,6 +33,10 @@ export function resolveExtensions(descriptors, tiptap, context = {}) {
     const missing = []
 
     descriptors.forEach(({ id, options }) => {
+        if (id === undefined || id === null) {
+            return
+        }
+
         const factory = factories.get(id)
 
         if (!factory) {

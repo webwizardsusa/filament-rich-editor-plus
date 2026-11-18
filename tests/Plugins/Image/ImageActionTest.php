@@ -106,6 +106,25 @@ it('inserts an uploaded image with its alt text, caption, alignment and width', 
         });
 });
 
+it('offers the full width, shown as Full, in the modal', function (): void {
+    Storage::fake('media');
+
+    Livewire::test(ImageTestForm::class)
+        ->mountAction(imageAction(), arguments: ['editorSelection' => caretSelection()])
+        ->assertMountedActionModalSee('Full');
+
+    Livewire::test(ImageTestForm::class)
+        ->callAction(imageAction(), arguments: ['editorSelection' => caretSelection()], data: [
+            'source' => 'upload',
+            'upload' => UploadedFile::fake()->image('cat.jpg'),
+            'alt' => 'A cat',
+            'align' => 'center',
+            'width' => 'full',
+        ])
+        ->assertHasNoActionErrors()
+        ->assertDispatched('run-rich-editor-plus-commands', fn (string $event, array $params): bool => $params['commands'][0]['arguments'][0]['width'] === 'full');
+});
+
 it('refuses an upload that is not an accepted image type', function (): void {
     Storage::fake('media');
 

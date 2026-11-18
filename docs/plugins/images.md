@@ -19,6 +19,9 @@ RichEditorPlus::make('body')->addPlugins([ImagePlugin::make()]);
 
 With the default `public` disk, run `php artisan storage:link` once.
 
+To store images as [Laravel Image Cache](docs:laravel-image-cache/introduction) Images, each shown in an Image Style
+picked in the editor, see [Image Cache](image-cache.md).
+
 ## Options
 
 Every option is shown with its default:

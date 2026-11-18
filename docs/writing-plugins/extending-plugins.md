@@ -134,8 +134,3 @@ Because the id stays `core/heading`, content stored before keeps working, and `w
 A plugin that replaces a core plugin but brings its own JS keeps the plugin id and registers its JS under a new
 JS extension id, as the [Rich Editor Plus Code](docs:rich-editor-plus-code/introduction) plugin does for
 `core/code-block`.
-
-A plugin that replaces `ImagePlugin` can give pasted and dropped images attributes of its own: its `store` answer
-(from an overridden `answerStoreRequest()`) may carry an `attrs` object, which is added to the inserted image node over
-its `disk` and `path`. The node must have those attributes, through a decorator registered with
-`extendExtension('webwizardsusa/image', …)`.

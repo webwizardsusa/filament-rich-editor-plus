@@ -23,17 +23,27 @@ const imageUrl = (value) => (isAllowedImageUrl(value) ? value.trim() : null)
 
 const isUpload = ({ disk, path }) => typeof disk === 'string' && typeof path === 'string'
 
+// The same test as PHP's `ImageCacheImages::normalizeUlid()`: a ULID, kept in lowercase.
+const ULID = /^[0-7][0-9a-hjkmnp-tv-z]{25}$/
+
+const ulid = (value) => (typeof value === 'string' && ULID.test(value.trim().toLowerCase()) ? value.trim().toLowerCase() : null)
+
 const isImageSelected = (state) => state.selection instanceof NodeSelection && state.selection.node.type.name === 'image'
 
 /**
  * The `image` block (PHP: `ImagePlugin`): a figure with an image, alt text, an optional caption, an alignment and a
  * width. Uploads keep their disk and path; their URL is looked up through the field and never written to the HTML.
+ * With `imageCache` options (PHP: `ImagePlugin::imageCache()`), an image can also be a Placement: an Image Cache Image's
+ * ULID and the Image Style it's shown in, looked up under the key `{ulid}:{style}`.
  */
-export function imageExtension({ widths = [], defaultWidth = '100', defaultAlignment = 'center', altRequired = false, uploads = null, labels = {} }, { callPlugin, runAction } = {}) {
+export function imageExtension({ widths = [], defaultWidth = '100', defaultAlignment = 'center', altRequired = false, uploads = null, labels = {}, imageCache = null }, { callPlugin, runAction } = {}) {
     const cache = createUrlCache(callPlugin, 'webwizardsusa/image')
     const alignment = (value) => (ALIGNMENTS.includes(value) ? value : defaultAlignment)
     const width = (value) => (widths.includes(String(value)) ? String(value) : defaultWidth)
     const text = (value) => (typeof value === 'string' ? value : '')
+    const styles = imageCache?.styles ?? []
+    const style = (value) => (styles.includes(value) ? value : (imageCache?.defaultStyle ?? null))
+    const placed = (attrs) => (imageCache ? ulid(attrs.image) : null)
 
     /**
      * Keeps only the attributes the node has, each in the shape PHP accepts, so commands cannot store an unsafe URL or
@@ -41,6 +51,7 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
      */
     const clean = (attrs) => {
         const cleaners = {
+            ...(imageCache ? { image: ulid, style: (value) => (ulid(attrs?.image) ? style(value) : null) } : {}),
             disk: (value) => (typeof value === 'string' && value !== '' ? value : null),
             path: (value) => (typeof value === 'string' && value !== '' ? value : null),
             url: imageUrl,
@@ -50,11 +61,14 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
             width,
         }
 
-        return Object.fromEntries(
+        const cleaned = Object.fromEntries(
             Object.entries(attrs ?? {})
                 .filter(([key]) => key in cleaners)
                 .map(([key, value]) => [key, cleaners[key](value)]),
         )
+
+        // A Placement has no disk, path or URL.
+        return cleaned.image ? { ...cleaned, disk: null, path: null, url: null } : cleaned
     }
 
     return Node.create({
@@ -80,6 +94,16 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
                 caption: { default: '', parseHTML: (element) => element.querySelector('figcaption')?.textContent.trim() ?? '', ...none },
                 align: { default: defaultAlignment, parseHTML: (element) => alignment(element.getAttribute('data-align')), ...none },
                 width: { default: defaultWidth, parseHTML: (element) => width(element.getAttribute('data-width')), ...none },
+                ...(imageCache
+                    ? {
+                          image: { default: null, parseHTML: (element) => (element.tagName === 'IMG' ? null : ulid(element.getAttribute('data-image'))), ...none },
+                          style: {
+                              default: null,
+                              parseHTML: (element) => (element.tagName !== 'IMG' && ulid(element.getAttribute('data-image')) ? style(element.getAttribute('data-style')) : null),
+                              ...none,
+                          },
+                      }
+                    : {}),
             }
         },
 
@@ -96,8 +120,12 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
             const url = imageUrl(node.attrs.url)
             const upload = isUpload(node.attrs)
             const figure = { class: 'rep-image', 'data-type': 'image' }
+            const image = placed(node.attrs)
 
-            if (upload) {
+            if (image) {
+                figure['data-image'] = image
+                figure['data-style'] = style(node.attrs.style)
+            } else if (upload) {
                 figure['data-disk'] = disk
                 figure['data-path'] = path
             } else if (url) {
@@ -107,7 +135,7 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
             figure['data-align'] = alignment(node.attrs.align)
             figure['data-width'] = width(node.attrs.width)
 
-            const img = !upload && url ? { src: url, alt: text(alt) } : { alt: text(alt) }
+            const img = !image && !upload && url ? { src: url, alt: text(alt) } : { alt: text(alt) }
             const children = [['img', img]]
 
             if (text(caption).trim() !== '') {
@@ -196,7 +224,9 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
                         dom.append(badge)
                     }
 
-                    if (!isUpload(node.attrs)) {
+                    const image = placed(node.attrs)
+
+                    if (!image && !isUpload(node.attrs)) {
                         show(imageUrl(node.attrs.url))
 
                         return
@@ -206,7 +236,7 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
 
                     dom.prepend(loading)
 
-                    cache.get(node.attrs.path, (src) => {
+                    cache.get(image ? `${image}:${style(node.attrs.style)}` : node.attrs.path, (src) => {
                         // A later render owns the figure now.
                         if (current !== renders) {
                             return

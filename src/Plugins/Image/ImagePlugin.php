@@ -13,6 +13,8 @@ use Webwizardsusa\RichEditorPlus\Plugins\Contracts\PatchesRenderedMarkup;
 use Webwizardsusa\RichEditorPlus\Plugins\Contracts\ProvidesEditorStyles;
 use Webwizardsusa\RichEditorPlus\Plugins\Image\Actions\ImageAction;
 use Webwizardsusa\RichEditorPlus\Plugins\Image\Concerns\StoresEditorFiles;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\Concerns\UsesImageCache;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImageCache\ImageCacheImages;
 use Webwizardsusa\RichEditorPlus\Plugins\Plugin;
 use Webwizardsusa\RichEditorPlus\RichEditorPlus;
 use Webwizardsusa\RichEditorPlus\Support\BlockType;
@@ -23,13 +25,15 @@ use Webwizardsusa\RichEditorPlus\Support\ToolMenuItem;
 /**
  * Images on a Laravel disk or at a URL, as `<figure class="rep-image" data-type="image">` blocks with alt text, a
  * caption, an alignment and a width. Uploads store their disk and path, never their URL: the URL is resolved when
- * content is rendered and when the editor shows it, so private disks get temporary URLs.
+ * content is rendered and when the editor shows it, so private disks get temporary URLs. With `imageCache()`, uploads
+ * are Laravel Image Cache Images instead, each shown in an Image Style picked in the editor.
  */
 class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorRequests, InheritsFieldFileAttachments, PatchesRenderedMarkup, ProvidesEditorStyles
 {
     use StoresEditorFiles {
         withFieldFileAttachments as withFieldStorage;
     }
+    use UsesImageCache;
 
     public const string ID = 'webwizardsusa/image';
 
@@ -259,30 +263,38 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
 
         $noAttributes = static fn (): array => [];
 
+        $node = NodeSpec::make('image')
+            ->atom()
+            ->priority(60)
+            ->parseUsing(static function (DOMElement $element): array|bool {
+                $tag = strtolower($element->tagName);
+
+                if ($tag === 'figure') {
+                    return $element->getAttribute('data-type') === 'image';
+                }
+
+                if ($tag === 'img' && static::isAllowedImageUrl($element->getAttribute('src'))) {
+                    return ['url' => trim($element->getAttribute('src'))];
+                }
+
+                return false;
+            })
+            ->attribute('disk', parse: static fn (DOMElement $element): ?string => $element->getAttribute('data-disk') ?: null, render: $noAttributes)
+            ->attribute('path', parse: static fn (DOMElement $element): ?string => $element->getAttribute('data-path') ?: null, render: $noAttributes)
+            ->attribute('url', parse: static fn (DOMElement $element): ?string => static::isAllowedImageUrl($element->getAttribute('data-url')) ? trim($element->getAttribute('data-url')) : null, render: $noAttributes)
+            ->attribute('alt', parse: static fn (DOMElement $element): string => $img($element)?->getAttribute('alt') ?? '', render: $noAttributes, default: '')
+            ->attribute('caption', parse: static fn (DOMElement $element): string => trim($element->getElementsByTagName('figcaption')->item(0)?->textContent ?? ''), render: $noAttributes, default: '')
+            ->attribute('align', parse: fn (DOMElement $element): string => $this->normalizeAlignment($element->getAttribute('data-align')), render: $noAttributes, default: $this->defaultAlignment)
+            ->attribute('width', parse: fn (DOMElement $element): string => $this->normalizeWidth($element->getAttribute('data-width')), render: $noAttributes, default: $this->defaultWidth);
+
+        if ($this->usesImageCache) {
+            $node
+                ->attribute('image', parse: static fn (DOMElement $element): ?string => ImageCacheImages::normalizeUlid($element->getAttribute('data-image')), render: $noAttributes)
+                ->attribute('style', parse: fn (DOMElement $element): ?string => ImageCacheImages::normalizeUlid($element->getAttribute('data-image')) !== null ? $this->imageCacheImages()->normalizeStyle($element->getAttribute('data-style')) : null, render: $noAttributes);
+        }
+
         return [
-            NodeSpec::make('image')
-                ->atom()
-                ->priority(60)
-                ->parseUsing(static function (DOMElement $element): array|bool {
-                    $tag = strtolower($element->tagName);
-
-                    if ($tag === 'figure') {
-                        return $element->getAttribute('data-type') === 'image';
-                    }
-
-                    if ($tag === 'img' && static::isAllowedImageUrl($element->getAttribute('src'))) {
-                        return ['url' => trim($element->getAttribute('src'))];
-                    }
-
-                    return false;
-                })
-                ->attribute('disk', parse: static fn (DOMElement $element): ?string => $element->getAttribute('data-disk') ?: null, render: $noAttributes)
-                ->attribute('path', parse: static fn (DOMElement $element): ?string => $element->getAttribute('data-path') ?: null, render: $noAttributes)
-                ->attribute('url', parse: static fn (DOMElement $element): ?string => static::isAllowedImageUrl($element->getAttribute('data-url')) ? trim($element->getAttribute('data-url')) : null, render: $noAttributes)
-                ->attribute('alt', parse: static fn (DOMElement $element): string => $img($element)?->getAttribute('alt') ?? '', render: $noAttributes, default: '')
-                ->attribute('caption', parse: static fn (DOMElement $element): string => trim($element->getElementsByTagName('figcaption')->item(0)?->textContent ?? ''), render: $noAttributes, default: '')
-                ->attribute('align', parse: fn (DOMElement $element): string => $this->normalizeAlignment($element->getAttribute('data-align')), render: $noAttributes, default: $this->defaultAlignment)
-                ->attribute('width', parse: fn (DOMElement $element): string => $this->normalizeWidth($element->getAttribute('data-width')), render: $noAttributes, default: $this->defaultWidth)
+            $node
                 ->transientAttribute('src', ['http', 'https'])
                 ->renderUsing(fn (array $node, array $attributes): array => $this->renderFigure(is_array($node['attrs'] ?? null) ? $node['attrs'] : [], $attributes))
                 ->textUsing(static function (array $node): string {
@@ -310,6 +322,7 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
                 'needsAlt' => __('rich-editor-plus::image.editor.needs_alt'),
             ],
             'uploadLabels' => $this->uploadLabels(),
+            'imageCache' => $this->usesImageCache ? $this->imageCacheImages()->jsOptions() : null,
         ])->module(ImageAssets::moduleUrl());
     }
 
@@ -331,7 +344,8 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
 
     /**
      * Gives every uploaded image its display URL. A stored document comes from the browser, so a `src` in it is
-     * dropped and only a URL for a safe path on the plugin's disk is set.
+     * dropped and only a URL for a safe path on the plugin's disk is set. With `imageCache()`, every Placement in the
+     * batch gets its Variant's URL, with all of their Images loaded in one query.
      */
     public function prepareRenderedContents(array $documents): array
     {
@@ -341,14 +355,18 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
             }
         }
 
-        return $documents;
+        return $this->usesImageCache ? $this->imageCacheImages()->fillUrls($documents) : $documents;
     }
 
     public function answerEditorRequest(string $request, array $payload, RichEditorPlus $field): array
     {
         return match ($request) {
-            'urls' => $this->answerUrlsRequest($payload),
-            'store' => $this->allowsUploads ? $this->answerStoreRequest($payload, $field) : ['error' => __('rich-editor-plus::errors.image.uploads_disabled')],
+            'urls' => $this->usesImageCache ? $this->answerImageCacheUrlsRequest($payload) : $this->answerUrlsRequest($payload),
+            'store' => match (true) {
+                ! $this->allowsUploads => ['error' => __('rich-editor-plus::errors.image.uploads_disabled')],
+                $this->usesImageCache => $this->answerImageCacheStoreRequest($payload, $field),
+                default => $this->answerStoreRequest($payload, $field),
+            },
             default => [],
         };
     }
@@ -397,6 +415,12 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
      */
     protected function renderFigure(array $attrs, array $attributes): array
     {
+        $placed = $this->usesImageCache ? ImageCacheImages::normalizeUlid($attrs['image'] ?? null) : null;
+
+        if ($placed !== null) {
+            return $this->renderPlacement($placed, $attrs, $attributes);
+        }
+
         $disk = $attrs['disk'] ?? null;
         $path = $attrs['path'] ?? null;
         $url = static::isAllowedImageUrl($attrs['url'] ?? null) ? trim($attrs['url']) : null;
@@ -423,6 +447,35 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
             'figure',
             array_filter($figure, static fn (mixed $value): bool => $value !== null),
             ['img', $image],
+            ...($caption !== '' ? [['figcaption', $caption]] : []),
+        ];
+    }
+
+    /**
+     * A Placement: the Image's ULID and style, with the Variant's URL as its `src` when it was found.
+     *
+     * @param  array<string, mixed>  $attrs
+     * @param  array<string, mixed>  $attributes
+     * @return array<mixed>
+     */
+    protected function renderPlacement(string $image, array $attrs, array $attributes): array
+    {
+        $img = array_filter(['src' => $attributes['src'] ?? null], static fn (mixed $value): bool => $value !== null);
+        $img['alt'] = is_string($attrs['alt'] ?? null) ? $attrs['alt'] : '';
+
+        $caption = is_string($attrs['caption'] ?? null) ? trim($attrs['caption']) : '';
+
+        return [
+            'figure',
+            [
+                'class' => 'rep-image',
+                'data-type' => 'image',
+                'data-image' => $image,
+                'data-style' => $this->imageCacheImages()->normalizeStyle($attrs['style'] ?? null),
+                'data-align' => $this->normalizeAlignment($attrs['align'] ?? null),
+                'data-width' => $this->normalizeWidth($attrs['width'] ?? null),
+            ],
+            ['img', $img],
             ...($caption !== '' ? [['figcaption', $caption]] : []),
         ];
     }
@@ -475,6 +528,10 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
         }
 
         $this->assertStorageConfigured();
+
+        if ($this->usesImageCache) {
+            $this->imageCacheImages()->assertConfigured();
+        }
 
         if ($this->servesSvgFromOwnDomain()) {
             throw new InvalidArgumentException(

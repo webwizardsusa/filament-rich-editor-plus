@@ -12,7 +12,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Enums\Width;
+use Illuminate\Http\UploadedFile;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Webwizardsusa\RichEditorPlus\Plugins\Image\ImageCache\ImageCacheImages;
 use Webwizardsusa\RichEditorPlus\Plugins\Image\ImagePlugin;
 use Webwizardsusa\RichEditorPlus\RichEditorPlus;
 use Webwizardsusa\RichEditorPlus\Support\EditorCommand;
@@ -20,6 +22,7 @@ use Webwizardsusa\RichEditorPlus\Support\EditorCommand;
 /**
  * The modal for inserting an image, or editing the selected one. The browser mounts it with the selection and, when
  * editing, the image's attributes; submitting sends an `insertImage` or `updateImage` command back to the editor.
+ * With `ImagePlugin::imageCache()`, an upload becomes an Image and an Image Style select sits beside the alignment.
  */
 class ImageAction
 {
@@ -31,9 +34,15 @@ class ImageAction
             $alignments[$alignment] = __("rich-editor-plus::image.alignments.{$alignment}");
         }
 
+        $styles = [];
+
+        foreach ($plugin->usesImageCache() ? $plugin->imageCacheImages()->styles() : [] as $style) {
+            $styles[$style] = str($style)->headline()->toString();
+        }
+
         $currentOf = static fn (HasActions $livewire): ?array => static::currentImage($plugin, $livewire->getMountedAction()?->getArguments() ?? []);
 
-        $keepsStoredImage = static fn (HasActions $livewire): bool => ! $plugin->allowsUploads() && filled(static::currentImage($plugin, $livewire->getMountedAction()?->getArguments() ?? [])['disk'] ?? null);
+        $keepsStoredImage = static fn (HasActions $livewire): bool => ! $plugin->allowsUploads() && static::isStored($currentOf($livewire));
 
         return Action::make('image')
             ->label(__('rich-editor-plus::image.modal.heading'))
@@ -49,6 +58,7 @@ class ImageAction
                     'alt' => $alt,
                     'decorative' => ! $plugin->requiresAlt() && ($arguments['editing'] ?? false) && $alt === '',
                     'caption' => (string) ($arguments['caption'] ?? ''),
+                    'style' => $plugin->usesImageCache() ? $plugin->imageCacheImages()->normalizeStyle($arguments['style'] ?? null) : null,
                     'align' => $arguments['align'] ?? $plugin->getDefaultAlignment(),
                     'width' => (string) ($arguments['width'] ?? $plugin->getDefaultWidth()),
                 ];
@@ -67,6 +77,8 @@ class ImageAction
                 FileUpload::make('upload')
                     ->label(__('rich-editor-plus::image.modal.upload'))
                     ->image()
+                    // Image Cache stores the file itself, as an Image.
+                    ->storeFiles(! $plugin->usesImageCache())
                     ->disk($plugin->getDisk())
                     ->directory($plugin->getDirectory())
                     ->visibility($plugin->getVisibility())
@@ -97,6 +109,13 @@ class ImageAction
                     ->hidden(fn (Get $get): bool => ! $plugin->requiresAlt() && (bool) $get('decorative')),
                 TextInput::make('caption')
                     ->label(__('rich-editor-plus::image.modal.caption')),
+                Select::make('style')
+                    ->label(__('rich-editor-plus::image.modal.style'))
+                    ->helperText(__('rich-editor-plus::image.modal.style_help'))
+                    ->options($styles)
+                    ->required()
+                    ->native(false)
+                    ->visible(fn (Get $get): bool => $plugin->usesImageCache() && $get('source') !== 'url'),
                 Select::make('align')
                     ->label(__('rich-editor-plus::image.modal.align'))
                     ->options($alignments)
@@ -111,17 +130,25 @@ class ImageAction
             ->action(function (array $arguments, array $data, RichEditorPlus $component) use ($plugin): void {
                 $editing = (bool) ($arguments['editing'] ?? false);
 
-                $keepsStoredImage = ! $plugin->allowsUploads() && blank($data['url'] ?? null) && filled(static::currentImage($plugin, $arguments)['disk'] ?? null);
+                $current = static::currentImage($plugin, $arguments);
+                $keepsStoredImage = ! $plugin->allowsUploads() && blank($data['url'] ?? null) && static::isStored($current);
+                $none = ['disk' => null, 'path' => null, 'url' => null, ...($plugin->usesImageCache() ? ['image' => null] : [])];
 
                 if ((($data['source'] ?? 'upload') === 'url' || ! $plugin->allowsUploads()) && $plugin->allowsUrls() && ! $keepsStoredImage) {
-                    $file = ['disk' => null, 'path' => null, 'url' => $data['url']];
+                    $file = [...$none, 'url' => $data['url']];
                 } else {
                     $upload = $data['upload'] ?? null;
                     $upload = is_array($upload) ? (reset($upload) ?: null) : $upload;
 
-                    $file = filled($upload)
-                        ? ['disk' => $plugin->getDisk(), 'path' => (string) $upload, 'url' => null]
-                        : (static::currentImage($plugin, $arguments) ?? ['disk' => null, 'path' => null, 'url' => null]);
+                    $file = match (true) {
+                        $upload instanceof UploadedFile && $plugin->usesImageCache() => [...$none, 'image' => $plugin->imageCacheImages()->store($upload)->ulid],
+                        filled($upload) => [...$none, 'disk' => $plugin->getDisk(), 'path' => (string) $upload],
+                        default => $current !== null ? [...$none, ...$current] : $none,
+                    };
+                }
+
+                if ($plugin->usesImageCache()) {
+                    $file['style'] = filled($file['image'] ?? null) ? $plugin->imageCacheImages()->normalizeStyle($data['style'] ?? null) : null;
                 }
 
                 $isDecorative = ! $plugin->requiresAlt() && (bool) ($data['decorative'] ?? false);
@@ -142,16 +169,23 @@ class ImageAction
     }
 
     /**
-     * The image being edited, when it can be kept as it is: an upload on a string disk and path the plugin considers
-     * safe, or an external image with an http(s) or relative URL. Mount arguments come from the browser, so nothing else is kept.
+     * The image being edited, when it can be kept as it is: with `imageCache()`, a Placement of an Image the field may
+     * show; an upload on a string disk and path the plugin considers safe; or an external image with an http(s) or
+     * relative URL. Mount arguments come from the browser, so nothing else is kept.
      *
      * @param  array<string, mixed>  $arguments
-     * @return ?array{disk: ?string, path: ?string, url: ?string}
+     * @return ?array{disk: ?string, path: ?string, url: ?string, image?: string}
      */
     protected static function currentImage(ImagePlugin $plugin, array $arguments): ?array
     {
         if (! ($arguments['editing'] ?? false)) {
             return null;
+        }
+
+        $ulid = $plugin->usesImageCache() ? ImageCacheImages::normalizeUlid($arguments['image'] ?? null) : null;
+
+        if ($ulid !== null && $plugin->imageCacheImages()->find([$ulid])->has($ulid)) {
+            return ['disk' => null, 'path' => null, 'url' => null, 'image' => $ulid];
         }
 
         $disk = $arguments['disk'] ?? null;
@@ -167,5 +201,15 @@ class ImageAction
         }
 
         return null;
+    }
+
+    /**
+     * Whether the image being edited is stored, as a Placement or by disk and path, rather than linked by URL.
+     *
+     * @param  ?array{disk: ?string, path: ?string, url: ?string, image?: string}  $current
+     */
+    protected static function isStored(?array $current): bool
+    {
+        return filled($current['image'] ?? null) || filled($current['disk'] ?? null);
     }
 }

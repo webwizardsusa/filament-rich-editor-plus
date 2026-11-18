@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.4.0...v0.5.0) (2026-11-18)
+
+
+### Features
+
+* give Image Cache Placements width and height attributes ([#18](https://github.com/webwizardsusa/filament-rich-editor-plus/issues/18)) ([3b20475](https://github.com/webwizardsusa/filament-rich-editor-plus/commit/3b20475f1a7bbc5e613a16808e6a0b2c6aa08cad))
+
 ## [0.4.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.3.0...v0.4.0) (2026-11-18)
 
 

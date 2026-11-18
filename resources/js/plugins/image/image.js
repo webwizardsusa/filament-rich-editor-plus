@@ -182,7 +182,7 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
                     dom.dataset.width = width(node.attrs.width)
                     dom.replaceChildren()
 
-                    const show = (src) => {
+                    const show = (src, size = null) => {
                         if (!src) {
                             dom.prepend(placeholder(labels.missing ?? 'Image missing'))
 
@@ -193,6 +193,12 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
 
                         img.src = src
                         img.alt = text(alt)
+
+                        // A Placement's size, as rendered content has it, so the editor doesn't shift as images load.
+                        if (size) {
+                            img.width = size.width
+                            img.height = size.height
+                        }
                         dom.prepend(img)
                     }
 
@@ -236,14 +242,14 @@ export function imageExtension({ widths = [], defaultWidth = '100', defaultAlign
 
                     dom.prepend(loading)
 
-                    cache.get(image ? `${image}:${style(node.attrs.style)}` : node.attrs.path, (src) => {
+                    cache.get(image ? `${image}:${style(node.attrs.style)}` : node.attrs.path, (src, size) => {
                         // A later render owns the figure now.
                         if (current !== renders) {
                             return
                         }
 
                         loading.remove()
-                        show(src)
+                        show(src, size)
                     })
                 }
 

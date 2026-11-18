@@ -121,11 +121,11 @@ trait UsesImageCache
     }
 
     /**
-     * Answers the editor's URL lookups. Keys of the form `{ulid}:{style}` are Placements; any other key is a path,
-     * answered as before.
+     * Answers the editor's URL lookups. Keys of the form `{ulid}:{style}` are Placements, answered with their URL and,
+     * when it's known, their size; any other key is a path, answered as before.
      *
      * @param  array<array-key, mixed>  $payload
-     * @return array{urls: array<string, string>}
+     * @return array{urls: array<string, string>, dimensions: array<string, array{width: int, height: int}>}
      */
     protected function answerImageCacheUrlsRequest(array $payload): array
     {
@@ -147,17 +147,25 @@ trait UsesImageCache
         }
 
         $urls = $paths === [] ? [] : $this->answerUrlsRequest(['paths' => $paths])['urls'];
+        $dimensions = [];
         $found = $images->find(array_column($placements, 0));
 
         foreach ($placements as $key => [$ulid, $style]) {
             $url = isset($found[$ulid]) ? $images->url($found[$ulid], $style) : null;
 
-            if ($url !== null) {
-                $urls[$key] = $url;
+            if ($url === null) {
+                continue;
+            }
+
+            $urls[$key] = $url;
+            $size = $images->dimensions($found[$ulid], $style);
+
+            if ($size !== null) {
+                $dimensions[$key] = $size;
             }
         }
 
-        return ['urls' => $urls];
+        return ['urls' => $urls, 'dimensions' => $dimensions];
     }
 
     /**
@@ -200,6 +208,7 @@ trait UsesImageCache
                 'size' => $image->size,
                 'mime' => $image->mime_type,
                 'url' => $images->url($image, $style),
+                'dimensions' => $images->dimensions($image, $style),
                 'attrs' => ['image' => $image->ulid, 'style' => $style, 'disk' => null, 'path' => null, 'url' => null],
             ];
         } catch (InvalidImageException) {

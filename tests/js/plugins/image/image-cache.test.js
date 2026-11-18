@@ -97,4 +97,35 @@ describe('Placements', () => {
         expect(calls).toEqual([{ plugin: 'webwizardsusa/image', request: 'urls', payload: { paths: [`${ULID}:thumb`] } }])
         expect(editor.view.dom.querySelector('figure img').getAttribute('src')).toBe('https://files.test/thumb.jpg')
     })
+
+    it('gives the Placement\'s img the size the field answers with', async () => {
+        answer = { urls: { [`${ULID}:thumb`]: 'https://files.test/thumb.jpg' }, dimensions: { [`${ULID}:thumb`]: { width: 150, height: 150 } } }
+        editor = make(placement)
+
+        await flush()
+
+        const img = editor.view.dom.querySelector('figure img')
+        expect([img.getAttribute('width'), img.getAttribute('height')]).toEqual(['150', '150'])
+    })
+
+    it('leaves the size off when the field gives none, or one that is not whole pixels', async () => {
+        answer = { urls: { [`${ULID}:thumb`]: 'https://files.test/thumb.jpg' }, dimensions: { [`${ULID}:thumb`]: { width: '150', height: 1.5 } } }
+        editor = make(placement)
+
+        await flush()
+
+        expect(editor.view.dom.querySelector('figure img').hasAttribute('width')).toBe(false)
+    })
+
+    it('keeps the size the upload answered with for a pasted image', async () => {
+        editor = make(doc(p('a')))
+        editor.storage.image.urlCache.set(`${ULID}:thumb`, 'https://files.test/thumb.jpg', { width: 150, height: 150 })
+        editor.commands.setTextSelection(2)
+        editor.commands.insertImage({ image: ULID, style: 'thumb', alt: 'A cat' })
+
+        await flush()
+
+        expect(calls).toEqual([])
+        expect(editor.view.dom.querySelector('figure img').getAttribute('width')).toBe('150')
+    })
 })

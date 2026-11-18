@@ -35,7 +35,7 @@ it('stores a Placement by its Image and style, and renders the Variant\'s URL', 
     $html = placement($image, caption: 'Our cat');
 
     expect(RichContentPlusRenderer::make($html)->parseHtml()->plugins([ImagePlugin::make()->imageCache()])->toStorableHtml())->toBe($html)
-        ->and(renderPlacement($html))->toBe(str_replace('<img alt', "<img src=\"http://localhost/image-cache/banner/{$image->ulid}\" alt", $html));
+        ->and(renderPlacement($html))->toBe(str_replace('<img alt', "<img src=\"http://localhost/image-cache/banner/{$image->ulid}\" width=\"400\" height=\"300\" alt", $html));
 });
 
 it('renders the disk URL once the Variant exists', function (): void {
@@ -167,4 +167,26 @@ it('takes a named srcset and the sizes given, and never stores the srcset', func
 
     expect(renderPlacement(placement($image), $plugin))->toContain('sizes="(min-width: 768px) 50vw, 100vw"')->toContain(' 400w')
         ->and(RichContentPlusRenderer::make(placement($image))->parseHtml()->plugins([$plugin])->toStorableHtml())->toBe(placement($image));
+});
+
+it('gives a Placement\'s img the width and height of its style', function (): void {
+    $image = editorImage();
+
+    expect(renderPlacement(placement($image, 'thumb')))->toContain('width="100" height="100"')
+        ->and(renderPlacement(placement($image, 'banner')))->toContain('width="400" height="300"');
+});
+
+it('uses the Variant\'s own size once it exists, and never stores a size', function (): void {
+    $image = Image::store(UploadedFile::fake()->image('photo.jpg', 200, 100), directory: 'editor-images');
+    $this->get($image->url('banner'));
+
+    expect(renderPlacement(placement($image->fresh(), 'banner')))->toContain('width="400" height="200"')
+        ->and(RichContentPlusRenderer::make(placement($image))->parseHtml()->plugins([ImagePlugin::make()->imageCache()])->toStorableHtml())->not->toContain('height=');
+});
+
+it('ignores a size the stored document carried', function (): void {
+    $image = editorImage(directory: 'avatars');
+    $document = ['type' => 'doc', 'content' => [['type' => 'image', 'attrs' => ['image' => $image->ulid, 'style' => 'thumb', 'dimensions' => ['width' => 9999, 'height' => 1]]]]];
+
+    expect(RichContentPlusRenderer::make($document)->plugins([ImagePlugin::make()->imageCache()])->toHtml())->not->toContain('9999');
 });

@@ -153,6 +153,23 @@ class ImageCacheImages
     }
 
     /**
+     * The width and height of an Image in this style, for its `img`: the Variant's, or the style's declared size.
+     * Null when they aren't known yet, or Laravel Image Cache is older than 0.3.
+     *
+     * @return array{width: int, height: int} | null
+     */
+    public function dimensions(Image $image, mixed $style): ?array
+    {
+        if (! method_exists(\Webwizardsusa\ImageCache\ImageCache::class, 'dimensions')) {
+            return null;
+        }
+
+        $dimensions = rescue(fn (): ?array => ImageCache::dimensions($image, $this->normalizeStyle($style)));
+
+        return is_array($dimensions) ? $dimensions : null;
+    }
+
+    /**
      * Stores an uploaded file as an Image in the field's directory, with its Visibility.
      */
     public function store(UploadedFile $file): Image
@@ -194,7 +211,7 @@ class ImageCacheImages
     }
 
     /**
-     * Sets the transient `src`, and `srcset` with `imageSrcset()`, of every Placement in the documents whose Image the field may show, loading every
+     * Sets the transient `src`, its `dimensions`, and `srcset` with `imageSrcset()`, of every Placement in the documents whose Image the field may show, loading every
      * Image in one query. The documents' own `src` values have already been dropped.
      *
      * @param  array<array-key, mixed>  $documents
@@ -284,7 +301,7 @@ class ImageCacheImages
             $ulid = static::normalizeUlid($attrs['image'] ?? null);
 
             if ($ulid !== null) {
-                unset($attrs['src'], $attrs['srcset']);
+                unset($attrs['src'], $attrs['srcset'], $attrs['dimensions']);
                 $url = isset($images[$ulid]) ? $this->url($images[$ulid], $attrs['style'] ?? null) : null;
 
                 if ($url !== null) {
@@ -293,6 +310,12 @@ class ImageCacheImages
 
                     if ($srcset !== null) {
                         $attrs['srcset'] = $srcset;
+                    }
+
+                    $dimensions = $this->dimensions($images[$ulid], $attrs['style'] ?? null);
+
+                    if ($dimensions !== null) {
+                        $attrs['dimensions'] = $dimensions;
                     }
                 }
 

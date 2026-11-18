@@ -58,7 +58,7 @@
         "orchestra/testbench": "^11.0",
         "pestphp/pest": "^5.2",
         "pestphp/pest-plugin-laravel": "^5.0",
-        "webwizardsusa/laravel-image-cache": "^0.1.0 || ^0.2.0"
+        "webwizardsusa/laravel-image-cache": "^0.1.0 || ^0.2.0 || ^0.3.0"
     },
     "suggest": {
         "webwizardsusa/laravel-image-cache": "To store images as Image Cache Images shown in Image Styles, with ImagePlugin::imageCache()."

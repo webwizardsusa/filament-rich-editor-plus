@@ -12,6 +12,16 @@ class ThumbStyle extends ImageStyle
         return 'thumb';
     }
 
+    public function width(): ?int
+    {
+        return 100;
+    }
+
+    public function height(): ?int
+    {
+        return 100;
+    }
+
     public function apply(ImageInterface $image): ImageInterface
     {
         return $image->cover(100, 100);

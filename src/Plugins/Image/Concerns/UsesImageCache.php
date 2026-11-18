@@ -33,6 +33,13 @@ trait UsesImageCache
     protected ?Closure $imageQueryCallback = null;
 
     /**
+     * @var array<string> | string | null
+     */
+    protected array|string|null $imageSrcset = null;
+
+    protected ?string $imageSizes = null;
+
+    /**
      * Stores images as Laravel Image Cache Images, shown in an Image Style editors pick for each. `$styles` are the
      * names offered (every registered style when null); `$default` is the style new images are placed in (the first
      * of them when null). Needs `webwizardsusa/laravel-image-cache`.
@@ -78,6 +85,28 @@ trait UsesImageCache
         return $this;
     }
 
+    /**
+     * With `imageCache()`, gives every Placement a srcset of these styles, or of a set named in
+     * `image-cache.srcsets`, as Laravel Image Cache's `srcset()` builds it. The Placement's own style stays its `src`
+     * and joins the srcset, and wider candidates are left out, so a Placement in a small style is never served a large
+     * file. `$sizes` defaults to `auto, 100vw`, with lazy loading. Needs Laravel Image Cache 0.3 or later.
+     *
+     * @param  array<string> | string | null  $set
+     *
+     * @throws LogicException when Laravel Image Cache is older than 0.3
+     */
+    public function imageSrcset(array|string|null $set, ?string $sizes = null): static
+    {
+        if ($set !== null && ! method_exists(ImageCache::class, 'srcsetCandidates')) {
+            throw new LogicException('ImagePlugin::imageSrcset() needs Laravel Image Cache 0.3 or later: composer require webwizardsusa/laravel-image-cache:^0.3');
+        }
+
+        $this->imageSrcset = $set;
+        $this->imageSizes = $sizes;
+
+        return $this;
+    }
+
     public function usesImageCache(): bool
     {
         return $this->usesImageCache;
@@ -88,7 +117,7 @@ trait UsesImageCache
      */
     public function imageCacheImages(): ImageCacheImages
     {
-        return new ImageCacheImages($this->imageStyles, $this->defaultImageStyle, $this->privateImages, $this->imageQueryCallback, $this->getDirectory());
+        return new ImageCacheImages($this->imageStyles, $this->defaultImageStyle, $this->privateImages, $this->imageQueryCallback, $this->getDirectory(), $this->imageSrcset, $this->imageSizes);
     }
 
     /**

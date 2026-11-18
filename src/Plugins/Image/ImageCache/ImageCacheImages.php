@@ -26,6 +26,7 @@ class ImageCacheImages
     /**
      * @param  array<string> | null  $styles  null for every registered style
      * @param  (Closure(Builder<Image>): mixed) | null  $queryCallback
+     * @param  array<string> | string | null  $srcset  styles, or the name of a set in `image-cache.srcsets`
      */
     public function __construct(
         protected ?array $styles,
@@ -33,6 +34,8 @@ class ImageCacheImages
         protected bool $private,
         protected ?Closure $queryCallback,
         protected string $directory,
+        protected array|string|null $srcset = null,
+        protected ?string $sizes = null,
     ) {}
 
     /**
@@ -113,6 +116,42 @@ class ImageCacheImages
         return is_string($url) && $url !== '' ? $url : null;
     }
 
+    public function hasSrcset(): bool
+    {
+        return $this->srcset !== null && $this->srcset !== [];
+    }
+
+    /**
+     * The `sizes` of a Placement with a srcset: the field's, or `auto, 100vw` for its lazy image.
+     */
+    public function sizes(): string
+    {
+        return $this->sizes ?? 'auto, 100vw';
+    }
+
+    /**
+     * A Placement's srcset: the field's set and the Placement's own style, without candidates wider than that style,
+     * or null when the field has none or it would hold a single candidate.
+     */
+    public function srcset(Image $image, mixed $style): ?string
+    {
+        if (! $this->hasSrcset()) {
+            return null;
+        }
+
+        $style = $this->normalizeStyle($style);
+        $styles = array_values(array_unique([...ImageCache::srcsetStyles($this->srcset), $style]));
+        $maxWidth = ImageCache::dimensions($image, $style)['width'] ?? null;
+
+        $srcset = rescue(static fn (): array => ImageCache::srcsetCandidates($image, $styles, $maxWidth), []);
+
+        if (count($srcset) < 2) {
+            return null;
+        }
+
+        return implode(', ', array_map(static fn (array $candidate): string => "{$candidate['url']} {$candidate['width']}w", $srcset));
+    }
+
     /**
      * Stores an uploaded file as an Image in the field's directory, with its Visibility.
      */
@@ -155,7 +194,7 @@ class ImageCacheImages
     }
 
     /**
-     * Sets the transient `src` of every Placement in the documents whose Image the field may show, loading every
+     * Sets the transient `src`, and `srcset` with `imageSrcset()`, of every Placement in the documents whose Image the field may show, loading every
      * Image in one query. The documents' own `src` values have already been dropped.
      *
      * @param  array<array-key, mixed>  $documents
@@ -245,11 +284,16 @@ class ImageCacheImages
             $ulid = static::normalizeUlid($attrs['image'] ?? null);
 
             if ($ulid !== null) {
-                unset($attrs['src']);
+                unset($attrs['src'], $attrs['srcset']);
                 $url = isset($images[$ulid]) ? $this->url($images[$ulid], $attrs['style'] ?? null) : null;
 
                 if ($url !== null) {
                     $attrs['src'] = $url;
+                    $srcset = $this->srcset($images[$ulid], $attrs['style'] ?? null);
+
+                    if ($srcset !== null) {
+                        $attrs['srcset'] = $srcset;
+                    }
                 }
 
                 $node['attrs'] = $attrs;

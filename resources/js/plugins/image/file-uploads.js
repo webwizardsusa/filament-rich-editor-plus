@@ -110,9 +110,13 @@ const routeFor = (routes, file) => {
     )
 }
 
+const isPlainObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value)
+
+// An image answer may carry `attrs` for the node, which a plugin that extends the image node adds to or overrides the
+// disk and path with (an image library's own id, say).
 const nodeFor = (route, answer) =>
     route.kind === 'image'
-        ? { type: 'image', attrs: { disk: answer.disk, path: answer.path, alt: '' } }
+        ? { type: 'image', attrs: { disk: answer.disk, path: answer.path, alt: '', ...(isPlainObject(answer.attrs) ? answer.attrs : {}) } }
         : {
               type: 'attachment',
               attrs: {
@@ -124,11 +128,12 @@ const nodeFor = (route, answer) =>
               },
           }
 
-const selectImage = (editor, path) => {
+// The image node an upload inserted: the one with every attribute the upload gave it.
+const selectImage = (editor, attrs) => {
     let found = null
 
     editor.state.doc.descendants((node, pos) => {
-        if (found === null && node.type.name === 'image' && node.attrs.path === path) {
+        if (found === null && node.type.name === 'image' && Object.entries(attrs).every(([key, value]) => node.attrs[key] === value)) {
             found = pos
         }
 
@@ -191,6 +196,8 @@ export function fileUploadsExtension({ uploadLabels = {} }, context = {}) {
             editor.storage.image?.urlCache?.set(answer.path, answer.url)
         }
 
+        const node = nodeFor(route, answer)
+
         editor
             .chain()
             .command(({ tr }) => {
@@ -198,10 +205,10 @@ export function fileUploadsExtension({ uploadLabels = {} }, context = {}) {
 
                 return true
             })
-            .insertContentAt(pos, nodeFor(route, answer), { updateSelection: false })
+            .insertContentAt(pos, node, { updateSelection: false })
             .run()
 
-        return { kind: route.kind, path: answer.path }
+        return { kind: route.kind, attrs: node.attrs }
     }
 
     const handleFiles = async (editor, fileList, pos) => {
@@ -252,7 +259,7 @@ export function fileUploadsExtension({ uploadLabels = {} }, context = {}) {
             const inserted = await uploadOne(editor, item)
 
             if (inserted?.kind === 'image') {
-                images.push(inserted.path)
+                images.push(inserted.attrs)
             }
         }
 

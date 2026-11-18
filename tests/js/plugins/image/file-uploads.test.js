@@ -116,6 +116,20 @@ describe('routing', () => {
         expect(editor.view.dom.querySelector('figure img').getAttribute('src')).toBe('https://files.test/1.png')
     })
 
+    it('gives the image the attributes the answer adds, and still opens its modal', async () => {
+        const context = make(makeContext({
+            answer: () => ({ disk: 'media', path: 'editor-images/1.png', name: 'x.png', size: 10, mime: 'image/png', attrs: { alt: 'From the library', width: '100' } }),
+        }))
+
+        paste([png()])
+        await settleAll()
+
+        const image = editor.getJSON().content.find(({ type }) => type === 'image')
+        expect(image.attrs).toMatchObject({ disk: 'media', path: 'editor-images/1.png', alt: 'From the library' })
+        expect(editor.state.selection.node?.type.name).toBe('image')
+        expect(context.runAction).toHaveBeenCalledWith('image')
+    })
+
     it('sends a PDF to the attachment plugin', async () => {
         const context = make(makeContext())
 

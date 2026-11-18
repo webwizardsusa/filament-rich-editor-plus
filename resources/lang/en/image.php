@@ -23,6 +23,8 @@ return [
         'alt_help' => 'Describe the image for people who can\'t see it.',
         'decorative' => 'Decorative image (no alt text)',
         'caption' => 'Caption',
+        'style' => 'Image style',
+        'style_help' => 'The size and format the image is served in. The width sets how wide it\'s shown.',
         'align' => 'Alignment',
         'width' => 'Width',
         'submit' => 'Save',

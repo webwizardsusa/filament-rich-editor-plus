@@ -47,6 +47,7 @@ don't call it never use it.
 | `imageCache($styles, default: $style)` | Off | Turns Image Cache on. `$styles` are the Image Style names editors pick from (every registered style when null); `default` is the style new images are placed in (the first when null), and the one a Placement with an unknown style is shown in. |
 | `privateImages()` | Off | Stores uploads as private Images, shown through temporary URLs. |
 | `imageQueryUsing(fn (Builder $query) => …)` | None | Narrows the Images a Placement may show. |
+| `imageSrcset($set, sizes: $sizes)` | None | Gives every Placement a [srcset](#responsive-images). |
 
 Uploads are stored with `Image::store()` in the plugin's `directory()` (`editor-images` by default), on the disk
 Laravel Image Cache uses for their Visibility. The plugin's `disk()` and `visibility()` options apply only to images
@@ -92,6 +93,25 @@ is uploaded. Pasted and dropped images are placed in the default style, and the 
 When content is shown, the `img` gets the URL of the Image's Variant in that style: its disk URL once the Variant
 exists, or Laravel Image Cache's route, which generates it, until then. Render many pieces of content with
 `RichContentPlusRenderer::many()` to load all of their Images in one query.
+
+## Responsive images
+
+With `imageSrcset()`, every Placement gets a srcset, so browsers download the size that fits:
+
+```php
+ImagePlugin::make()
+    ->imageCache(['banner', 'card', 'thumb'], default: 'banner')
+    ->imageSrcset(['thumb', 'card', 'banner'], sizes: '(min-width: 768px) 720px, 100vw');
+```
+
+`$set` is a list of Image Styles, or the name of a set in `image-cache.srcsets`. The Placement's own style stays its
+`src` and joins the srcset, and candidates wider than it are left out, so a Placement shown in `thumb` is never served
+`banner`. The srcset is built as Laravel Image Cache's [`srcset()`](docs:laravel-image-cache/usage/responsive-images)
+builds it, so styles need a declared width, or a generated Variant, to take part. Use styles that keep the same
+aspect ratio, such as scales to several widths: a crop in a srcset would be shown in place of the whole picture.
+
+Images with a srcset are lazy-loaded. Without `sizes`, they get `sizes="auto, 100vw"`. The srcset is worked out when
+content is shown, never stored. This needs Laravel Image Cache 0.3 or later.
 
 ## Tracking the Images content uses
 

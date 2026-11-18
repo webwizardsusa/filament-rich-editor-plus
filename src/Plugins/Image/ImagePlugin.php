@@ -290,7 +290,8 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
         if ($this->usesImageCache) {
             $node
                 ->attribute('image', parse: static fn (DOMElement $element): ?string => ImageCacheImages::normalizeUlid($element->getAttribute('data-image')), render: $noAttributes)
-                ->attribute('style', parse: fn (DOMElement $element): ?string => ImageCacheImages::normalizeUlid($element->getAttribute('data-image')) !== null ? $this->imageCacheImages()->normalizeStyle($element->getAttribute('data-style')) : null, render: $noAttributes);
+                ->attribute('style', parse: fn (DOMElement $element): ?string => ImageCacheImages::normalizeUlid($element->getAttribute('data-image')) !== null ? $this->imageCacheImages()->normalizeStyle($element->getAttribute('data-style')) : null, render: $noAttributes)
+                ->transientAttribute('srcset', ['http', 'https']);
         }
 
         return [
@@ -452,7 +453,8 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
     }
 
     /**
-     * A Placement: the Image's ULID and style, with the Variant's URL as its `src` when it was found.
+     * A Placement: the Image's ULID and style, with the Variant's URL as its `src` when it was found, and with
+     * `imageSrcset()` a lazy-loaded srcset.
      *
      * @param  array<string, mixed>  $attrs
      * @param  array<string, mixed>  $attributes
@@ -460,7 +462,15 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
      */
     protected function renderPlacement(string $image, array $attrs, array $attributes): array
     {
-        $img = array_filter(['src' => $attributes['src'] ?? null], static fn (mixed $value): bool => $value !== null);
+        $srcset = is_string($attributes['srcset'] ?? null) && isset($attributes['src']) ? $attributes['srcset'] : null;
+
+        $img = array_filter([
+            'src' => $attributes['src'] ?? null,
+            'srcset' => $srcset,
+            'sizes' => $srcset !== null ? $this->imageCacheImages()->sizes() : null,
+            'loading' => $srcset !== null ? 'lazy' : null,
+            'decoding' => $srcset !== null ? 'async' : null,
+        ], static fn (mixed $value): bool => $value !== null);
         $img['alt'] = is_string($attrs['alt'] ?? null) ? $attrs['alt'] : '';
 
         $caption = is_string($attrs['caption'] ?? null) ? trim($attrs['caption']) : '';

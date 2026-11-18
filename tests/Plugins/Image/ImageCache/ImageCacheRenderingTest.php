@@ -145,3 +145,26 @@ it('leaves data-image alone without imageCache()', function (): void {
 
     expect(renderPlacement(placement($image), ImagePlugin::make()))->not->toContain('data-image')->not->toContain('src=');
 });
+
+it('gives Placements a lazy srcset of the field\'s styles, never wider than their own', function (): void {
+    $image = editorImage();
+    $plugin = ImagePlugin::make()->imageCache()->imageSrcset(['thumb', 'banner']);
+
+    $banner = renderPlacement(placement($image, 'banner'), $plugin);
+    $thumb = renderPlacement(placement($image, 'thumb'), $plugin);
+
+    expect($banner)->toContain('srcset="'.e($image->url('thumb').' 100w, '.$image->url('banner').' 400w').'"')
+        ->toContain('sizes="auto, 100vw"')
+        ->toContain('loading="lazy"')
+        ->toContain('decoding="async"')
+        ->and($thumb)->not->toContain('srcset')->not->toContain('loading=');
+});
+
+it('takes a named srcset and the sizes given, and never stores the srcset', function (): void {
+    config(['image-cache.srcsets.post' => ['thumb', 'banner']]);
+    $image = editorImage();
+    $plugin = ImagePlugin::make()->imageCache()->imageSrcset('post', sizes: '(min-width: 768px) 50vw, 100vw');
+
+    expect(renderPlacement(placement($image), $plugin))->toContain('sizes="(min-width: 768px) 50vw, 100vw"')->toContain(' 400w')
+        ->and(RichContentPlusRenderer::make(placement($image))->parseHtml()->plugins([$plugin])->toStorableHtml())->toBe(placement($image));
+});

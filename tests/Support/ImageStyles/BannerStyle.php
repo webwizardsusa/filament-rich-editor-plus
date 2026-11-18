@@ -12,6 +12,11 @@ class BannerStyle extends ImageStyle
         return 'banner';
     }
 
+    public function width(): ?int
+    {
+        return 400;
+    }
+
     public function apply(ImageInterface $image): ImageInterface
     {
         return $image->scale(width: 400);

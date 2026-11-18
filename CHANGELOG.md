@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.5.0...v0.6.0) (2026-11-18)
+
+
+### Features
+
+* show Image Cache Placements in the editor with their width and height ([#20](https://github.com/webwizardsusa/filament-rich-editor-plus/issues/20)) ([6205ce6](https://github.com/webwizardsusa/filament-rich-editor-plus/commit/6205ce6d33271d330b45d0d7e6943c39d5b455c0))
+
 ## [0.5.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.4.0...v0.5.0) (2026-11-18)
 
 

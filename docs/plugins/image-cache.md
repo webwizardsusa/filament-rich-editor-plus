@@ -91,7 +91,10 @@ is uploaded. Pasted and dropped images are placed in the default style, and the 
 ```
 
 When content is shown, the `img` gets the URL of the Image's Variant in that style: its disk URL once the Variant
-exists, or Laravel Image Cache's route, which generates it, until then. Render many pieces of content with
+exists, or Laravel Image Cache's route, which generates it, until then. It also gets `width` and `height`, so the page
+doesn't shift as images load: the Variant's own size, or the size the style
+[declares](docs:laravel-image-cache/usage/image-styles#declaring-a-size) before the Variant exists. Styles that
+declare no size get neither until their Variant is generated. This needs Laravel Image Cache 0.3 or later. Render many pieces of content with
 `RichContentPlusRenderer::many()` to load all of their Images in one query.
 
 ## Responsive images

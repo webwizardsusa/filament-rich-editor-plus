@@ -453,8 +453,9 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
     }
 
     /**
-     * A Placement: the Image's ULID and style, with the Variant's URL as its `src` when it was found, and with
-     * `imageSrcset()` a lazy-loaded srcset.
+     * A Placement: the Image's ULID and style, with the Variant's URL as its `src` and its `width` and `height` when
+     * it was found, and with `imageSrcset()` a lazy-loaded srcset. The size comes from rendering (`dimensions`, set
+     * by `ImageCacheImages::fillUrls()`), never from the stored document.
      *
      * @param  array<string, mixed>  $attrs
      * @param  array<string, mixed>  $attributes
@@ -463,11 +464,14 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
     protected function renderPlacement(string $image, array $attrs, array $attributes): array
     {
         $srcset = is_string($attributes['srcset'] ?? null) && isset($attributes['src']) ? $attributes['srcset'] : null;
+        $dimensions = isset($attributes['src']) && is_array($attrs['dimensions'] ?? null) ? $attrs['dimensions'] : [];
 
         $img = array_filter([
             'src' => $attributes['src'] ?? null,
             'srcset' => $srcset,
             'sizes' => $srcset !== null ? $this->imageCacheImages()->sizes() : null,
+            'width' => is_int($dimensions['width'] ?? null) ? $dimensions['width'] : null,
+            'height' => is_int($dimensions['height'] ?? null) ? $dimensions['height'] : null,
             'loading' => $srcset !== null ? 'lazy' : null,
             'decoding' => $srcset !== null ? 'async' : null,
         ], static fn (mixed $value): bool => $value !== null);

@@ -101,6 +101,7 @@ it('stores a pasted or dropped image as an Image, and answers with its Placement
             'name' => 'cat.png',
             'mime' => 'image/png',
             'url' => "http://localhost/image-cache/thumb/{$image->ulid}",
+            'dimensions' => ['width' => 100, 'height' => 100],
             'attrs' => ['image' => $image->ulid, 'style' => 'thumb', 'disk' => null, 'path' => null, 'url' => null],
         ]);
 });

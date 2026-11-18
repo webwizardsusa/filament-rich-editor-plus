@@ -193,7 +193,7 @@ export function fileUploadsExtension({ uploadLabels = {} }, context = {}) {
         }
 
         if (route.kind === 'image') {
-            editor.storage.image?.urlCache?.set(answer.path, answer.url)
+            editor.storage.image?.urlCache?.set(answer.path, answer.url, answer.dimensions)
         }
 
         const node = nodeFor(route, answer)

@@ -121,6 +121,9 @@ it('answers the urls request for Placements and for paths', function (): void {
         'editor-images/a.jpg' => Storage::disk('public')->url('editor-images/a.jpg'),
         "{$image->ulid}:thumb" => "http://localhost/image-cache/thumb/{$image->ulid}",
         strtoupper($image->ulid).':nonsense' => "http://localhost/image-cache/thumb/{$image->ulid}",
+    ])->and($answer['dimensions'])->toBe([
+        "{$image->ulid}:thumb" => ['width' => 100, 'height' => 100],
+        strtoupper($image->ulid).':nonsense' => ['width' => 100, 'height' => 100],
     ]);
 });
 

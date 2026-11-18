@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.2.1...v0.3.0) (2026-11-18)
+
+
+### Features
+
+* store images as Laravel Image Cache Images with ImagePlugin::imageCache() ([fdff19b](https://github.com/webwizardsusa/filament-rich-editor-plus/commit/fdff19bc169555533062b7bc9b9fa67a1f6d005d))
+
 ## [0.2.1](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.2.0...v0.2.1) (2026-11-17)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.3.0...v0.4.0) (2026-11-18)
+
+
+### Features
+
+* give Image Cache Placements a srcset with ImagePlugin::imageSrcset() ([#16](https://github.com/webwizardsusa/filament-rich-editor-plus/issues/16)) ([1eaa18e](https://github.com/webwizardsusa/filament-rich-editor-plus/commit/1eaa18e3a38b310d6dbe692074684eec9885ac9d))
+
 ## [0.3.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.2.1...v0.3.0) (2026-11-18)
 
 

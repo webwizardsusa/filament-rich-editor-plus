@@ -1,5 +1,7 @@
 # Rich Editor Plus
 
+![Rich Editor Plus: the slash menu and the block toolbar in a Filament form](https://raw.githubusercontent.com/webwizardsusa/filament-rich-editor-plus/main/art/rich-editor-plus-banner.webp)
+
 [![Latest version on Packagist](https://img.shields.io/packagist/v/webwizardsusa/filament-rich-editor-plus.svg)](https://packagist.org/packages/webwizardsusa/filament-rich-editor-plus)
 [![Tests](https://github.com/webwizardsusa/filament-rich-editor-plus/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/webwizardsusa/filament-rich-editor-plus/actions/workflows/tests.yml)
 [![Total downloads](https://img.shields.io/packagist/dt/webwizardsusa/filament-rich-editor-plus.svg)](https://packagist.org/packages/webwizardsusa/filament-rich-editor-plus/stats)
@@ -11,6 +13,16 @@ A rich editor field for Filament, built on TipTap. Each block gets its own toolb
 opens a menu of blocks to insert. Everything the editor can do comes from a plugin, so you can turn features off one
 by one, add the optional plugins for tables, images, attachments, mentions, colours and Markdown storage, or write
 your own in PHP and JavaScript.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/webwizardsusa/filament-rich-editor-plus/main/art/rich-editor-plus-toolbar.webp" alt="The floating toolbar over a selected passage" width="49%">
+  <img src="https://raw.githubusercontent.com/webwizardsusa/filament-rich-editor-plus/main/art/rich-editor-plus-slash-menu.webp" alt="Typing / opens a menu of blocks to insert" width="49%">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/webwizardsusa/filament-rich-editor-plus/main/art/rich-editor-plus-mentions.webp" alt="Typing @ suggests users to mention" width="49%">
+  <img src="https://raw.githubusercontent.com/webwizardsusa/filament-rich-editor-plus/main/art/rich-editor-plus-tables.webp" alt="A table with its row and column tools in the toolbar" width="49%">
+</p>
 
 **Requirements:** PHP 8.3 or later and Filament 5.
 

@@ -1,5 +1,8 @@
 # Rich Editor Plus
 
+> **Under active development.** This package is still changing and may not be ready for production use yet. Until
+> 1.0, a minor release can include breaking changes, so check the changelog before you upgrade.
+
 ![Rich Editor Plus: the slash menu and the block toolbar in a Filament form](https://raw.githubusercontent.com/webwizardsusa/filament-rich-editor-plus/main/art/rich-editor-plus-banner.webp)
 
 [![Latest version on Packagist](https://img.shields.io/packagist/v/webwizardsusa/filament-rich-editor-plus.svg)](https://packagist.org/packages/webwizardsusa/filament-rich-editor-plus)

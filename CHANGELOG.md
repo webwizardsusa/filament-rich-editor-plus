@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.6.0...v0.7.0) (2026-11-19)
+
+
+### Features
+
+* add a full image width, and line narrower images up with their alignment ([#22](https://github.com/webwizardsusa/filament-rich-editor-plus/issues/22)) ([8357f2b](https://github.com/webwizardsusa/filament-rich-editor-plus/commit/8357f2b9285d24f56551b7ba2a1daec1558f8d12))
+
 ## [0.6.0](https://github.com/webwizardsusa/filament-rich-editor-plus/compare/v0.5.0...v0.6.0) (2026-11-18)
 
 

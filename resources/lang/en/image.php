@@ -10,6 +10,7 @@ return [
         'width_current' => 'Image width: :item',
     ],
     'alignments' => ['left' => 'Left', 'center' => 'Center', 'right' => 'Right', 'wide' => 'Wide'],
+    'widths' => ['fit_content' => 'Full'],
     'editor' => ['loading' => 'Loading image…', 'missing' => 'Image missing', 'needs_alt' => 'Needs alt text'],
     'modal' => [
         'heading' => 'Image',

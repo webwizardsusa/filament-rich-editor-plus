@@ -36,7 +36,7 @@ ImagePlugin::make()
     ->allowUrls()                                 // let editors link to an external image
     ->allowUploads()                              // let editors upload, paste and drop image files
     ->altRequired()                               // alt text is required unless the image is marked decorative
-    ->widths(['25' => '25%', '50' => '50%', '75' => '75%', '100' => '100%'])
+    ->widths(['25' => '25%', '50' => '50%', '75' => '75%', '100' => '100%', 'full' => 'fit-content'])
     ->defaultWidth('100')
     ->defaultAlignment('center')                  // 'left', 'center', 'right' or 'wide'
     ->temporaryUrlMinutes(30)
@@ -45,8 +45,12 @@ ImagePlugin::make()
 
 - The disk defaults to Filament's default disk (`filament.default_filesystem_disk`), using `public` in place of `local`
   while the visibility is `public`, as Filament's own uploads do.
-- `widths()` maps a key, which is stored in the content, to a CSS length (`%`, `px`, `rem`, `em`), `auto` or a CSS
-  variable. The default width must be one of the keys.
+- `widths()` maps a key, which is stored in the content, to a CSS length (`%`, `px`, `rem`, `em`), `auto`,
+  `fit-content` or a CSS variable. The default width must be one of the keys.
+- A width is the most an image takes up: an image narrower than its width keeps its own size, placed by its
+  alignment (centered, or against the left or right edge). `fit-content`, labelled "Full", shows the image at its own
+  size, never wider than the column, with the caption wrapping to the image's width; it suits floated images, which
+  text then wraps closely around.
 - `acceptedFileTypes()` takes MIME types and `type/*` wildcards such as `image/*`, in the modal and for pasted and
   dropped files alike. A wildcard never matches SVG, HTML, XML or JavaScript: those are taken only when listed by name.
 - `allowUploads(false)` leaves only the URL field: the modal has no upload, the editor stops taking pasted and dropped

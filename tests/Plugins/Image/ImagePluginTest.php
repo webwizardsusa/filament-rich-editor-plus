@@ -138,6 +138,20 @@ it('writes CSS for its widths and alignments', function (): void {
         ->and(imagePlugin()->getEditorStyles())->toBe(imagePlugin()->getStylesheet());
 });
 
+it('shows a full width image at its own size, never wider than the column', function (): void {
+    expect(imagePlugin()->getStylesheet())->toContain('.rep-image[data-width="full"]{width:fit-content}')
+        ->toContain('.rep-image{margin:1rem auto;max-width:100%}')
+        // A long caption wraps to the image rather than widening the figure.
+        ->toContain('contain:inline-size')
+        ->and(imagePlugin()->widths(['own' => 'fit-content'])->defaultWidth('own')->getWidthLabels())->toBe(['own' => 'Full']);
+});
+
+it('lines an image narrower than its width up with its alignment', function (): void {
+    expect(imagePlugin()->getStylesheet())->toContain('.rep-image img{display:block;max-width:100%;height:auto;margin-left:auto;margin-right:auto}')
+        ->toContain('.rep-image[data-align="left"] img{margin-left:0}')
+        ->toContain('.rep-image[data-align="right"] img{margin-right:0}');
+});
+
 it('refuses bad configuration', function (Closure $configure): void {
     expect(fn () => $configure(imagePlugin())->getStylesheet())->toThrow(InvalidArgumentException::class, 'ImagePlugin');
 })->with([
@@ -189,7 +203,8 @@ it('offers an image block type and block tools for images', function (): void {
         ->and($tools->keys()->all())->toBe(['editImage', 'imageAlign', 'imageWidth'])
         ->and($tools['editImage']->toArray())->toMatchArray(['action' => 'image', 'scope' => 'block', 'nodes' => ['image']])
         ->and(array_map(fn ($item) => $item->getName(), $tools['imageAlign']->getMenu()))->toBe(['left', 'center', 'right', 'wide'])
-        ->and(array_map(fn ($item) => $item->getName(), $tools['imageWidth']->getMenu()))->toBe(['25', '50', '75', '100'])
+        ->and(array_map(fn ($item) => $item->getName(), $tools['imageWidth']->getMenu()))->toBe(['25', '50', '75', '100', 'full'])
+        ->and(array_map(fn ($item) => $item->toArray()['label'], $tools['imageWidth']->getMenu()))->toBe(['25%', '50%', '75%', '100%', 'Full'])
         ->and($plugin->getActions()[0]->getName())->toBe('image');
 });
 

@@ -123,7 +123,7 @@ class ImageAction
                     ->native(false),
                 Select::make('width')
                     ->label(__('rich-editor-plus::image.modal.width'))
-                    ->options($plugin->getWidths())
+                    ->options($plugin->getWidthLabels())
                     ->required()
                     ->native(false),
             ])

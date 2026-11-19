@@ -51,7 +51,7 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
     /**
      * @var array<string, string>
      */
-    protected array $widths = ['25' => '25%', '50' => '50%', '75' => '75%', '100' => '100%'];
+    protected array $widths = ['25' => '25%', '50' => '50%', '75' => '75%', '100' => '100%', 'full' => 'fit-content'];
 
     protected string $defaultWidth = '100';
 
@@ -83,7 +83,8 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
     }
 
     /**
-     * Width keys and the CSS width each stands for.
+     * Width keys and the CSS width each stands for. `fit-content` shows the image at its own size, never wider than
+     * the column.
      *
      * @param  array<string, string>  $widths
      */
@@ -152,6 +153,22 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
     public function getWidths(): array
     {
         return $this->widths;
+    }
+
+    /**
+     * What the width menu and the image modal call each width: its CSS width, or "Full" for `fit-content`.
+     *
+     * @return array<string, string>
+     */
+    public function getWidthLabels(): array
+    {
+        $labels = [];
+
+        foreach ($this->widths as $key => $value) {
+            $labels[(string) $key] = $value === 'fit-content' ? __('rich-editor-plus::image.widths.fit_content') : $value;
+        }
+
+        return $labels;
     }
 
     public function getDefaultWidth(): string
@@ -244,7 +261,7 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
                 ->currentLabel(__('rich-editor-plus::image.tools.width_current'))
                 ->icon('mdi-arrow-left-right')
                 ->menu(array_map(fn (string $key): ToolMenuItem => ToolMenuItem::make($key)
-                    ->label($this->widths[$key])
+                    ->label($this->getWidthLabels()[$key])
                     ->command('setImageWidth', [$key])
                     ->active('image', ['width' => $key]), array_map(strval(...), array_keys($this->widths))))
                 ->block()
@@ -390,10 +407,12 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
         return implode("\n", [
             ...$lines,
             '.rep-image{margin:1rem auto;max-width:100%}',
-            '.rep-image img{display:block;max-width:100%;height:auto}',
-            '.rep-image figcaption{font-size:.875em;opacity:.8;margin-top:.375rem;text-align:center}',
+            '.rep-image img{display:block;max-width:100%;height:auto;margin-left:auto;margin-right:auto}',
+            '.rep-image figcaption{font-size:.875em;opacity:.8;margin-top:.375rem;text-align:center;contain:inline-size}',
             '.rep-image[data-align="left"]{float:left;margin:.25rem 1rem 1rem 0}',
+            '.rep-image[data-align="left"] img{margin-left:0}',
             '.rep-image[data-align="right"]{float:right;margin:.25rem 0 1rem 1rem}',
+            '.rep-image[data-align="right"] img{margin-right:0}',
             '.rep-image[data-align="center"]{margin-left:auto;margin-right:auto}',
             '.rep-image[data-align="wide"]{width:100%;float:none}',
         ]);
@@ -524,8 +543,8 @@ class ImagePlugin extends Plugin implements AcceptsEditorUploads, AnswersEditorR
 
             $this->assertSafeCssValue((string) $key, $value);
 
-            if (preg_match('/^(?:\d+(?:\.\d+)?(?:%|px|rem|em)|auto|var\(--[A-Za-z0-9_-]+\))\z/', $value) !== 1) {
-                throw new InvalidArgumentException("ImagePlugin has the width [{$key}] set to [{$value}], which is not a length, auto or a CSS variable.");
+            if (preg_match('/^(?:\d+(?:\.\d+)?(?:%|px|rem|em)|auto|fit-content|var\(--[A-Za-z0-9_-]+\))\z/', $value) !== 1) {
+                throw new InvalidArgumentException("ImagePlugin has the width [{$key}] set to [{$value}], which is not a length, auto, fit-content or a CSS variable.");
             }
         }
 
